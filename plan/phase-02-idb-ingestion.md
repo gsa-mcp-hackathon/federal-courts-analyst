@@ -106,6 +106,8 @@ Key derived columns on `idb_civil`:
 | C-2 FY2024 by category and group | 25 rows, all within 0.6% except RICO +15, environmental +6, tax −5 cases |
 | N.D. Fla. FY2020 direct-filed MDL | **202,463** (> 200,000 claim), 202,362 in MDL 2885 |
 
+**CI:** green on [PR #3](https://github.com/syedaun-techsur/federal-courts-analyst/pull/3) (lint, test 3.11, test 3.12, docker), building the IDB from the committed sample.
+
 **Automated tests:** 328 passed in the default suite (96 new for this phase), **96% total coverage**; `pipeline/idb/` modules 90–100%. `@fulldata` IDB suite: 7/7 against the full build. `make docker-test`: 6/6, including a container reading both mounted databases and confirming `data/private` is absent. Lint, format, mypy and pre-commit clean.
 
 | Suite | Tests | Covers |
