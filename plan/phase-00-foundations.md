@@ -63,7 +63,7 @@ Build a throwaway server to confirm what actually works, then record the answers
 
 ## Exit criteria
 
-- [x] `make setup && make test` passes on a clean clone on macOS (and on Python 3.11). **In CI: pending the first push** — see Open issues
+- [x] `make setup && make test` passes on a clean clone on macOS (and on Python 3.11) and in CI ([PR #1](https://github.com/syedaun-techsur/federal-courts-analyst/pull/1): lint, test 3.11, test 3.12, docker all green)
 - [x] Claude Code connects over stdio and calls `server_info` (Claude Desktop not yet tried by hand)
 - [x] ADR 0001 written, with a yes/no for every MCP feature we plan to use
 - [ ] Team items resolved, or a written plan with owners and dates (needs the team; see Open issues)
@@ -112,7 +112,7 @@ Build a throwaway server to confirm what actually works, then record the answers
 
 ## Open issues
 
-1. **CI on GitHub not yet run.** The branch `phase-0-foundations` is committed locally but not pushed. Push and open a PR to see `ci.yml` go green.
+1. ~~CI on GitHub not yet run~~: green on PR #1 and merged.
 2. **Team items** (domain expert, what's public) need the team.
 3. **Claude Desktop** stdio connection not tried by hand (Claude Code and Inspector work over stdio).
 4. `~/.npm` has root-owned files, so `npx` fails with EACCES. We ran the Inspector with a scratch npm cache. Fix with `sudo chown -R 502:20 ~/.npm`, or `make inspector` will fail.
