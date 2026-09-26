@@ -4,6 +4,16 @@
 
 **Judging impact:** Technical quality (modular, typed, heavily tested) and innovation (decomposition + reconciliation is what no other server does).
 
+## Inputs from Phase 1
+
+Phase 1 built the official tables catalog ([ADR 0006](../docs/adr/0006-official-tables-ingestion.md), [data-sources.md](../docs/data-sources.md)). Build on it rather than re-creating it:
+
+- `core/courts.py` already is the court registry (94 districts, 12 circuits, `US`) with alias resolution; `enums.py` should re-export it, not redefine it.
+- `pipeline/tables/measures.yaml` is the seed of the measures registry (37 measures with label, definition, unit, weighted flag, display decimals).
+- DuckDB tables `observation`, `source_file`, `edition`, `footnote`, `measure_def`, `court`, the `revision` view and `revision_log` supply `get_official_figure`, `list_revisions` and `first_published`/`later_revisions`. Every observation has a `cell_ref`.
+- `core/numbers.round_half_up` is the display rule (Excel-style); use it for every published figure.
+- Moved here from P1: C-2/C-3 (civil filings by nature of suit, national and by district), FCMS district profiles (vacancies, median times, weighted filings), and Judicial Conference judgeship recommendations and judicial emergencies for `judgeships.py`. Add each as a table family (a few rules each) plus its measures.
+
 ## Module layout
 
 ```

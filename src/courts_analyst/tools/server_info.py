@@ -15,9 +15,11 @@ from courts_analyst.config import settings
 from courts_analyst.models import ServerInfo
 
 COVERAGE = (
-    "Planned: uscourts.gov statistical tables across published editions "
-    "(FY2015–FY2025) and the FJC civil Integrated Database FY2015–FY2025. "
-    "No statistics tools are available yet."
+    "Built by `make data-tables`: six uscourts.gov district court tables "
+    "(X-1A, C-1, C-5 from Judicial Business; 6.1, 6.2, 6.3 from Judicial Facts "
+    "and Figures) in every edition covering FY2016–FY2025, with revisions "
+    "tracked across editions. Planned: the FJC civil Integrated Database "
+    "(Phase 2). No statistics tools are available yet (Phase 5)."
 )
 
 

@@ -98,3 +98,55 @@ def test_logs_are_json(container_name: str) -> None:
     assert ours, logs.stderr
     for line in ours:
         assert json.loads(line)["level"]
+
+
+def _run_with_catalog(db_dir: str) -> tuple[str, str]:
+    """Start the image with a built catalog mounted read-only at DATA_DIR/build."""
+    name = f"fca-data-{uuid.uuid4().hex[:8]}"
+    subprocess.run(
+        [
+            "docker", "run", "-d", "--rm", "--name", name, "-p", "127.0.0.1::8080",
+            "-v", f"{db_dir}:/app/data/build:ro", IMAGE,
+        ],
+        check=True,
+        capture_output=True,
+    )  # fmt: skip
+    port = (
+        subprocess.run(
+            ["docker", "port", name, "8080/tcp"],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        .stdout.strip()
+        .splitlines()[0]
+        .rsplit(":", 1)[1]
+    )
+    base = f"http://127.0.0.1:{port}"
+    deadline = time.monotonic() + 30
+    while time.monotonic() < deadline:
+        try:
+            if httpx.get(f"{base}/health", timeout=1).status_code == 200:
+                break
+        except httpx.TransportError:
+            time.sleep(0.3)
+    return name, base
+
+
+async def test_container_reads_built_catalog(catalog, tmp_path) -> None:  # type: ignore[no-untyped-def]
+    """The deploy story: `make data-tables` output mounted into the image → ready."""
+    if not shutil.which("docker"):
+        pytest.skip("docker not installed")
+    build_dir = tmp_path / "build"
+    build_dir.mkdir()
+    shutil.copy(catalog.db, build_dir / "courts.duckdb")
+    build_dir.chmod(0o755)
+    (build_dir / "courts.duckdb").chmod(0o644)
+    name, base = _run_with_catalog(str(build_dir))
+    try:
+        async with Client(f"{base}/mcp") as c:
+            result = await c.call_tool("server_info", {})
+        assert result.structured_content is not None
+        assert result.structured_content["data_status"] == "ready"
+    finally:
+        subprocess.run(["docker", "stop", name], capture_output=True)

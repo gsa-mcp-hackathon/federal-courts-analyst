@@ -64,4 +64,5 @@ def test_requirements_txt_mirrors_pyproject() -> None:
 
 def test_adrs_present() -> None:
     names = sorted(p.name for p in (ROOT / "docs/adr").glob("0*.md"))
-    assert [n[:4] for n in names] == ["0001", "0002", "0003", "0004", "0005"]
+    assert [n[:4] for n in names] == [f"{i:04d}" for i in range(1, len(names) + 1)]
+    assert len(names) >= 6

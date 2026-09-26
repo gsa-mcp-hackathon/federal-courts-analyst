@@ -21,7 +21,7 @@ jobs:
       - uses: astral-sh/setup-uv@v6
         with:
           enable-cache: true
-      - run: uv sync --group dev --frozen
+      - run: uv sync --group dev --group pipeline --frozen
       - name: Ruff lint
         run: uv run ruff check --output-format=github .
       - name: Ruff format
@@ -42,7 +42,7 @@ jobs:
         with:
           enable-cache: true
           python-version: ${{ matrix.python }}
-      - run: uv sync --group dev --frozen
+      - run: uv sync --group dev --group pipeline --frozen
       - name: Pytest
         run: >
           uv run pytest -v --cov --cov-report=term-missing
@@ -71,7 +71,7 @@ jobs:
       - uses: astral-sh/setup-uv@v6
         with:
           enable-cache: true
-      - run: uv sync --group dev --frozen
+      - run: uv sync --group dev --group pipeline --frozen
       - name: Build image
         run: docker build --build-arg GIT_SHA=${GITHUB_SHA::7} -t federal-courts-analyst:dev .
       - name: Container tests
