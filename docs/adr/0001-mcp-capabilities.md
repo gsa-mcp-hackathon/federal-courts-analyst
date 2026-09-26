@@ -104,8 +104,8 @@ Tested with FastMCP 4.0.10 and MCP SDK 2.2.0 on 2026-09-26. "Modern" means a
 
 - Claude Desktop connecting over stdio (Claude Code is verified; see the Phase 0
   Evidence section).
-- MCP Inspector's UI against the HTTP endpoint (checked in the Chrome pass;
-  see Evidence).
+- Verified: Claude Code (stdio), MCP Inspector v2.8.0 web UI (stdio,
+  negotiated 2025-11-25) and CLI (HTTP). See the Phase 0 Evidence section.
 
 ## Sources
 
