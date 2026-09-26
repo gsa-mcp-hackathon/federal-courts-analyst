@@ -10,11 +10,13 @@ correctly. Keep it fast and dependency-free.
 
 from __future__ import annotations
 
+import os
+
 from fastmcp import FastMCP
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
-from example_server import __version__
+from courts_analyst import SERVICE_ID, __version__
 
 
 def register_routes(mcp: FastMCP) -> None:
@@ -22,8 +24,15 @@ def register_routes(mcp: FastMCP) -> None:
 
     @mcp.custom_route("/health", methods=["GET"])
     async def health_check(request: Request) -> JSONResponse:
-        return JSONResponse({"status": "healthy", "service": "example-mcp-server"})
+        return JSONResponse({"status": "healthy", "service": SERVICE_ID})
 
     @mcp.custom_route("/version", methods=["GET"])
     async def version(request: Request) -> JSONResponse:
-        return JSONResponse({"version": __version__})
+        # GIT_SHA is baked into the container image at build time.
+        return JSONResponse(
+            {
+                "service": SERVICE_ID,
+                "version": __version__,
+                "git_sha": os.getenv("GIT_SHA", "unknown"),
+            }
+        )

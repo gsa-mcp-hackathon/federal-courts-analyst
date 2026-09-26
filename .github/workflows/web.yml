@@ -1,0 +1,17 @@
+# Frontend lint, typecheck, unit and Playwright smoke tests.
+# Placeholder until Phase 8: runs only when triggered by hand and exits early.
+name: Web
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Placeholder
+        run: echo "web/ has no app yet — this job is enabled in Phase 8."

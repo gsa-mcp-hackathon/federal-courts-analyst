@@ -1,0 +1,19 @@
+# Nightly agent evaluation on a small model budget.
+# Placeholder until Phase 3/10: add the schedule trigger and API key secrets then.
+name: Eval (nightly)
+
+on:
+  workflow_dispatch:
+  # schedule:
+  #   - cron: "0 7 * * *"   # 03:00 ET
+
+permissions:
+  contents: read
+
+jobs:
+  eval:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Placeholder
+        run: echo "The benchmark harness arrives in Phase 3 (make eval)."

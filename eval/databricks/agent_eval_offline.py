@@ -129,9 +129,7 @@ mlflow.tracing.set_destination(MlflowExperimentLocation(experiment_id=EXPERIMENT
 # dict; `expected_facts` must be a LIST. Add more rows to broaden coverage.
 eval_dataset = [
     {
-        "inputs": {
-            "request": "<a question your agent should answer using its tools>"
-        },
+        "inputs": {"request": "<a question your agent should answer using its tools>"},
         "expectations": {
             "expected_facts": ["<a fact the correct answer must contain>"],
         },
@@ -155,7 +153,9 @@ def _loop_runner():
     _LOOP.run_forever()
 
 
-_LOOP_THREAD = threading.Thread(target=_loop_runner, daemon=True, name="eval-async-loop")
+_LOOP_THREAD = threading.Thread(
+    target=_loop_runner, daemon=True, name="eval-async-loop"
+)
 _LOOP_THREAD.start()
 atexit.register(lambda: _LOOP.call_soon_threadsafe(_LOOP.stop))
 

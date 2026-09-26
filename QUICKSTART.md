@@ -1,6 +1,6 @@
-# Quickstart — Your First MCP Server in 5 Minutes
+# Quickstart — Run Federal Courts Analyst in 5 Minutes
 
-New to MCP? This gets you from clone to a running server connected to a client.
+This gets you from clone to a running server connected to a client.
 
 ## 1. Install prerequisites
 
@@ -13,8 +13,7 @@ pip install uv     # or: brew install uv
 ## 2. Set up the project
 
 ```bash
-cp .env.example .env
-uv sync
+make setup     # or: cp .env.example .env && uv sync --group dev
 ```
 
 ## 3. Run the server
@@ -31,16 +30,17 @@ server is launched *by* the client as a subprocess. Press `Ctrl-C` to stop it.
 
 ### Claude Code
 
-Create or edit `.mcp.json` (or your user MCP settings) with the **absolute path**
-to this repo:
+The repo already includes a project `.mcp.json`; start Claude Code in the repo
+and approve the `courts-analyst` server. To use it from another directory, add
+this to your user MCP settings with the **absolute path** to this repo:
 
 ```json
 {
   "mcpServers": {
-    "example-mcp": {
+    "courts-analyst": {
       "command": "uv",
-      "args": ["run", "example-server"],
-      "cwd": "/absolute/path/to/mcp-hackathon-template"
+      "args": ["run", "courts-analyst"],
+      "cwd": "/absolute/path/to/federal-courts-analyst"
     }
   }
 }
@@ -53,19 +53,17 @@ Add the same block to
 `%APPDATA%\Claude\claude_desktop_config.json` (Windows), then restart Claude
 Desktop.
 
-Once connected, ask the client to call the example tool, e.g.:
+Once connected, ask the client:
 
-> "Use the example_search_datasets tool to search for 'transportation'."
+> "Call server_info from the courts-analyst server."
 
-You'll get placeholder results — proof the wiring works. Now replace the example
-with your own tool.
+You'll get the server version, supported protocol versions and whether the data
+has been built (`not_built` until Phase 1/2's `make data`).
 
 ## 5. Verify everything
 
 ```bash
-uv sync --group dev
-uv run pytest tests/ -v      # tests pass
-uv run ruff check .          # lint clean
+make lint typecheck test
 ```
 
 ## 6. Test HTTP mode (optional)
@@ -82,11 +80,6 @@ curl http://localhost:8000/health      # {"status":"healthy",...}
 
 ## Next steps
 
-- **Add a real tool** — follow "The one-tool-per-file pattern" in the
-  [README](README.md#the-one-tool-per-file-pattern).
-- **Rename the package** from `example_server` to your service — see the
-  [README](README.md#rename-the-package).
-- **Deploy it** — pick a kit in [deploy/README.md](deploy/README.md)
-  (IBM watsonx Orchestrate or Databricks).
-- **Evaluate it** — build an eval harness with the `mcp-eval` skill; see
-  [eval/README.md](eval/README.md).
+- Build plan and current phase: [plan/README.md](plan/README.md)
+- Deploy: [deploy/README.md](deploy/README.md) (Databricks Apps, IBM watsonx Orchestrate)
+- Inspect the server in a browser: `make inspector`

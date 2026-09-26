@@ -6,28 +6,73 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  test:
+  lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Set up uv
-        uses: astral-sh/setup-uv@v4
+      - uses: astral-sh/setup-uv@v6
         with:
-          version: "latest"
-
-      - name: Install Python
-        run: uv python install 3.11
-
-      - name: Install dependencies
-        run: uv sync --group dev
-
-      - name: Lint
-        run: uv run ruff check .
-
-      - name: Format check
+          enable-cache: true
+      - run: uv sync --group dev --frozen
+      - name: Ruff lint
+        run: uv run ruff check --output-format=github .
+      - name: Ruff format
         run: uv run ruff format --check .
+      - name: Mypy
+        run: uv run mypy
 
-      - name: Run tests
-        run: uv run pytest tests/ -v
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # 3.12 is what we ship; 3.11 is the floor the deploy hosts need.
+        python: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          python-version: ${{ matrix.python }}
+      - run: uv sync --group dev --frozen
+      - name: Pytest
+        run: >
+          uv run pytest -v --cov --cov-report=term-missing
+          --cov-report=xml --cov-report=html --junitxml=junit.xml
+      - name: Coverage summary
+        if: always() && matrix.python == '3.12'
+        run: |
+          echo '### Coverage' >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          uv run coverage report >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload coverage
+        if: always() && matrix.python == '3.12'
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: |
+            coverage.xml
+            htmlcov/
+            junit.xml
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - run: uv sync --group dev --frozen
+      - name: Build image
+        run: docker build --build-arg GIT_SHA=${GITHUB_SHA::7} -t federal-courts-analyst:dev .
+      - name: Container tests
+        run: uv run pytest -m docker tests/test_docker.py -v

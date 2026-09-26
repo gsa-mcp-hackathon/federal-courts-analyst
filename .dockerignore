@@ -20,3 +20,10 @@ tests/
 dist/
 build/
 *.egg-info/
+plan/
+docs/
+web/node_modules/
+data/raw/
+.mypy_cache/
+*.md
+!README.md
