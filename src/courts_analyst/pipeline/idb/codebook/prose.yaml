@@ -1,0 +1,12 @@
+# PROSE — self-represented parties. Blank before October 1995.
+# Source: FJC IDB Civil Codebook 1988 Forward (2023-10-25), pp. 13–14.
+field: prose
+column: PROSE
+title: Pro se parties
+description: Whether any plaintiff or defendant is self-represented.
+missing: ["-8"]
+codes:
+  - {code: "0", label: No pro se parties, group: none}
+  - {code: "1", label: Pro se plaintiff(s) only, group: plaintiff}
+  - {code: "2", label: Pro se defendant(s) only, group: defendant}
+  - {code: "3", label: Pro se plaintiff(s) and defendant(s), group: both}

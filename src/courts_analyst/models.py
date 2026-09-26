@@ -24,8 +24,16 @@ class ServerInfo(BaseModel):
     )
     data_status: DataStatus = Field(
         description=(
-            "'ready' when the analytical DuckDB file exists; 'not_built' before "
-            "`make data` has run, in which case data tools will be unavailable."
+            "'ready' when the official tables catalog exists; 'not_built' before "
+            "`make data` has run, in which case data tools will be unavailable. "
+            "See `datasets` for each dataset."
+        )
+    )
+    datasets: dict[str, DataStatus] = Field(
+        description=(
+            "Readiness of each dataset: 'official_tables' (uscourts.gov tables "
+            "with edition history, courts.duckdb) and 'idb_civil' (FJC Integrated "
+            "Database civil records, idb.duckdb)."
         )
     )
     coverage: str = Field(

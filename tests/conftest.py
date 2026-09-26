@@ -67,3 +67,50 @@ def con(catalog: Catalog) -> Iterator[duckdb.DuckDBPyConnection]:
         yield c
     finally:
         c.close()
+
+
+# ── Civil IDB (Phase 2) ──────────────────────────────────────────────────────
+# tests/fixtures/idb/cv_sample.zip is a stratified sample of the real release
+# in the FJC's own format (party names synthetic), built by
+# `python -m courts_analyst.pipeline.idb sample`.
+
+IDB_SAMPLE_ZIP = ROOT / "tests" / "fixtures" / "idb" / "cv_sample.zip"
+IDB_MANIFEST_PATH = ROOT / "data" / "manifest" / "idb.yaml"
+
+
+@dataclass(frozen=True)
+class IdbBuild:
+    db: Path
+    parties: Path
+    result: Any
+    stats: Any
+
+
+def build_idb_from_zip(zip_path: Path, out: Path) -> IdbBuild:
+    """Normalize and load an IDB-format zip into ``out`` (used by tests)."""
+    from courts_analyst.pipeline.idb.load import build_idb
+    from courts_analyst.pipeline.idb.manifest import load_manifest
+    from courts_analyst.pipeline.idb.normalize import normalize_zip
+
+    manifest = load_manifest(IDB_MANIFEST_PATH)
+    tsv = out / "normalized.tsv"
+    stats, cols = normalize_zip(zip_path, manifest.member, tsv)
+    db, parties = out / "idb.duckdb", out / "private" / "idb_parties.parquet"
+    result = build_idb(tsv, cols, db, parties, manifest, stats)
+    tsv.unlink()
+    return IdbBuild(db=db, parties=parties, result=result, stats=stats)
+
+
+@pytest.fixture(scope="session")
+def idb(tmp_path_factory: pytest.TempPathFactory) -> IdbBuild:
+    """The IDB built from the committed sample (session-scoped: ~2 s)."""
+    return build_idb_from_zip(IDB_SAMPLE_ZIP, tmp_path_factory.mktemp("idb"))
+
+
+@pytest.fixture
+def idb_con(idb: IdbBuild) -> Iterator[duckdb.DuckDBPyConnection]:
+    c = duckdb.connect(str(idb.db), read_only=True)
+    try:
+        yield c
+    finally:
+        c.close()

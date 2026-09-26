@@ -1,0 +1,12 @@
+# JURY — which party demanded a jury trial.
+# Source: FJC IDB Civil Codebook 1988 Forward (2023-10-25), p. 5.
+field: jury
+column: JURY
+title: Jury demand
+description: The party or parties demanding a jury trial.
+missing: ["-8"]
+codes:
+  - {code: "B", label: Both plaintiff and defendant}
+  - {code: "D", label: Defendant}
+  - {code: "P", label: Plaintiff}
+  - {code: "N", label: Neither}

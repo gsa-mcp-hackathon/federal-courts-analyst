@@ -29,8 +29,9 @@ Needs [uv](https://docs.astral.sh/uv/) and `make`. Docker is optional.
 
 ```bash
 make setup        # install dev + pipeline deps, pre-commit hooks, create .env
-make test         # pytest with coverage (builds the catalog from committed fixtures)
+make test         # pytest with coverage (builds both datasets from committed fixtures)
 make data-tables  # download the official tables (≈4 min, polite) and build courts.duckdb
+make data-idb     # download the FJC civil IDB (330 MB) and build idb.duckdb (≈1.5 min)
 make serve        # MCP over stdio (what Claude Desktop/Code launch)
 make serve-http   # MCP over streamable HTTP on :8000 (/mcp, /health, /version)
 make help         # every target
@@ -52,8 +53,10 @@ in this directory offers the `courts-analyst` server. For Claude Desktop, see
 | `docker-build` / `docker-run` / `docker-test` | Build the image, run it on :8080, run container integration tests |
 | `inspector` | Open the MCP Inspector against the stdio server |
 | `data-tables` | Fetch every file in `data/manifest/tables.yaml` (sha256-pinned) and build `data/build/courts.duckdb`, Parquet, `docs/revision-log.md` |
+| `data-idb` | Fetch the pinned civil IDB release (resumable) and build `data/build/idb.duckdb` and `docs/data-profile.md`; party names go to `data/private/` |
+| `data-idb-sample` | Rebuild the committed IDB test sample from the download |
 | `data-discover` | Re-crawl uscourts.gov and rewrite the table manifest (review the diff) |
-| `data` | All datasets (tables now; the IDB joins in P2) |
+| `data` | Both datasets (`data-tables` + `data-idb`) |
 | `web` / `eval` | Placeholders until Phases 8 and 3 |
 
 ## Repository layout
@@ -71,7 +74,7 @@ src/courts_analyst/
 ├── core/             # pure domain logic, no MCP/HTTP imports (ADR 0002)
 │   ├── courts.py     #   94 districts, 12 circuits, alias resolution
 │   └── numbers.py    #   Excel-style rounding for published figures
-├── pipeline/         # data ingestion (P2 adds the IDB)
+├── pipeline/         # data ingestion: tables/ (P1), idb/ (P2)
 │   └── tables/       #   official tables: discover, fetch, parse, load (ADR 0006)
 ├── api/              # FastAPI REST + agent SSE (P7)
 └── agent/            # model adapters (P7)

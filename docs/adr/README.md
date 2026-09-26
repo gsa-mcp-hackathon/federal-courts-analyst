@@ -12,3 +12,4 @@ consequences. Status is one of Proposed, Accepted, Superseded.
 | [0004](0004-default-edition-policy.md) | Latest edition by default, first-published attached | Proposed (awaiting domain expert; P1 data supports either default) |
 | [0005](0005-frontend-served-from-python.md) | Frontend served from the Python container | Accepted |
 | [0006](0006-official-tables-ingestion.md) | Official tables: committed manifest, label-based parsing, PDF cross-check | Accepted |
+| [0007](0007-idb-ingestion.md) | Civil IDB: pinned release, record grain, party names outside the database | Accepted |

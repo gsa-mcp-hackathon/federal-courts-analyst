@@ -1,0 +1,30 @@
+# ORIGIN — how the case came to be filed in the district.
+# Source: FJC IDB Civil Codebook 1988 Forward (2023-10-25), pp. 2–3.
+# `group` feeds the derived flags: mdl_direct (13) → is_mdl_direct_filed,
+# mdl_transfer (6) → is_mdl_transferred.
+field: origin
+column: ORIGIN
+title: Origin
+description: The manner in which the case was filed in the district.
+missing: ["-8"]
+codes:
+  - {code: "1", label: Original proceeding, group: original}
+  - {code: "2", label: Removed from state court, group: removed}
+  - {code: "3", label: Remanded from court of appeals for further action, group: remanded}
+  - {code: "4", label: Reinstated or reopened, group: reopened}
+  - {code: "5", label: Transferred from another district (28 U.S.C. 1404), group: transferred}
+  - {code: "6", label: Multidistrict litigation transferred in by the JPML (28 U.S.C. 1407), group: mdl_transfer}
+  - {code: "7", label: Appeal to a district judge of a magistrate judge's decision, group: appeal_from_magistrate}
+  - {code: "8", label: Second reopen, group: reopened}
+  - {code: "9", label: Third reopen, group: reopened}
+  - {code: "10", label: Fourth reopen, group: reopened}
+  - {code: "11", label: Fifth reopen, group: reopened}
+  - {code: "12", label: Sixth reopen, group: reopened}
+  - code: "13"
+    label: Multidistrict litigation originating in the district (direct filed)
+    group: mdl_direct
+    valid_from: 2016-07-01
+    note: >-
+      Valid beginning July 1, 2016. Before that, cases filed directly into an
+      MDL court carried origin 1 and can't be told apart from other original
+      proceedings.

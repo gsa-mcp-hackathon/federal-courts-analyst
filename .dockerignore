@@ -24,6 +24,7 @@ plan/
 docs/
 web/node_modules/
 data/raw/
+data/private/
 .mypy_cache/
 *.md
 !README.md

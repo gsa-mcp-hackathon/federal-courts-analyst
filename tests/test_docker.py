@@ -133,20 +133,36 @@ def _run_with_catalog(db_dir: str) -> tuple[str, str]:
     return name, base
 
 
-async def test_container_reads_built_catalog(catalog, tmp_path) -> None:  # type: ignore[no-untyped-def]
-    """The deploy story: `make data-tables` output mounted into the image → ready."""
+async def test_container_reads_built_catalog(catalog, idb, tmp_path) -> None:  # type: ignore[no-untyped-def]
+    """The deploy story: `make data` output mounted into the image → ready.
+
+    Only data/build is mounted; the IDB party names (data/private) never are.
+    """
     if not shutil.which("docker"):
         pytest.skip("docker not installed")
     build_dir = tmp_path / "build"
     build_dir.mkdir()
     shutil.copy(catalog.db, build_dir / "courts.duckdb")
+    shutil.copy(idb.db, build_dir / "idb.duckdb")
     build_dir.chmod(0o755)
     (build_dir / "courts.duckdb").chmod(0o644)
+    (build_dir / "idb.duckdb").chmod(0o644)
     name, base = _run_with_catalog(str(build_dir))
     try:
         async with Client(f"{base}/mcp") as c:
             result = await c.call_tool("server_info", {})
         assert result.structured_content is not None
         assert result.structured_content["data_status"] == "ready"
+        assert result.structured_content["datasets"] == {
+            "official_tables": "ready",
+            "idb_civil": "ready",
+        }
+        ls = subprocess.run(
+            ["docker", "exec", name, "ls", "-A", "/app/data"],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        assert "private" not in ls.stdout.split()
     finally:
         subprocess.run(["docker", "stop", name], capture_output=True)

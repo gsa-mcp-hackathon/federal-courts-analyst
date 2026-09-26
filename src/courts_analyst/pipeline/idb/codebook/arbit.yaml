@@ -1,0 +1,14 @@
+# ARBIT (at filing) and TRMARB (at termination) — formal arbitration program
+# participation (about 20 courts). Both columns use these codes; Y appears
+# only at filing.
+# Source: FJC IDB Civil Codebook 1988 Forward (2023-10-25), pp. 7 and 13.
+field: arbit
+column: ARBIT
+title: Arbitration
+description: Method of participation in a court's formal arbitration program.
+missing: ["-8"]
+codes:
+  - {code: "M", label: Mandatory}
+  - {code: "V", label: Voluntary}
+  - {code: "E", label: Exempt}
+  - {code: "Y", label: "Yes, type unknown"}
