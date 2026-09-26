@@ -119,6 +119,8 @@ revision      (measure_id, court, fiscal_year, edition, value, prior_value, delt
 | Cell refs | every observation resolves to its spreadsheet cell or PDF line |
 | Completeness (`@fulldata`) | every manifest edition parsed; no district missing in any X-1A, C-1, C-5 edition; all 57 dual-format editions cross-checked |
 
+**CI:** green on [PR #2](https://github.com/syedaun-techsur/federal-courts-analyst/pull/2) (lint, test 3.11, test 3.12, docker), building the full catalog from fixtures.
+
 **Automated tests:** 232 passed (default suite; 9 more are `@fulldata`/`@docker`) with **95% total coverage**; `pipeline/tables/` modules 91–98%. `make docker-test`: 6 passed, including the mounted-catalog test. Lint, format, mypy (strict on `core/`) and pre-commit clean.
 
 | Suite | Tests | Covers |
@@ -138,7 +140,7 @@ revision      (measure_id, court, fiscal_year, edition, value, prior_value, delt
 - Opened the JB-2024 X-1A landing page on uscourts.gov: its two file links are exactly the manifest's `2025-01/` URLs.
 - Opened the source PDFs from the manifest. Chrome's PDF viewer only drew thumbnails in automated tabs, so the pages were rendered locally (pypdfium2) and read: **JB-2020 X-1A national row 673 / 676 / 554** ([image](../docs/evidence/phase-01/jb-2020-x1a-national-row.png)) and **JFF-2023 6.2 FY2020 row 674 / 322 / 675** ([image](../docs/evidence/phase-01/jff-2023-6.2-fy2020-row.png)).
 - MCP Inspector v2.8.0 web UI over stdio (MCP 2025-11-25): `server_info` returns `data_status: "ready"` with the catalog built ([screenshot](../docs/evidence/phase-01/inspector-server-info-ready.jpg)).
-- The generated [revision log](../docs/revision-log.md) as rendered on GitHub: see the PR.
+- The generated [revision log](../docs/revision-log.md) rendered on GitHub (PR #2 branch): headings, outline and tables display correctly; the weighted civil table shows every year FY2016–FY2025 revised down, FY2020 554 → 322 ([screenshot](../docs/evidence/phase-01/revision-log-weighted-civil.jpg)).
 
 **Found and fixed during the phase:**
 - Python's banker's rounding made 174 xlsx/PDF values disagree; switched to Excel-style rounding everywhere.
