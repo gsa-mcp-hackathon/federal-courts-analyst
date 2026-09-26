@@ -1,167 +1,110 @@
-# GSA MCP Hackathon — Server Template
+# Federal Courts Analyst
 
-A ready-to-run starter for building a [Model Context Protocol (MCP)](https://modelcontextprotocol.io) server in Python, plus deployment kits for **IBM Cloud (watsonx Orchestrate)** and **Databricks**.
+An MCP server that answers plain-language questions about federal court workload,
+built for GSA's MCP Server and AI Agent Government Hackathon (Dataset Access track).
+For recent years the judiciary publishes more than one official figure for the same
+statistic. This server knows which edition each number comes from and why the
+editions differ.
 
-Built with [FastMCP](https://github.com/jlowin/fastmcp) and [uv](https://docs.astral.sh/uv/). If you have never built an MCP server before, start with **[QUICKSTART.md](QUICKSTART.md)**.
+- Concept: [`Federal Courts Analyst — MCP Hackathon Concept.md`](Federal%20Courts%20Analyst%20—%20MCP%20Hackathon%20Concept.md)
+- Build plan and phase status: [`plan/`](plan/README.md)
+- Architecture decisions: [`docs/adr/`](docs/adr/README.md)
 
----
+Built on the [GSA MCP hackathon template](https://github.com/GSA-TTS/mcp-hackathon-template)
+with [FastMCP 4](https://gofastmcp.com) (MCP spec 2026-07-28, backward compatible
+with 2025-11-25 clients) and [uv](https://docs.astral.sh/uv/).
 
-## What is an MCP server?
-
-An MCP server exposes **tools** (functions the model can call), **prompts** (reusable conversation starters), and **resources** (data the model can read) to an AI client such as Claude Desktop, Claude Code, or an agent platform like watsonx Orchestrate. You write the tools; the client's model decides when to call them.
-
-This template gives you a working server with one example of each, so you can replace the examples with your own service and deploy.
-
----
-
-## Repo structure
-
-```
-mcp-hackathon-template/
-├── README.md                  # This file
-├── QUICKSTART.md              # 5-minute clone → run → connect walkthrough
-├── main.py                    # Local entry point (uv run python main.py)
-├── pyproject.toml             # Package + dependencies (uv)
-├── requirements.txt           # Mirror of runtime deps (for buildpack hosts)
-├── Dockerfile                 # Container image (streamable-HTTP, port 8080)
-├── manifest.yaml              # cloud.gov (Cloud Foundry) deploy
-├── server.json                # MCP registry metadata
-├── .env.example               # Copy to .env for local dev
-├── .github/workflows/ci.yml   # Lint + test on push/PR
-├── src/
-│   └── example_server/        # ← rename to your service
-│       ├── app.py             # Thin entry point: builds FastMCP, picks transport
-│       ├── config.py          # Settings from env vars / .env
-│       ├── models.py          # Pydantic models & enums for tool params
-│       ├── utils.py           # Shared helpers (HTTP client, pagination)
-│       ├── routes.py          # HTTP-only routes (/health, /version)
-│       ├── tools/             # ONE FILE PER TOOL
-│       │   ├── __init__.py    #   register_tools(mcp) aggregator
-│       │   └── example_tool.py
-│       ├── prompts/
-│       │   ├── __init__.py    #   register_prompts(mcp) aggregator
-│       │   └── example.py
-│       └── resources/
-│           ├── __init__.py    #   register_resources(mcp) aggregator
-│           └── example.py
-├── tests/                     # Import + registration smoke tests
-├── eval/                      # Stub → build a Phoenix eval harness (see mcp-eval skill)
-└── deploy/
-    ├── README.md              # Which deployment kit to use
-    ├── ibm/                   # watsonx Orchestrate: 3 kits (see below)
-    └── databricks/            # Databricks Apps kit
-```
+> **Status: Phase 0 (foundations).** The server runs and exposes `server_info`.
+> Data and the statistics tools arrive in Phases 1–5.
 
 ---
 
-## Getting started
+## Quick start
 
-### Prerequisites
-- [uv](https://docs.astral.sh/uv/) — `pip install uv` or `brew install uv`
-
-### Install and run
+Needs [uv](https://docs.astral.sh/uv/) and `make`. Docker is optional.
 
 ```bash
-cp .env.example .env
-uv sync
-uv run python main.py
+make setup        # install dev deps + pre-commit hooks, create .env
+make test         # pytest with coverage
+make serve        # MCP over stdio (what Claude Desktop/Code launch)
+make serve-http   # MCP over streamable HTTP on :8000 (/mcp, /health, /version)
+make help         # every target
 ```
 
-The server starts in **stdio** mode — it talks JSON-RPC over stdin/stdout, which is how local clients (Claude Desktop, Claude Code) launch it. See [QUICKSTART.md](QUICKSTART.md) to connect a client.
+Connect Claude Code: the repo ships a project `.mcp.json`, so opening Claude Code
+in this directory offers the `courts-analyst` server. For Claude Desktop, see
+[QUICKSTART.md](QUICKSTART.md).
 
-### Verify
+## Make targets
 
-```bash
-uv sync --group dev
-uv run pytest tests/ -v      # tests
-uv run ruff check .          # lint
+| Target | What it does |
+| --- | --- |
+| `setup` | `uv sync --group dev`, install pre-commit hooks, copy `.env.example` → `.env` |
+| `lint` / `format` | ruff lint and format check / auto-fix |
+| `typecheck` | mypy (strict on `core/` and `models.py`) |
+| `test` | Fast suite with coverage (excludes `@fulldata` and `@docker`) |
+| `test-full` | Everything, including full-data tests |
+| `docker-build` / `docker-run` / `docker-test` | Build the image, run it on :8080, run container integration tests |
+| `inspector` | Open the MCP Inspector against the stdio server |
+| `data` / `web` / `eval` | Placeholders until Phases 1–2, 8 and 3 |
+
+## Repository layout
+
+```
+src/courts_analyst/
+├── app.py            # thin entry point: build_server() + transport choice
+├── config.py         # typed settings (pydantic-settings) from env / .env
+├── logging_config.py # JSON logs over HTTP, readable text locally; always stderr
+├── models.py         # shared Pydantic models (tool outputs, provenance)
+├── routes.py         # /health, /version
+├── tools/            # one file per MCP tool, each with register(mcp)
+├── resources/        # courts:// and ui:// resources
+├── prompts/          # analyst prompts
+├── core/             # pure domain logic, no MCP/HTTP imports (ADR 0002)
+├── pipeline/         # data ingestion (P1 tables, P2 IDB)
+├── api/              # FastAPI REST + agent SSE (P7)
+└── agent/            # model adapters (P7)
+tests/                # unit, MCP protocol, transport, container tests
+web/                  # React frontend (P8)
+eval/                 # benchmark and eval kits (P3, P10)
+data/                 # gitignored downloads and DuckDB build
+docs/adr/             # architecture decision records
+deploy/               # template kits: Databricks Apps, IBM watsonx / Code Engine
+plan/                 # phased build plan
 ```
 
----
+## Configuration
 
-## The one-tool-per-file pattern
+Every setting is optional; see [`.env.example`](.env.example) and
+[`config.py`](src/courts_analyst/config.py).
 
-Each tool lives in its own file under `src/example_server/tools/` and exposes a `register(mcp)` function. `tools/__init__.py` calls each one from a single `register_tools(mcp)`. This keeps the tool list scannable and lets you add or remove an integration by touching two files.
+| Variable | Default | Purpose |
+| --- | --- | --- |
+| `MCP_TRANSPORT` | `stdio` | `stdio` or `streamable-http` (a host-injected `PORT`/`DATABRICKS_APP_PORT` forces HTTP) |
+| `MCP_HOST` / `MCP_PORT` | `0.0.0.0` / `8000` | HTTP bind address |
+| `DATA_DIR` | `data` | Downloads (`raw/`) and build outputs (`build/`) |
+| `DUCKDB_PATH` | `$DATA_DIR/build/courts.duckdb` | Analytical store |
+| `ANTHROPIC_API_KEY`, `OPENAI_API_KEY` | unset | Agent and eval models (P7, P10) |
+| `COURTLISTENER_API_TOKEN` | unset | CourtListener handoff (P7) |
+| `LOG_LEVEL` / `LOG_FORMAT` | `INFO` / `auto` | `auto` = JSON over HTTP, text on stdio |
 
-**Step 1 — create `src/example_server/tools/my_tool.py`:**
+## Adding a tool
 
-```python
-from typing import Annotated
-from fastmcp import FastMCP
+Tools are thin adapters over `core/` (see [ADR 0002](docs/adr/0002-core-adapter-architecture.md)):
 
-from example_server.utils import fetch_json
-
-
-def register(mcp: FastMCP) -> None:
-    @mcp.tool(
-        name="example_get_thing",
-        annotations={
-            "title": "Get a thing",
-            "readOnlyHint": True,
-            "destructiveHint": False,
-            "idempotentHint": True,
-            "openWorldHint": True,
-        },
-    )
-    async def get_thing(thing_id: Annotated[str, "The ID to fetch."]) -> dict:
-        """One-line summary. Document the data source, its update cadence,
-        and the return shape here — the model reads this docstring."""
-        return await fetch_json(f"https://api.example.gov/things/{thing_id}")
-```
-
-**Step 2 — wire it up in `tools/__init__.py`:**
-
-```python
-from example_server.tools import example_tool, my_tool
-
-def register_tools(mcp) -> None:
-    example_tool.register(mcp)
-    my_tool.register(mcp)  # ← add this line
-```
-
-**Step 3 — add any API key** as a typed field in `config.py` and document the env var in `.env.example`.
-
-Prompts (`prompts/`) and resources (`resources/`) follow the exact same `register(mcp)` + aggregator pattern.
-
----
-
-## Rename the package
-
-Before publishing your server, rename `example_server` to your service (e.g. `census_mcp`):
-
-1. Rename the folder `src/example_server/` → `src/<your_name>/`.
-2. Update `pyproject.toml`: the `[project].name`, `[project.scripts]`, and `[tool.hatch.build.targets.wheel].packages`.
-3. Find-and-replace `example_server` across `src/`, `tests/`, `main.py`, `Dockerfile`, and `manifest.yaml`.
-
----
-
-## Tool design tips (federal data)
-
-- **Return structured data, not prose.** Return dicts/lists with consistent keys and let the model narrate.
-- **Document freshness.** Federal datasets lag; state the update frequency and "as-of" date in the docstring.
-- **Expose pagination.** Use `PaginationParams` / `paginate()` from `utils.py`, and return `has_more` / `next_offset`.
-- **Use explicit timeouts.** `utils.fetch_json` defaults to 30s.
-- **Actionable errors.** Return an error dict with a `hint`, not a raw stack trace.
-
----
+1. Put the logic in `core/` with unit tests.
+2. Create `tools/<name>.py` with `register(mcp)`, returning a Pydantic model
+   (FastMCP publishes it as the tool's `outputSchema`).
+3. Call it from `tools/__init__.py` and add the name to `EXPECTED_TOOLS` in
+   `tests/test_registration.py`.
 
 ## Deploying
 
-Local development uses stdio. To share your server with an agent platform, deploy it and register it. See **[deploy/README.md](deploy/README.md)** for a chooser, then:
-
-- **IBM watsonx Orchestrate** — [deploy/ibm/](deploy/ibm/) (three kits: local stdio toolkit, Code Engine build-from-Git, and prebuilt image).
-- **Databricks Apps** — [deploy/databricks/](deploy/databricks/).
-
-Both read the same server code; `app.py` automatically serves HTTP when the platform injects a port.
-
----
-
-## Evaluations
-
-Measuring how well an LLM can use your tools is the real test of server quality. This template intentionally does **not** ship an eval harness — see [eval/README.md](eval/README.md) for how to build one with the `mcp-eval` skill.
-
----
+The template's kits work unchanged with the renamed package. See
+[deploy/README.md](deploy/README.md) for Databricks Apps and IBM watsonx
+Orchestrate / Code Engine. The `Dockerfile` builds a locked, non-root image
+serving `/mcp` on :8080.
 
 ## License
 
-[MIT](LICENSE). See [SECURITY.md](SECURITY.md) for the vulnerability disclosure policy and hackathon security notes.
+[MIT](LICENSE). See [SECURITY.md](SECURITY.md) for the vulnerability disclosure policy.

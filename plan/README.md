@@ -97,9 +97,9 @@ flowchart TB
 
 | Layer | Choice | Why |
 | --- | --- | --- |
-| Language | Python 3.12+ (match the template's `.python-version`) | Template and FastMCP |
+| Language | Python 3.12 (container and dev); 3.11 floor for deploy hosts, and CI tests both | Template and FastMCP |
 | Packaging | `uv`, plus a mirrored `requirements.txt` | Template convention |
-| MCP | FastMCP (version pinned after the P0 spike) | Template; Pydantic-native tools and output schemas |
+| MCP | FastMCP 4 (`>=4.0.10,<5`, MCP spec 2026-07-28; see [ADR 0001](../docs/adr/0001-mcp-capabilities.md)) | Template; Pydantic-native tools and output schemas |
 | Models | Pydantic v2 | Judges explicitly look for Pydantic inputs |
 | Storage | DuckDB + Parquet | Fast analytical SQL, a single file, no server |
 | Scraping and parsing | httpx, openpyxl/calamine, pdfplumber (PDF fallback) | Official tables come as xlsx and PDF |

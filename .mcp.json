@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "courts-analyst": {
+      "command": "uv",
+      "args": ["run", "--quiet", "courts-analyst"]
+    }
+  }
+}

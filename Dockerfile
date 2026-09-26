@@ -4,28 +4,45 @@
 # Used by:
 #   - IBM Code Engine (deploy/ibm/)
 #   - cloud.gov (docker image path) and any other container host
+#   - local integration tests (make docker-test)
 #
 # The server serves MCP over streamable-HTTP at :8080/mcp with a health check
 # at :8080/health. app.py auto-selects HTTP because PORT is set below.
 
-FROM python:3.11-slim
+FROM python:3.12-slim
 
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
-ENV PYTHONPATH=/app/src
-ENV PORT=8080
+ARG GIT_SHA=unknown
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    UV_COMPILE_BYTECODE=1 \
+    UV_LINK_MODE=copy \
+    UV_PROJECT_ENVIRONMENT=/app/.venv \
+    PATH=/app/.venv/bin:$PATH \
+    PORT=8080 \
+    DATA_DIR=/app/data \
+    GIT_SHA=${GIT_SHA}
 
 WORKDIR /app
 
-# Install uv (fast, reproducible installs).
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
+# Install uv (fast, reproducible installs from uv.lock).
+COPY --from=ghcr.io/astral-sh/uv:0.10 /uv /usr/local/bin/uv
 
-# Install dependencies first for better layer caching.
-COPY pyproject.toml README.md ./
+# Dependencies first for better layer caching; exact versions from uv.lock.
+COPY pyproject.toml uv.lock README.md ./
+RUN uv sync --frozen --no-dev --no-install-project
+
 COPY src ./src
-RUN uv pip install --system --no-cache .
+RUN uv sync --frozen --no-dev --no-editable
+
+# Run as an unprivileged user.
+RUN useradd --system --uid 10001 app && mkdir -p /app/data && chown -R app /app/data
+USER app
 
 EXPOSE 8080
 
+HEALTHCHECK --interval=30s --timeout=3s --start-period=10s \
+  CMD python -c "import urllib.request,sys; urllib.request.urlopen('http://127.0.0.1:8080/health', timeout=2)" || exit 1
+
 # PORT=8080 (set above) makes app.py run HTTP on that port automatically.
-CMD ["python", "-m", "example_server.app"]
+CMD ["python", "-m", "courts_analyst.app"]

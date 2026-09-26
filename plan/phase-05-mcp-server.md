@@ -41,6 +41,8 @@ Example:
 | `courts://methodology/{topic}` | Methodology notes (weighted filings, MDL, fiscal vs statistical year, reconciliation) | long |
 | `courts://glossary` | Glossary | long |
 
+> **P0 spike finding ([ADR 0001](../docs/adr/0001-mcp-capabilities.md)):** FastMCP 4 supports only server-wide cache hints (`FastMCP(cache_ttl=…, cache_scope=…)`), not a TTL per resource. Plan: one conservative server-wide TTL, with edition dates in the resource content. The per-resource column above is the ideal if FastMCP adds it.
+
 ## Prompts
 
 - `district_caseload_profile(court, fiscal_year)`
@@ -57,6 +59,8 @@ Triggered when the input is ambiguous in ways that change the answer:
 - edition: "current official" vs "as first published" when a figure was revised
 
 If the client supports elicitation: send a schema-constrained request (enum choices). If not (detected from client capabilities): return a structured `NeedsClarification` result with the same choices, which the agent can show to the user. Both paths share one `Clarification` model.
+
+> **P0 spike finding ([ADR 0001](../docs/adr/0001-mcp-capabilities.md)):** spec 2026-07-28 replaced server-initiated elicitation with multi round-trip requests (MRTR). "Supports elicitation" therefore has **two** paths: modern clients get an `InputRequiredResult` (read the answer from `ctx.input_responses` on the retry), and 2025-11-25 clients get `ctx.elicit()`. Each fails on the other era. One helper picks the path per request, and every elicited choice is also an ordinary tool argument. `test_elicitation.py` must cover modern, legacy and no-handler clients.
 
 ## Server plumbing
 

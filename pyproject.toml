@@ -1,35 +1,59 @@
 [project]
-name = "example-server"
+name = "courts-analyst"
 version = "0.1.0"
-description = "Starter MCP server for the GSA MCP hackathon"
+description = "Federal Courts Analyst: an edition-aware MCP server for federal court workload statistics"
 readme = "README.md"
+# 3.11 floor keeps the template's deploy targets (Databricks Apps, cloud.gov
+# buildpack) working; we develop and ship the container on 3.12.
 requires-python = ">=3.11"
 dependencies = [
-    "fastmcp>=2.0.0",
-    "httpx>=0.27.0",
-    "pydantic>=2.0.0",
-    "pydantic-settings>=2.0.0",
+    # 4.x speaks MCP 2026-07-28 and still negotiates 2025-11-25 clients.
+    # See docs/adr/0001-mcp-capabilities.md before changing this pin.
+    "fastmcp>=4.0.10,<5",
+    "pydantic>=2.12",
+    "pydantic-settings>=2.6",
 ]
 
 [project.scripts]
-# Lets you run the server with `uv run example-server`.
-example-server = "example_server.app:main"
+# Lets you run the server with `uv run courts-analyst`.
+courts-analyst = "courts_analyst.app:main"
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/example_server"]
+packages = ["src/courts_analyst"]
 
 [dependency-groups]
-# Dev + eval-only deps. Install with `uv sync --group dev`.
-# The Phoenix evaluation harness (see eval/) is not scaffolded in this template
-# on purpose — add these when you build it per the mcp-eval skill.
+# `make setup` installs dev only. Other groups are pulled in by the phase that
+# needs them (`uv sync --group pipeline`, etc.).
 dev = [
-    "pytest>=8.0.0",
-    "pytest-asyncio>=0.23.0",
-    "ruff>=0.6.0",
+    "httpx>=0.27",
+    "hypothesis>=6.100",
+    "mypy>=1.13",
+    "pre-commit>=4.0",
+    "pytest>=8.0",
+    "pytest-asyncio>=0.24",
+    "pytest-cov>=6.0",
+    "ruff>=0.8",
+    "syrupy>=4.8",
+]
+# P1/P2: official tables scraper and IDB loader.
+pipeline = [
+    "duckdb>=1.1",
+    "httpx>=0.27",
+    "openpyxl>=3.1",
+    "pdfplumber>=0.11",
+]
+# P7: REST + SSE agent stream. FastMCP 4 needs Starlette >= 1.0.1.
+api = [
+    "fastapi>=0.133",
+    "uvicorn>=0.32",
+]
+# P3/P10: benchmark harness. Model SDKs and tracing are added in those phases.
+eval = [
+    "pyyaml>=6.0",
 ]
 
 [tool.ruff]
@@ -41,8 +65,69 @@ exclude = [".venv", ".agents"]
 extend-exclude = ["*.md"]
 
 [tool.ruff.lint]
-select = ["E", "F", "I"]
+select = [
+    "E",   # pycodestyle
+    "F",   # pyflakes
+    "I",   # isort
+    "B",   # bugbear
+    "UP",  # pyupgrade
+    "SIM", # simplify
+    "RUF", # ruff-specific
+    "PTH", # prefer pathlib
+]
+ignore = [
+    "RUF001", # ambiguous unicode in strings (we use en dashes and arrows in text)
+    "RUF002",
+    "RUF003",
+]
+
+[tool.ruff.lint.per-file-ignores]
+# The template's Databricks eval kit is vendored; lint it lightly.
+"eval/databricks/**" = ["E402", "E501", "B", "UP", "SIM", "RUF", "PTH"]
+"deploy/**" = ["PTH", "RUF100"]
+
+[tool.mypy]
+python_version = "3.11"
+mypy_path = "src"
+packages = ["courts_analyst"]
+warn_unused_configs = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+check_untyped_defs = true
+disallow_incomplete_defs = true
+no_implicit_optional = true
+plugins = ["pydantic.mypy"]
+
+# Domain logic and shared models are fully typed.
+[[tool.mypy.overrides]]
+module = ["courts_analyst.core", "courts_analyst.models"]
+strict = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 asyncio_mode = "auto"
+addopts = "-m 'not fulldata and not docker' --strict-markers"
+markers = [
+    "fulldata: needs the full downloaded datasets; run locally or nightly (make test-full)",
+    "docker: runs against the local Docker container",
+]
+filterwarnings = [
+    "error::DeprecationWarning:courts_analyst.*",
+]
+
+[tool.coverage.run]
+source = ["courts_analyst"]
+branch = true
+# Measure the server subprocesses started by tests/test_transport.py too.
+patch = ["subprocess"]
+parallel = true
+sigterm = true
+
+[tool.coverage.report]
+fail_under = 75
+show_missing = true
+skip_covered = true
+exclude_also = [
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+]
