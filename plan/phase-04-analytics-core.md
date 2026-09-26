@@ -14,6 +14,16 @@ Phase 1 built the official tables catalog ([ADR 0006](../docs/adr/0006-official-
 - `core/numbers.round_half_up` is the display rule (Excel-style); use it for every published figure.
 - Moved here from P1: C-2/C-3 (civil filings by nature of suit, national and by district), FCMS district profiles (vacancies, median times, weighted filings), and Judicial Conference judgeship recommendations and judicial emergencies for `judgeships.py`. Add each as a table family (a few rules each) plus its measures.
 
+## Inputs from Phase 2
+
+Phase 2 built the civil IDB ([ADR 0007](../docs/adr/0007-idb-ingestion.md), [methodology](../docs/methodology/idb.md)):
+
+- It lives in its own file, `settings.resolved_idb_path` (`data/build/idb.duckdb`). Attach it read-only next to `courts.duckdb`.
+- **Pick the grain per measure:** filings and cohorts from `idb_civil` (one row per case); terminations, dispositions and time to disposition from `idb_civil_terminations` (every terminated record, which matches C-1 exactly). `idb_civil_record` is the base table.
+- Fiscal years: `filing_fy`/`termination_fy` (AO dates) and `core.fiscal`. `nos_category`/`nos_group`/`nos_line` follow Table C-2, which makes C-2 reconciliation a join.
+- Pending on a past date needs the rule in `pipeline/idb/profile.py` (`PENDING_AT`); move it into `measures.py`. FY2017 is 7.2% above C-1 because reopenings aren't dated (the `reopened-without-date` data break), so `reconcile` should explain that variance.
+- `data_breaks` and `code_validity` tables feed the data-break warnings. Party names are not in the database and must never be.
+
 ## Module layout
 
 ```
