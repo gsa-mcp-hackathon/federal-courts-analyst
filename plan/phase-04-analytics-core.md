@@ -158,3 +158,55 @@ Metrics: count, trend by FY, median days to disposition (bootstrap CI), disposit
 | Inputs from P1: add C-2/C-3 and FCMS as table families | Not added; the IDB's nature-of-suit hierarchy (checked against C-2 in Phase 2) serves the case-type breakdowns | The core didn't need them for any P4 exit criterion; they stay open in [#9](https://github.com/syedaun-techsur/federal-courts-analyst/issues/9) |
 | — | `EngineAnswerer` (`courts-eval run --answerer engine`) | Makes the engine exit criterion a repeatable eval run |
 | — | Glossary claim "tables use fiscal years from 1992" dropped, with the matching eval claim | Not verified against a source |
+
+## Evidence
+
+**Full data (2026-09-26, IDB release of 2026-08-26):**
+
+| Check | Result |
+| --- | --- |
+| Engine eval suite (30 IDB rebuilds vs C-1) | **30/30** ([run](../eval/results/phase4-engine.md)) |
+| FY2019→FY2020 civil filings | official +172,704 (C-1); IDB +173,239; **N.D. Fla. +199,881**, the only key contributor; directly filed MDL +179,741 (MDL 2885 +201,017); excluding directly filed MDL, filings **fell** 6,502 |
+| FY2020 weighted revision (554 → 322) | N.D. Fla.'s JB-2020 filings contribute **211 points** of 554; the revision is **232 points**; reported as an `inferred` driver with an `inferred_not_official` warning |
+| FY2023→FY2024 terminations | +102,958, IDB identical; N.D. Fla. +104,167; MDL terminations +97,266 |
+| Variance report, 3,180 court-years FY2016–FY2025 | matched 2,989, explained 131, **unexplained 60 (1.9%)**; every national figure and all **1,060 termination court-years** match ([report](../docs/variance-report.md)) |
+| FY2017 pending ([#11](https://github.com/syedaun-techsur/federal-courts-analyst/issues/11)) | JB-2018 restated it to 366,195; IDB 363,601 (−0.71%, matched). S.D. W. Va.: 71,478 vs 71,454 |
+| Judgeship context | E.D. Tex. FY2025: 894 weighted filings per judgeship (JB-2025), above 430 and 600; the 2025 Conference recommendation of 2 judgeships attached with its source |
+| Variance report build | 1.2 s (bulk queries) |
+
+**CI:** green on [PR #20](https://github.com/syedaun-techsur/federal-courts-analyst/pull/20) (lint, test 3.11, test 3.12, docker).
+
+**Automated tests:** 633 passed in the default suite (139 new), **96% total coverage, 96% on `core/`** (every core module ≥ 93% except `numbers.py`'s one-line formatter branch); `@fulldata` 14/14. `make docker-test` 6/6: the image now runs the core against the mounted catalog and IDB (FY2020 weighted → 322 JFF-2025, first published 554). Lint, format and mypy strict on `core/` clean.
+
+| Suite | Checks |
+| --- | --- |
+| `test_official_default_edition.py` | FY2020 weighted → 322 (JFF-2025) with first-published 554 (JB-2020); explicit editions; 673/674; statuses; statistical year; footnotes; typed errors (territorial, national-only, out of scope, unknown); one-edition comparisons with revised national warnings |
+| `test_provenance.py` | `ok()` refuses empty provenance; every revised figure carries `first_published` and `later_revisions` |
+| `test_decomposition_additivity.py` | hypothesis: contributions sum exactly to the change; key contributors reach 80% minimally; shift-share effects sum exactly |
+| `test_explain_fy2020.py` | fixture and full-data FY2020 storyline, MDL driver, inference label, no-IDB fallback, pending restatement text, FY2024 terminations |
+| `test_cohort_handles.py` | same spec → same handle (order, circuits, US), pinned handle, invalid specs, refine lineage, unknown handle error, persistence, LRU, preview-only summaries, scoped data breaks |
+| `test_analyze_cohort_stats.py` | Wilson reference values, median ranks (exact and approximate), 95% coverage by simulation, small-cell boundaries 9/10/29/30, every metric, grouping and suppression |
+| `test_reconcile.py` | each classification rule, engineered mismatch → unexplained, cohort reconcile, report rendering, full-data national and FY2017 pending |
+| `test_judgeship_context.py` | thresholds and recommendations sourced from data (25 districts, 69 judgeships), statements never recommend |
+| `test_glossary.py`, `test_enums.py` | lookups and suggestions; vocabularies equal the manifest, catalog and codebook; invented values rejected by the schema |
+| `test_sql_safety.py` | AST scan finds no formatted SQL in `core/`; writes, file reads, ATTACH and COPY all refused |
+| `test_architecture.py` | `core/` imports no FastMCP, FastAPI, httpx, uvicorn, anthropic or openai |
+| `test_schemas_export.py` | committed frontend schemas are current |
+
+**Claude in Chrome:** opened the generated [variance report](../docs/variance-report.md) and [analytics-core methodology](../docs/methodology/analytics-core.md) on the PR branch on GitHub; tables, the shift-share formula block and anchors render ([screenshot](../docs/evidence/phase-04/variance-report-summary.jpg)). The core has no web surface of its own yet; its MCP tools are exercised in the Inspector in Phase 5.
+
+**Found and fixed during the phase:**
+- DuckDB rejects `ATTACH ?` and turning external access *on* after start; paths are quoted literals from settings, and external access is switched *off* after attaching.
+- The first revision inference also "explained" FY2019 by C.D. Cal. (25 of 49 points); gated on a majority share and a majority-MDL district.
+- Wilson bounds came out as 0.9999999999999999 and 5.5e-17 at the extremes; clamped to exactly 1 and 0.
+
+## Open issues
+
+Live status is on the [issue tracker](https://github.com/syedaun-techsur/federal-courts-analyst/issues).
+
+1. **Domain expert review** now also covers `core/data/glossary.yaml` and `core/data/judgeships.yaml`. [#5](https://github.com/syedaun-techsur/federal-courts-analyst/issues/5) (comment added)
+2. **C-2/C-3 and FCMS table families**, judicial emergencies: not added. [#9](https://github.com/syedaun-techsur/federal-courts-analyst/issues/9) (updated)
+3. **AO confirmation** of the weighted revision; the core labels it inferred. [#8](https://github.com/syedaun-techsur/federal-courts-analyst/issues/8)
+4. **60 unexplained court-years** in the variance report (45 pending, 15 filings; largest: S.D. W. Va. FY2016 pending +6.0%, E.D. Mich. FY2016–FY2017 pending −14%). [#21](https://github.com/syedaun-techsur/federal-courts-analyst/issues/21)
+5. **ADR 0004** is implemented but still Proposed. [#4](https://github.com/syedaun-techsur/federal-courts-analyst/issues/4) (comment added)
+6. Resolved: FY2017 pending variance. [#11](https://github.com/syedaun-techsur/federal-courts-analyst/issues/11) (closed by PR #20)
