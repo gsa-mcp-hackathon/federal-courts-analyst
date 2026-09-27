@@ -51,6 +51,10 @@ Claude executes the phases one at a time and follows these rules in every phase:
 4. **Improve on the plan.** These plans are a starting point, not a contract. If you find a better approach, library, data source or design while working, use it. Record the change and the reason in the phase file (a "Deviations" section) or an ADR, and update later phases if they're affected.
 5. **Search the web when it helps.** Check current docs (FastMCP, MCP spec, Databricks, watsonx, library APIs), uscourts.gov and FJC data details, codebooks, and best practices whenever you're unsure, instead of guessing. Cite the sources you relied on in `docs/`.
 6. **End-of-phase report.** When a phase is finished, summarize what was built, test results (counts and coverage), the Chrome check, deviations from the plan, and any open issues. Then wait for the go-ahead before starting the next phase.
+7. **Track open issues on GitHub.** The [issue tracker](https://github.com/syedaun-techsur/federal-courts-analyst/issues) is the live list of open issues; each phase file's "Open issues" section is a snapshot that links to it.
+   - **When a phase finishes:** file every actionable open issue as a GitHub issue (skip duplicates of existing ones and pure notes about workarounds already applied). Use one issue per decision or piece of work, with the context, a "Done when" line and links to the phase file. Label it with the phase it came from (`phase N`), the phase that should fix it if that's different, and any of `needs domain expert`, `needs team`, `data`, `dev environment`, `stretch`. Then link the issue numbers from the phase file.
+   - **While working:** before starting a phase, read the open issues labelled for it. When work resolves one, close it from the PR (`Closes #N`) or comment with what changed. When new information changes one, comment on it rather than opening a duplicate.
+   - Filing, commenting on and closing issues in this repo doesn't need asking. Anything that reaches outside the repo (emailing the AO, submitting to the Wayback Machine) still does.
 
 ## Architecture
 
@@ -190,6 +194,7 @@ GSA estimates about 40 hours. This plan is deliberately bigger than that because
 - [ ] Integration/e2e tests pass against the app running in local Docker
 - [ ] Claude in Chrome walkthrough done; issues fixed; findings recorded under "Evidence"
 - [ ] Any deviations from the plan recorded (phase file "Deviations" section or an ADR)
+- [ ] Open issues filed on GitHub (or linked to existing ones) and the phase file's "Open issues" section links them; issues this phase resolved are closed
 - [ ] Public functions and every MCP tool have precise docstrings/descriptions
 - [ ] `docs/` updated (methodology, ADR if a design decision was made)
 - [ ] Short demo (screenshot, clip or transcript) added to the phase's "Evidence" section, which we'll reuse for the deck
