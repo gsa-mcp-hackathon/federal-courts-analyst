@@ -11,7 +11,10 @@ ROOT = Path(__file__).resolve().parents[1]
 PKG = ROOT / "src" / "courts_analyst"
 
 # core/ is pure domain logic: no protocol or web framework imports.
-FORBIDDEN_IN_CORE = {"fastmcp", "mcp", "mcp_types", "starlette", "fastapi", "httpx"}
+FORBIDDEN_IN_CORE = {
+    "fastmcp", "mcp", "mcp_types", "starlette", "fastapi", "httpx", "anthropic",
+    "openai", "uvicorn",
+}  # fmt: skip
 
 
 def _imported_roots(path: Path) -> set[str]:

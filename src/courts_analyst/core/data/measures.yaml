@@ -10,7 +10,13 @@
 # inference, not here.
 #
 # Fields: label, definition, unit, weighted (bool), denominator (or null),
-#         decimals (display precision used by tools), scope notes.
+#         decimals (display precision used by tools), tables (which
+#         published tables print it), idb (the IDB rule that rebuilds it, for
+#         reconciliation: filed | terminated | pending), scope notes.
+#
+# The official tables are authoritative for every measure here. The IDB only
+# reconstructs counts (for reconcile, explain_change and cohorts); it never
+# replaces a published figure.
 
 authorized_judgeships:
   label: Authorized judgeships
@@ -23,6 +29,7 @@ authorized_judgeships:
   weighted: false
   denominator: null
   decimals: 1
+  tables: ['6.2', X-1A]
 
 authorized_judgeships_incl_territorial:
   label: Authorized judgeships (including territorial courts)
@@ -34,6 +41,7 @@ authorized_judgeships_incl_territorial:
   weighted: false
   denominator: null
   decimals: 0
+  tables: ['6.1']
 
 # ── Filings per authorized judgeship (X-1A, 6.2) ───────────────────────────
 civil_filings_per_judgeship:
@@ -46,6 +54,7 @@ civil_filings_per_judgeship:
   weighted: false
   denominator: authorized_judgeships
   decimals: 0
+  tables: ['6.2', X-1A]
 weighted_civil_filings_per_judgeship:
   label: Weighted civil filings per judgeship
   definition: >-
@@ -57,6 +66,7 @@ weighted_civil_filings_per_judgeship:
   weighted: true
   denominator: authorized_judgeships
   decimals: 0
+  tables: ['6.2', X-1A]
 criminal_filings_per_judgeship:
   label: Criminal filings per judgeship (unweighted)
   definition: >-
@@ -68,6 +78,7 @@ criminal_filings_per_judgeship:
   weighted: false
   denominator: authorized_judgeships
   decimals: 0
+  tables: ['6.2', X-1A]
 weighted_criminal_filings_per_judgeship:
   label: Weighted criminal filings per judgeship
   definition: Criminal defendant filings multiplied by FJC case weights, divided by authorized judgeships.
@@ -75,6 +86,7 @@ weighted_criminal_filings_per_judgeship:
   weighted: true
   denominator: authorized_judgeships
   decimals: 0
+  tables: ['6.2', X-1A]
 supervision_hearings_per_judgeship:
   label: Supervised release hearings per judgeship (unweighted)
   definition: Supervised release and probation revocation hearings divided by authorized judgeships.
@@ -82,6 +94,7 @@ supervision_hearings_per_judgeship:
   weighted: false
   denominator: authorized_judgeships
   decimals: 1
+  tables: ['6.2', X-1A]
 weighted_supervision_hearings_per_judgeship:
   label: Weighted supervised release hearings per judgeship
   definition: >-
@@ -91,6 +104,7 @@ weighted_supervision_hearings_per_judgeship:
   weighted: true
   denominator: authorized_judgeships
   decimals: 1
+  tables: ['6.2', X-1A]
 total_filings_per_judgeship:
   label: Total filings per judgeship (unweighted)
   definition: Civil filings plus criminal defendants plus supervised release hearings, divided by authorized judgeships.
@@ -98,6 +112,7 @@ total_filings_per_judgeship:
   weighted: false
   denominator: authorized_judgeships
   decimals: 0
+  tables: ['6.2', X-1A]
 weighted_total_filings_per_judgeship:
   label: Weighted total filings per judgeship
   definition: >-
@@ -109,6 +124,7 @@ weighted_total_filings_per_judgeship:
   weighted: true
   denominator: authorized_judgeships
   decimals: 0
+  tables: ['6.2', X-1A]
 
 # ── Civil caseload (C-1) ───────────────────────────────────────────────────
 civil_cases_filed:
@@ -118,6 +134,8 @@ civil_cases_filed:
   weighted: false
   denominator: null
   decimals: 0
+  tables: [C-1]
+  idb: filed
 civil_cases_terminated:
   label: Civil cases terminated
   definition: Civil cases terminated in the 12-month period (Table C-1).
@@ -125,6 +143,8 @@ civil_cases_terminated:
   weighted: false
   denominator: null
   decimals: 0
+  tables: [C-1]
+  idb: terminated
 civil_cases_pending:
   label: Civil cases pending
   definition: >-
@@ -134,6 +154,8 @@ civil_cases_pending:
   weighted: false
   denominator: null
   decimals: 0
+  tables: [C-1]
+  idb: pending
 us_civil_cases_filed:
   label: U.S. civil cases filed
   definition: Civil cases filed in which the United States is a party (plaintiff or defendant).
@@ -141,6 +163,7 @@ us_civil_cases_filed:
   weighted: false
   denominator: null
   decimals: 0
+  tables: [C-1]
 us_civil_cases_terminated:
   label: U.S. civil cases terminated
   definition: Civil cases terminated in which the United States is a party.
@@ -148,6 +171,7 @@ us_civil_cases_terminated:
   weighted: false
   denominator: null
   decimals: 0
+  tables: [C-1]
 us_civil_cases_pending:
   label: U.S. civil cases pending
   definition: Civil cases pending in which the United States is a party.
@@ -155,6 +179,7 @@ us_civil_cases_pending:
   weighted: false
   denominator: null
   decimals: 0
+  tables: [C-1]
 private_civil_cases_filed:
   label: Private civil cases filed
   definition: Civil cases filed between private parties (federal question, diversity, local jurisdiction).
@@ -162,6 +187,7 @@ private_civil_cases_filed:
   weighted: false
   denominator: null
   decimals: 0
+  tables: [C-1]
 private_civil_cases_terminated:
   label: Private civil cases terminated
   definition: Civil cases between private parties terminated in the period.
@@ -169,6 +195,7 @@ private_civil_cases_terminated:
   weighted: false
   denominator: null
   decimals: 0
+  tables: [C-1]
 private_civil_cases_pending:
   label: Private civil cases pending
   definition: Civil cases between private parties pending at the end of the period.
@@ -176,6 +203,7 @@ private_civil_cases_pending:
   weighted: false
   denominator: null
   decimals: 0
+  tables: [C-1]
 
 # ── Total caseload, civil + criminal (6.1) ─────────────────────────────────
 total_cases_filed:
@@ -185,6 +213,7 @@ total_cases_filed:
   weighted: false
   denominator: null
   decimals: 0
+  tables: ['6.1']
 total_cases_terminated:
   label: Total civil and criminal cases terminated
   definition: Civil and criminal cases terminated, including transfers (Table 6.1).
@@ -192,6 +221,7 @@ total_cases_terminated:
   weighted: false
   denominator: null
   decimals: 0
+  tables: ['6.1']
 total_cases_pending:
   label: Total civil and criminal cases pending
   definition: Civil and criminal cases pending at period end, including transfers (Table 6.1).
@@ -199,6 +229,7 @@ total_cases_pending:
   weighted: false
   denominator: null
   decimals: 0
+  tables: ['6.1']
 
 # ── Time to disposition (C-5, 6.3) ─────────────────────────────────────────
 civil_cases_terminated_for_median:
@@ -211,6 +242,7 @@ civil_cases_terminated_for_median:
   weighted: false
   denominator: null
   decimals: 0
+  tables: [C-5]
 civil_median_months_to_disposition:
   label: Median time from filing to disposition, civil (months)
   definition: >-
@@ -220,6 +252,7 @@ civil_median_months_to_disposition:
   weighted: false
   denominator: null
   decimals: 1
+  tables: ['6.3', C-5]
 civil_cases_no_court_action:
   label: Civil cases terminated with no court action
   definition: Civil cases terminated with no court action (Table C-5).
@@ -227,6 +260,7 @@ civil_cases_no_court_action:
   weighted: false
   denominator: null
   decimals: 0
+  tables: [C-5]
 civil_median_months_no_court_action:
   label: Median time to disposition, civil, no court action (months)
   definition: Median months from filing to disposition for civil cases terminated with no court action.
@@ -234,6 +268,7 @@ civil_median_months_no_court_action:
   weighted: false
   denominator: null
   decimals: 1
+  tables: ['6.3', C-5]
 civil_cases_court_action_before_pretrial:
   label: Civil cases terminated by court action before pretrial
   definition: Civil cases terminated by court action before a pretrial conference (Table C-5).
@@ -241,6 +276,7 @@ civil_cases_court_action_before_pretrial:
   weighted: false
   denominator: null
   decimals: 0
+  tables: [C-5]
 civil_median_months_court_action_before_pretrial:
   label: Median time to disposition, civil, court action before pretrial (months)
   definition: Median months for civil cases terminated by court action before pretrial.
@@ -248,6 +284,7 @@ civil_median_months_court_action_before_pretrial:
   weighted: false
   denominator: null
   decimals: 1
+  tables: ['6.3', C-5]
 civil_cases_court_action_during_after_pretrial:
   label: Civil cases terminated by court action during or after pretrial
   definition: Civil cases terminated by court action during or after pretrial (Table C-5).
@@ -255,6 +292,7 @@ civil_cases_court_action_during_after_pretrial:
   weighted: false
   denominator: null
   decimals: 0
+  tables: [C-5]
 civil_median_months_court_action_during_after_pretrial:
   label: Median time to disposition, civil, during or after pretrial (months)
   definition: Median months for civil cases terminated by court action during or after pretrial.
@@ -262,6 +300,7 @@ civil_median_months_court_action_during_after_pretrial:
   weighted: false
   denominator: null
   decimals: 1
+  tables: ['6.3', C-5]
 civil_cases_court_action_trial:
   label: Civil cases terminated during or after trial
   definition: Civil cases terminated during trial (Table C-5).
@@ -269,6 +308,7 @@ civil_cases_court_action_trial:
   weighted: false
   denominator: null
   decimals: 0
+  tables: [C-5]
 civil_median_months_court_action_trial:
   label: Median time to disposition, civil, trial (months)
   definition: Median months from filing to disposition for civil cases terminated during trial.
@@ -276,6 +316,7 @@ civil_median_months_court_action_trial:
   weighted: false
   denominator: null
   decimals: 1
+  tables: ['6.3', C-5]
 criminal_median_months_to_disposition:
   label: Median time from filing to disposition, criminal defendants (months)
   definition: >-
@@ -286,6 +327,7 @@ criminal_median_months_to_disposition:
   weighted: false
   denominator: null
   decimals: 1
+  tables: ['6.3']
 criminal_median_months_dismissed:
   label: Median time to disposition, criminal, dismissed (months)
   definition: Median months for criminal defendants whose cases were dismissed.
@@ -293,6 +335,7 @@ criminal_median_months_dismissed:
   weighted: false
   denominator: null
   decimals: 1
+  tables: ['6.3']
 criminal_median_months_guilty_plea:
   label: Median time to disposition, criminal, guilty plea (months)
   definition: Median months for criminal defendants who pleaded guilty.
@@ -300,6 +343,7 @@ criminal_median_months_guilty_plea:
   weighted: false
   denominator: null
   decimals: 1
+  tables: ['6.3']
 criminal_median_months_bench_trial:
   label: Median time to disposition, criminal, bench trial (months)
   definition: Median months for criminal defendants disposed of by bench trial.
@@ -307,6 +351,7 @@ criminal_median_months_bench_trial:
   weighted: false
   denominator: null
   decimals: 1
+  tables: ['6.3']
 criminal_median_months_jury_trial:
   label: Median time to disposition, criminal, jury trial (months)
   definition: Median months for criminal defendants disposed of by jury trial.
@@ -314,3 +359,4 @@ criminal_median_months_jury_trial:
   weighted: false
   denominator: null
   decimals: 1
+  tables: ['6.3']

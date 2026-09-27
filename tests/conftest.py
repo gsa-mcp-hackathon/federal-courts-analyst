@@ -114,3 +114,50 @@ def idb_con(idb: IdbBuild) -> Iterator[duckdb.DuckDBPyConnection]:
         yield c
     finally:
         c.close()
+
+
+# ── Analytics core (Phase 4) ─────────────────────────────────────────────────
+# The core reads both fixture builds through one read-only connection, the
+# way the server does.
+
+
+@pytest.fixture(scope="session")
+def core_db(catalog: Catalog, idb: IdbBuild) -> Iterator[Any]:
+    from courts_analyst.core.db import Database
+
+    db = Database(catalog.db, idb.db)
+    yield db
+    db.close()
+
+
+@pytest.fixture(scope="session")
+def tables_only_db(catalog: Catalog) -> Iterator[Any]:
+    """The catalog without the IDB (as when only `make data-tables` has run)."""
+    from courts_analyst.core.db import Database
+
+    db = Database(catalog.db, None)
+    yield db
+    db.close()
+
+
+@pytest.fixture
+def store() -> Any:
+    from courts_analyst.core.cohorts import CohortStore
+
+    return CohortStore()
+
+
+FULL_TABLES = ROOT / "data" / "build" / "courts.duckdb"
+FULL_IDB = ROOT / "data" / "build" / "idb.duckdb"
+
+
+@pytest.fixture(scope="session")
+def full_db() -> Iterator[Any]:
+    """The full local builds (`make data`), for @fulldata tests."""
+    from courts_analyst.core.db import Database
+
+    if not (FULL_TABLES.is_file() and FULL_IDB.is_file()):
+        pytest.skip("full datasets not built (make data)")
+    db = Database(FULL_TABLES, FULL_IDB)
+    yield db
+    db.close()

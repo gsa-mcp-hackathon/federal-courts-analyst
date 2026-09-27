@@ -1,0 +1,485 @@
+{
+  "additionalProperties": false,
+  "description": "Which civil cases are in the cohort. Every filter is optional; lists\nmean \"any of\". Courts may be districts or circuits (a circuit means all its\ndistricts); omit ``courts`` or pass ``US`` for every district.",
+  "properties": {
+    "courts": {
+      "anyOf": [
+        {
+          "items": {
+            "description": "Court code: US (all district courts), a circuit (CIR-01 \u2026 CIR-11, CIR-DC) or a district (state postal code, plus -N/-E/-S/-W/-M/-C for divided states: FL-N = N.D. Fla., NY-S = S.D.N.Y., DC = D.D.C.).",
+            "enum": [
+              "US",
+              "CIR-DC",
+              "DC",
+              "CIR-01",
+              "ME",
+              "MA",
+              "NH",
+              "RI",
+              "PR",
+              "CIR-02",
+              "CT",
+              "NY-N",
+              "NY-E",
+              "NY-S",
+              "NY-W",
+              "VT",
+              "CIR-03",
+              "DE",
+              "NJ",
+              "PA-E",
+              "PA-M",
+              "PA-W",
+              "VI",
+              "CIR-04",
+              "MD",
+              "NC-E",
+              "NC-M",
+              "NC-W",
+              "SC",
+              "VA-E",
+              "VA-W",
+              "WV-N",
+              "WV-S",
+              "CIR-05",
+              "LA-E",
+              "LA-M",
+              "LA-W",
+              "MS-N",
+              "MS-S",
+              "TX-N",
+              "TX-E",
+              "TX-S",
+              "TX-W",
+              "CIR-06",
+              "KY-E",
+              "KY-W",
+              "MI-E",
+              "MI-W",
+              "OH-N",
+              "OH-S",
+              "TN-E",
+              "TN-M",
+              "TN-W",
+              "CIR-07",
+              "IL-N",
+              "IL-C",
+              "IL-S",
+              "IN-N",
+              "IN-S",
+              "WI-E",
+              "WI-W",
+              "CIR-08",
+              "AR-E",
+              "AR-W",
+              "IA-N",
+              "IA-S",
+              "MN",
+              "MO-E",
+              "MO-W",
+              "NE",
+              "ND",
+              "SD",
+              "CIR-09",
+              "AK",
+              "AZ",
+              "CA-N",
+              "CA-E",
+              "CA-C",
+              "CA-S",
+              "HI",
+              "ID",
+              "MT",
+              "NV",
+              "OR",
+              "WA-E",
+              "WA-W",
+              "GU",
+              "MP",
+              "CIR-10",
+              "CO",
+              "KS",
+              "NM",
+              "OK-N",
+              "OK-E",
+              "OK-W",
+              "UT",
+              "WY",
+              "CIR-11",
+              "AL-N",
+              "AL-M",
+              "AL-S",
+              "FL-N",
+              "FL-M",
+              "FL-S",
+              "GA-N",
+              "GA-M",
+              "GA-S"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "District or circuit codes; omit for all districts.",
+      "title": "Courts"
+    },
+    "fy_from": {
+      "description": "First fiscal year.",
+      "maximum": 2025,
+      "minimum": 2015,
+      "title": "Fy From",
+      "type": "integer"
+    },
+    "fy_to": {
+      "description": "Last fiscal year.",
+      "maximum": 2025,
+      "minimum": 2015,
+      "title": "Fy To",
+      "type": "integer"
+    },
+    "basis": {
+      "default": "filed",
+      "description": "'filed': cases filed in those fiscal years. 'terminated': terminations in those fiscal years (every termination counts, as in Table C-1).",
+      "enum": [
+        "filed",
+        "terminated"
+      ],
+      "title": "Basis",
+      "type": "string"
+    },
+    "nos_codes": {
+      "anyOf": [
+        {
+          "items": {
+            "description": "Three-digit nature-of-suit code.",
+            "enum": [
+              "110",
+              "120",
+              "130",
+              "140",
+              "150",
+              "151",
+              "152",
+              "153",
+              "160",
+              "190",
+              "195",
+              "196",
+              "210",
+              "220",
+              "230",
+              "240",
+              "245",
+              "290",
+              "310",
+              "315",
+              "320",
+              "330",
+              "340",
+              "345",
+              "350",
+              "355",
+              "360",
+              "362",
+              "365",
+              "367",
+              "368",
+              "370",
+              "371",
+              "380",
+              "385",
+              "375",
+              "376",
+              "400",
+              "410",
+              "422",
+              "423",
+              "430",
+              "440",
+              "441",
+              "442",
+              "443",
+              "444",
+              "445",
+              "446",
+              "448",
+              "450",
+              "460",
+              "462",
+              "463",
+              "465",
+              "470",
+              "480",
+              "485",
+              "490",
+              "510",
+              "530",
+              "535",
+              "540",
+              "550",
+              "555",
+              "560",
+              "610",
+              "620",
+              "625",
+              "630",
+              "640",
+              "650",
+              "660",
+              "690",
+              "710",
+              "720",
+              "730",
+              "740",
+              "751",
+              "790",
+              "791",
+              "820",
+              "830",
+              "835",
+              "840",
+              "850",
+              "861",
+              "862",
+              "863",
+              "864",
+              "865",
+              "870",
+              "871",
+              "875",
+              "880",
+              "890",
+              "891",
+              "893",
+              "895",
+              "896",
+              "899",
+              "950"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Nature-of-suit codes, for example ['442'] or ['830'].",
+      "title": "Nos Codes"
+    },
+    "nos_groups": {
+      "anyOf": [
+        {
+          "items": {
+            "description": "Table C-2 nature-of-suit group.",
+            "enum": [
+              "Insurance",
+              "Marine",
+              "Miller Act",
+              "Negotiable Instruments",
+              "Recovery of Overpayments and Enforcement of Judgments",
+              "Other Contract Actions",
+              "Franchise",
+              "Condemnation of Land",
+              "Foreclosure",
+              "Rent, Lease, and Ejectment",
+              "Torts to Land, Including Product Liability",
+              "Other Real Property Actions",
+              "Other Personal Injury",
+              "Personal Injury/Product Liability",
+              "Personal Property Damage",
+              "Other Statutory Actions",
+              "State Reapportionment Suits",
+              "Antitrust",
+              "Bankruptcy",
+              "Banks and Banking",
+              "Civil Rights",
+              "Deportation",
+              "Immigration",
+              "Prisoner Petitions",
+              "Racketeer Influenced and Corrupt Organization Act",
+              "Consumer Credit",
+              "Cable/Sat. TV",
+              "Forfeiture and Penalty",
+              "Labor Laws",
+              "Intellectual Property Rights",
+              "Securities, Commodities, and Exchanges",
+              "Social Security Laws",
+              "Tax Suits",
+              "Customer Challenge",
+              "Environmental Matters",
+              "Freedom of Information Act",
+              "Constitutionality of State Statutes"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Table C-2 groups, for example ['Civil Rights'].",
+      "title": "Nos Groups"
+    },
+    "nos_categories": {
+      "anyOf": [
+        {
+          "items": {
+            "description": "Table C-2 top-level category.",
+            "enum": [
+              "Contract Actions",
+              "Real Property Actions",
+              "Tort Actions",
+              "Actions Under Statutes"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Nos Categories"
+    },
+    "origins": {
+      "anyOf": [
+        {
+          "items": {
+            "description": "How the case arrived: original, removed, remanded, reopened, transferred, mdl_transfer (sent by the JPML), mdl_direct (filed directly in the MDL court, from July 2016), appeal_from_magistrate.",
+            "enum": [
+              "original",
+              "removed",
+              "remanded",
+              "reopened",
+              "transferred",
+              "mdl_transfer",
+              "appeal_from_magistrate",
+              "mdl_direct"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Origins to include, for example ['mdl_direct'] for directly filed MDL cases.",
+      "title": "Origins"
+    },
+    "exclude_mdl": {
+      "default": false,
+      "description": "Drop MDL cases (directly filed and transferred in by the JPML).",
+      "title": "Exclude Mdl",
+      "type": "boolean"
+    },
+    "jurisdictions": {
+      "anyOf": [
+        {
+          "items": {
+            "description": "us (U.S. a party) or private.",
+            "enum": [
+              "us",
+              "private"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Jurisdictions"
+    },
+    "dispositions": {
+      "anyOf": [
+        {
+          "items": {
+            "description": "dismissed, judgment (including settlements entered as judgments and statistical closings) or transferred_or_remanded.",
+            "enum": [
+              "transferred_or_remanded",
+              "dismissed",
+              "judgment"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Only terminated cases with these dispositions.",
+      "title": "Dispositions"
+    },
+    "pro_se": {
+      "anyOf": [
+        {
+          "items": {
+            "description": "Who was pro se at filing: plaintiff, defendant, both, none.",
+            "enum": [
+              "none",
+              "plaintiff",
+              "defendant",
+              "both"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Who was pro se: plaintiff, defendant, both, none.",
+      "title": "Pro Se"
+    },
+    "class_action": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "True: class action alleged at filing.",
+      "title": "Class Action"
+    },
+    "mdl_docket": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "An MDL docket number, for example '2885'.",
+      "title": "Mdl Docket"
+    }
+  },
+  "required": [
+    "fy_from",
+    "fy_to"
+  ],
+  "title": "CohortSpec",
+  "type": "object"
+}

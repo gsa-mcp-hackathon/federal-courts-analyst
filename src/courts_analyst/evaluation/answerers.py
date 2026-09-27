@@ -106,8 +106,15 @@ class NullAnswerer:
         return AnswerRecord(question_id=item.id, answerer=self.name, latency_s=0.0)
 
 
+def _engine() -> Answerer:
+    from courts_analyst.evaluation.engine import EngineAnswerer
+
+    return EngineAnswerer()
+
+
 ANSWERERS: dict[str, Callable[[], Answerer]] = {
     "gold": GoldAnswerer,
     "null": NullAnswerer,
+    "engine": _engine,
 }
 """Answerers the CLI can build by name. Later phases register more."""

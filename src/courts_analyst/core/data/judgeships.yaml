@@ -1,0 +1,74 @@
+# Judgeship reference data for judgeship_context (core/judgeships.py).
+#
+# Everything here is quoted from a published source and tagged with it. The
+# server reports these facts next to the official weighted filings; it never
+# makes a recommendation of its own. Review: issue #5 (domain expert).
+
+thresholds:
+  - id: new_judgeship_standard
+    value: 430
+    measure: weighted_total_filings_per_judgeship
+    label: Judicial Conference standard for considering an additional district judgeship
+    description: >-
+      The Judicial Conference's starting point for the district courts is 430
+      weighted filings per authorized judgeship after accounting for the
+      judgeships it recommends; it generally requires a court to be above 430
+      to recommend an additional judgeship. It also weighs other factors
+      (senior and magistrate judge assistance, geography, case mix), so
+      crossing 430 is not by itself a recommendation.
+    source: >-
+      CRS Insight IN12541, "Recommendation for New U.S. Circuit and District
+      Court Judgeships by the Judicial Conference of the United States (119th
+      Congress)"; AO, "Judiciary Makes the Case for New Judgeships" (2020)
+    url: https://www.congress.gov/crs-product/IN12541
+  - id: judicial_emergency_vacancy_600
+    value: 600
+    measure: weighted_total_filings_per_judgeship
+    label: Judicial emergency threshold (with a vacancy)
+    description: >-
+      A district court vacancy is a judicial emergency when weighted filings
+      exceed 600 per judgeship; a vacancy open more than 18 months is an
+      emergency when weighted filings are 430 to 600 per judgeship; so is a
+      court with more than one authorized judgeship and only one active judge.
+      The definition needs vacancy data, which this server doesn't have, so it
+      can report the filings side only.
+    source: Administrative Office of the U.S. Courts, "Judicial Emergency Definition"
+    url: https://www.uscourts.gov/judicial-emergency-definition
+
+recommendations:
+  - edition: JC-2025
+    date: 2025-03-11
+    title: "Table 1. Additional Judgeships Recommended by the Judicial Conference, 2025"
+    url: https://www.uscourts.gov/sites/default/files/2025-03/2025_judicial_conference_recommendations.pdf
+    sha256: c650e5be0bd3fb7b2fcf389b08531782d187888bbba1c25ce04281ad425e1641
+    note: >-
+      The Conference recommended 2 court of appeals judgeships (Ninth Circuit)
+      and 69 permanent district judgeships in 25 districts. "Current
+      authorized" is as printed in the table.
+    districts:
+      # court: [current authorized judgeships, recommended additional]
+      AZ: [13, 3]
+      CA-C: [28, 12]
+      CA-E: [6, 5]
+      CA-N: [14, 2]
+      CO: [7, 2]
+      DE: [4, 2]
+      FL-M: [15, 7]
+      FL-N: [4, 1]
+      FL-S: [18, 3]
+      GA-N: [11, 4]
+      ID: [2, 1]
+      IN-S: [5, 1]
+      IA-N: [2, 1]
+      NE: [3, 1]
+      NJ: [17, 4]
+      NY-E: [15, 2]
+      NY-S: [28, 2]
+      NY-W: [4, 1]
+      OK-E: [1.5, 2]
+      OK-N: [3.5, 1]
+      TN-M: [4, 1]
+      TX-E: [8, 2]
+      TX-N: [12, 1]
+      TX-S: [19, 2]
+      TX-W: [13, 6]
