@@ -112,9 +112,20 @@ def _engine() -> Answerer:
     return EngineAnswerer()
 
 
+def _claude_code(model: str) -> Callable[[], Answerer]:
+    def make() -> Answerer:
+        from courts_analyst.evaluation.claude_code import ClaudeCodeAnswerer
+
+        return ClaudeCodeAnswerer(model)
+
+    return make
+
+
 ANSWERERS: dict[str, Callable[[], Answerer]] = {
     "gold": GoldAnswerer,
     "null": NullAnswerer,
     "engine": _engine,
+    "claude-code": _claude_code("sonnet"),
+    "claude-code-haiku": _claude_code("haiku"),
 }
 """Answerers the CLI can build by name. Later phases register more."""

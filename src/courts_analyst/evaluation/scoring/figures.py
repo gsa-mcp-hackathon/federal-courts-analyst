@@ -76,7 +76,36 @@ def find_editions(text: str) -> list[_Mention]:
     return sorted(out, key=lambda x: x.start)
 
 
-def _nearest_edition(start: int, end: int, mentions: list[_Mention]) -> str | None:
+_SENTENCE_END = re.compile(r"(?<=[.!?])\s+(?=[A-Z*(\[])|\n+")
+# "N.D. Fla., M.D. Ga." and "Tex. Table" aren't sentence ends: a short
+# capitalised word or initials before the period is an abbreviation.
+_ABBREV = re.compile(r"(?:\b[A-Z][a-z]{0,3}|(?:\b[A-Z]\.)+[A-Z]?|\bNo|\bv|\bvs)\.$")
+
+
+def _sentence_bounds(text: str) -> list[tuple[int, int]]:
+    bounds, start = [], 0
+    for m in _SENTENCE_END.finditer(text):
+        if not m.group().startswith("\n") and _ABBREV.search(text[: m.start()]):
+            continue
+        bounds.append((start, m.start()))
+        start = m.end()
+    bounds.append((start, len(text)))
+    return bounds
+
+
+def _nearest_edition(
+    start: int, end: int, mentions: list[_Mention], sentence: tuple[int, int]
+) -> str | None:
+    """Nearest edition in the same sentence; otherwise within WINDOW chars."""
+    lo, hi = sentence
+    same = [m for m in mentions if m.start >= lo and m.end <= hi]
+    if same:
+        after = [m for m in same if m.start >= end]
+        before = [m for m in same if m.end <= start]
+        if after:
+            return min(after, key=lambda m: m.start - end).edition
+        if before:
+            return max(before, key=lambda m: m.end).edition
     best: tuple[float, str] | None = None
     for m in mentions:
         if m.start >= end:
@@ -94,6 +123,7 @@ def figures_in_text(text: str) -> list[ReportedFigure]:
     """Numbers in prose, each with its nearest edition (or None)."""
     mentions = find_editions(text)
     spans = [(m.start, m.end) for m in mentions]
+    sentences = _sentence_bounds(text)
     out: list[ReportedFigure] = []
     for m in _NUMBER.finditer(text):
         if any(s <= m.start() < e for s, e in spans):
@@ -104,7 +134,12 @@ def figures_in_text(text: str) -> list[ReportedFigure]:
         out.append(
             ReportedFigure(
                 value=float(raw),
-                edition=_nearest_edition(m.start(), m.end(), mentions),
+                edition=_nearest_edition(
+                    m.start(),
+                    m.end(),
+                    mentions,
+                    next(b for b in sentences if b[0] <= m.start() <= b[1]),
+                ),
             )
         )
     return out

@@ -94,7 +94,9 @@ async def test_mcp_over_stdio(mode: str) -> None:
     async with Client(transport, mode=mode) as c:
         result = await c.call_tool("server_info", {})
     assert result.structured_content is not None
-    assert result.structured_content["tools"] == ["server_info"]
+    from tests.test_registration import EXPECTED_TOOLS
+
+    assert result.structured_content["tools"] == sorted(EXPECTED_TOOLS)
 
 
 def test_platform_port_forces_http() -> None:

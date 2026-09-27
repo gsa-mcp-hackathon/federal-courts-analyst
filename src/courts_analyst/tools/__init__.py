@@ -14,12 +14,40 @@ from __future__ import annotations
 
 from fastmcp import FastMCP
 
-from courts_analyst.tools import server_info
+from courts_analyst.tools import (
+    analyze_cohort,
+    compare_courts,
+    explain_change,
+    explain_term,
+    find_cases,
+    get_official_figure,
+    judgeship_context,
+    reconcile,
+    sample_dockets,
+    server_info,
+)
+
+# Registration order is the tools/list order (spec 2026-07-28 asks for a
+# stable one): the flagship first, then the rest in the order an analyst
+# usually reaches for them.
+MODULES = (
+    explain_change,
+    get_official_figure,
+    compare_courts,
+    find_cases,
+    analyze_cohort,
+    reconcile,
+    judgeship_context,
+    explain_term,
+    sample_dockets,
+    server_info,
+)
 
 
 def register_tools(mcp: FastMCP) -> None:
     """Register all tools with the MCP server."""
-    server_info.register(mcp)
+    for module in MODULES:
+        module.register(mcp)
 
 
 __all__ = ["register_tools"]

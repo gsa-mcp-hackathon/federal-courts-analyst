@@ -30,10 +30,40 @@ def rec(text: str = "", **kw: object) -> AnswerRecord:
         ("Could you clarify which edition you want?", "clarify"),
         ("Which figure would you like: raw or weighted?", "clarify"),
         ("", "answer"),
+        # Seen in Phase 5 transcripts (Claude Sonnet):
+        ("This tool set has no party-level data — it can't provide names of "
+         "litigants.", "decline"),
+        ("This isn't something I can answer — FY2030 hasn't happened yet.", "decline"),
+        ("I don't have data for FY2012. Would you like FY2016 instead?", "decline"),
+        ("Weighted civil filings per judgeship isn't published for FY1992. Would "
+         "you like the FY1990 or FY1995 figure instead?", "decline"),
+        ("There were 0 cases, so the sample is too small to report a median.",
+         "decline"),
+        ("That data isn't in scope for these tools. Could you clarify what you "
+         "need?", "decline"),
+        ('"Filings" is ambiguous here—did you mean civil or criminal? Also let me '
+         "know the court.", "clarify"),
+        ("I need to clarify which measure you mean — could you confirm which one: "
+         "1. count 2. per judgeship.", "clarify"),
+        ("There's no published national figure for FY1992 — Table 6.2 reports "
+         "1990 and 1995.", "decline"),
+        ("There were zero cases — too few (fewer than 10, in fact none) to compute "
+         "a median.", "decline"),
+        ("This tool covers district courts, not bankruptcy courts: a separate "
+         "system this data doesn't include. If you meant appeals, I can look.",
+         "decline"),
+        ("E.D. Tex. had 894 weighted filings per judgeship. " + "Detail. " * 90
+         + "The server doesn't provide vacancy data.", "answer"),
     ],
-)
+)  # fmt: skip
 def test_text_inference(text: str, behavior: str) -> None:
     assert infer_behavior(rec(text)) == behavior
+
+
+def test_expected_figures_mean_answered() -> None:
+    text = "900 is not correct. I won't confirm it. The figure is 322 (JFF-2025)."
+    assert infer_behavior(rec(text)) == "decline"
+    assert infer_behavior(rec(text), answered_expected=True) == "answer"
 
 
 def test_declared_behaviour_wins() -> None:

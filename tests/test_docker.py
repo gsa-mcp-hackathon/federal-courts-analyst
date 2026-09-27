@@ -175,6 +175,26 @@ async def test_container_reads_built_catalog(catalog, idb, tmp_path) -> None:  #
             check=True,
         )
         assert "private" not in ls.stdout.split()
+        # The data tools answer over streamable HTTP from the container.
+        async with Client(f"{base}/mcp") as c:
+            fig = await c.call_tool(
+                "get_official_figure",
+                {
+                    "measure": "weighted_civil_filings_per_judgeship",
+                    "fiscal_year": 2020,
+                },
+            )
+            cases = await c.call_tool(
+                "find_cases", {"courts": ["FL-N"], "fy_from": 2020, "fy_to": 2020}
+            )
+            handle = cases.structured_content["data"]["handle"]
+            median = await c.call_tool(
+                "analyze_cohort",
+                {"handle": handle, "metric": "median_days_to_disposition"},
+            )
+        assert fig.structured_content["data"]["value"] == 322
+        assert fig.structured_content["data"]["first_published"]["value"] == 554
+        assert median.structured_content["data"]["results"][0]["n"] > 0
         # The analytics core runs in the image against the mounted data.
         core = subprocess.run(
             ["docker", "exec", name, "python", "-c", CORE_SMOKE],

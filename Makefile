@@ -2,7 +2,7 @@
 .DEFAULT_GOAL := help
 .PHONY: help setup lint format typecheck test test-full cov data data-tables \
         data-discover data-idb data-idb-sample serve serve-http \
-        variance-report schemas inspector docker-build docker-run docker-test web eval eval-validate clean
+        variance-report schemas inspector docker-build docker-run docker-test web eval eval-validate eval-claude clean
 
 IMAGE ?= federal-courts-analyst:dev
 PORT  ?= 8000
@@ -78,6 +78,10 @@ web: ## Frontend dev server (P8)
 
 eval-validate: ## Validate the question bank (schema, ids, splits)
 	uv run courts-eval validate
+
+eval-claude: ## Dev-split tool-selection + e2e run with Claude (needs a logged-in `claude` CLI)
+	uv run courts-eval run --answerer claude-code --suite tool_selection --split dev --workers 4
+	uv run courts-eval run --answerer claude-code --suite e2e --split dev --workers 4
 
 eval: ## Harness self-check: gold must score 100%, null 0%
 	uv run courts-eval run --answerer gold --quiet --expect-accuracy 1

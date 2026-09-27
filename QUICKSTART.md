@@ -39,8 +39,7 @@ this to your user MCP settings with the **absolute path** to this repo:
   "mcpServers": {
     "courts-analyst": {
       "command": "uv",
-      "args": ["run", "courts-analyst"],
-      "cwd": "/absolute/path/to/federal-courts-analyst"
+      "args": ["run", "--quiet", "--directory", "/absolute/path/to/federal-courts-analyst", "courts-analyst"]
     }
   }
 }
@@ -53,12 +52,18 @@ Add the same block to
 `%APPDATA%\Claude\claude_desktop_config.json` (Windows), then restart Claude
 Desktop.
 
-Once connected, ask the client:
+`uv run --directory` runs the server from the repo, so it finds `data/`
+wherever the client starts it. Build the data first (`make data`).
 
-> "Call server_info from the courts-analyst server."
+Once connected, try:
 
-You'll get the server version, supported protocol versions and whether the data
-has been built (`not_built` until Phase 1/2's `make data`).
+> "Call server_info from the courts-analyst server." (version, protocols, which datasets are built)
+>
+> "What were weighted civil filings per judgeship nationally in FY2020?" (322 in JFF-2025, first published as 554 in JB-2020)
+>
+> "Why did federal civil filings jump in FY2020?" (explain_change: N.D. Fla., directly filed MDL cases)
+>
+> "Which five districts had the highest weighted filings per judgeship in FY2024?" (compare_courts)
 
 ## 5. Verify everything
 

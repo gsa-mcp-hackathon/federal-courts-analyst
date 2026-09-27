@@ -43,6 +43,11 @@ class Settings(BaseSettings):
     data_dir: Path = Path("data")
     duckdb_path: Path | None = None
     idb_duckdb_path: Path | None = None
+    # Cohort handles (Phase 5). Unset → in-memory only; handles are
+    # deterministic, so a restart just means calling find_cases again. Set a
+    # writable path (never inside data/build, which is mounted read-only) to
+    # keep handles across restarts in HTTP mode.
+    cohort_store_path: Path | None = None
 
     # ── External services (all optional) ──────────────────────────────────────
     anthropic_api_key: SecretStr | None = None

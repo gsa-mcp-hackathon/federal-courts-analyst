@@ -26,7 +26,7 @@ def test_clarify_envelope() -> None:
         choices=[Choice(value="a", label="A"), Choice(value="b", label="B")],
         default="a",
     )
-    r = clarify(c)
+    r = clarify(c, OfficialFigure)
     assert r.status == "needs_clarification" and r.data is None
     assert r.clarification == c and r.provenance == []
 

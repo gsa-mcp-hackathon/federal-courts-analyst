@@ -20,7 +20,9 @@ COVERAGE = (
     "Figures) in every edition covering FY2016–FY2025, with revisions tracked "
     "across editions; (2) the FJC Integrated Database civil file: every case "
     "active in FY2015–FY2025, one row per record, all codes decoded, party names "
-    "excluded. No statistics tools are available yet (Phase 5)."
+    "excluded. Tools: official figures and revisions, court comparisons, change "
+    "explanations, IDB cohorts, reconciliation, judgeship context, definitions "
+    "and example dockets."
 )
 
 

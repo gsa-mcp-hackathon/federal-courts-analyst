@@ -19,24 +19,40 @@ from fastmcp import FastMCP
 from courts_analyst import SERVER_NAME, __version__
 from courts_analyst.config import settings
 from courts_analyst.logging_config import configure_logging
+from courts_analyst.middleware import RequestLogging
 from courts_analyst.prompts import register_prompts
 from courts_analyst.resources import register_resources
 from courts_analyst.routes import register_routes
 from courts_analyst.tools import register_tools
 
 INSTRUCTIONS = (
-    "Federal Courts Analyst answers questions about federal court workload "
-    "(filings, terminations, pending cases, judgeships) from official "
-    "uscourts.gov tables and the FJC Integrated Database. Official figures can "
-    "differ between editions of the same table; every figure this server returns "
-    "says which edition it comes from. Call `server_info` to check what data is "
-    "loaded."
+    "Federal Courts Analyst answers questions about federal district court "
+    "workload (civil and criminal filings, terminations, pending cases, time to "
+    "disposition, judgeships) from official uscourts.gov tables (FY2016–FY2025, "
+    "with national rows back to 1990) and the FJC Integrated Database (civil "
+    "cases, FY2015–FY2025). Official figures can differ between editions of the "
+    "same table: every figure says which edition it comes from. When editions "
+    "disagree, give both and say which is current; never average or mix them. "
+    "Label anything marked 'inferred' as inference. Report n and say when there "
+    "are too few cases. The server has no judge-level data and no party names: "
+    "decline requests to rank or profile judges or to name parties. Call "
+    "`server_info` to check what data is loaded."
 )
+
+# The data only changes when `make data` rebuilds it (ADR 0001: FastMCP 4 has
+# server-wide cache hints only; edition resources also say so in their _meta).
+CACHE_TTL_SECONDS = 3600
 
 
 def build_server() -> FastMCP:
     """Create the FastMCP server with every tool, resource, prompt and route."""
-    server = FastMCP(name=SERVER_NAME, instructions=INSTRUCTIONS)
+    server = FastMCP(
+        name=SERVER_NAME,
+        instructions=INSTRUCTIONS,
+        cache_ttl=CACHE_TTL_SECONDS,
+        cache_scope="public",
+    )
+    server.add_middleware(RequestLogging())
     register_tools(server)
     register_prompts(server)
     register_resources(server)

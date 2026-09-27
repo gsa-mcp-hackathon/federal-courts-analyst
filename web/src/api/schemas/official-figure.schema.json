@@ -238,6 +238,14 @@
           },
           "title": "Footnotes",
           "type": "array"
+        },
+        "revision_notes": {
+          "description": "Why the editions differ: the official history, and our inference (basis 'inferred') only where the district figures support it.",
+          "items": {
+            "$ref": "#/$defs/RevisionNote"
+          },
+          "title": "Revision Notes",
+          "type": "array"
         }
       },
       "required": [
@@ -541,6 +549,68 @@
         "status"
       ],
       "title": "ReconciliationBadge",
+      "type": "object"
+    },
+    "RevisionNote": {
+      "description": "One statement about why editions differ, labelled by what backs it.",
+      "properties": {
+        "basis": {
+          "enum": [
+            "official",
+            "inferred"
+          ],
+          "title": "Basis",
+          "type": "string"
+        },
+        "text": {
+          "title": "Text",
+          "type": "string"
+        },
+        "district": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "The district an inference is about.",
+          "title": "District"
+        },
+        "points": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Points of the first-published figure that district contributes.",
+          "title": "Points"
+        },
+        "revision": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Latest minus first-published value.",
+          "title": "Revision"
+        }
+      },
+      "required": [
+        "basis",
+        "text"
+      ],
+      "title": "RevisionNote",
       "type": "object"
     }
   },

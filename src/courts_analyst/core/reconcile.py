@@ -33,6 +33,7 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
+from courts_analyst.core.chain import load_chain
 from courts_analyst.core.cohorts import (
     CohortSpec,
     CohortStore,
@@ -44,7 +45,6 @@ from courts_analyst.core.db import Database
 from courts_analyst.core.errors import OutOfScopeError
 from courts_analyst.core.measures import PENDING_WHERE, get_measure
 from courts_analyst.core.numbers import fmt, round_half_up
-from courts_analyst.core.official import CHAIN_SQL, _Row
 from courts_analyst.core.provenance import (
     BadgeStatus,
     FigureRef,
@@ -226,13 +226,6 @@ def classify(
     return "unexplained", []
 
 
-def _chain(db: Database, measure: str, court: str, fy: int) -> list[_Row]:
-    return [
-        _Row(e, t, v, d if d is not None else 0, p, c, u, pe, list(f or []))
-        for e, t, v, d, p, c, u, pe, f in db.rows(CHAIN_SQL, [measure, court, fy])
-    ]
-
-
 def reconcile_figure(
     db: Database, measure: str, court: str, fiscal_year: int
 ) -> Result[Reconciliation]:
@@ -245,7 +238,7 @@ def reconcile_figure(
             f"{m.label} has no IDB counterpart.",
             ["get_official_figure"],
         )
-    chain = _chain(db, measure, court, fiscal_year)
+    chain = load_chain(db, measure, court, fiscal_year)
     if not chain:
         raise OutOfScopeError(
             f"{m.label} for {court} isn't published for FY{fiscal_year}.",
