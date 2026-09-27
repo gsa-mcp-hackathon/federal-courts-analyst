@@ -444,7 +444,10 @@ def _data_break_caveats(db: Database, spec: CohortSpec) -> list[Caveat]:
         ):
             continue
         out.append(
-            Caveat(code="data_break", message=f"{title} ({bid})", severity="info")
+            Caveat(
+                code="data_break",
+                message=f"The window crosses a data break: {title} ({bid})",
+            )
         )
     return out
 

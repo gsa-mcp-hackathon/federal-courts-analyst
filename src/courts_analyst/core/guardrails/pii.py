@@ -193,7 +193,9 @@ class Scanner:
     ``extra_vocabulary`` is more of the server's own text (for example
     footnotes from the catalog). ``boundaries`` are phrases the server
     inserts into its sentences (court names and citations): each is treated
-    as a separator, so "W.D. La. rose by 41" can't read as a name "LA ROSE".
+    as a separator, so a citation followed by an ordinary word can't read as a
+    two-word party name. (Examples live in the tests: this file's text is
+    itself part of the vocabulary.)
     """
 
     def __init__(

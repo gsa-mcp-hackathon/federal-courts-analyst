@@ -479,8 +479,8 @@
     'warnings': list([
       dict({
         'code': 'data_break',
-        'message': 'COVID-19 national emergency (March 13, 2020) disrupted court operations. (pandemic-2020)',
-        'severity': 'info',
+        'message': 'The window crosses a data break: COVID-19 national emergency (March 13, 2020) disrupted court operations. (pandemic-2020)',
+        'severity': 'caution',
       }),
     ]),
   })

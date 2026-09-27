@@ -9,10 +9,10 @@ features that need them.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Literal
+from typing import Annotated, Literal
 
 from pydantic import SecretStr, field_validator
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 LogLevel = Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
 
@@ -36,6 +36,17 @@ class Settings(BaseSettings):
     mcp_host: str = "0.0.0.0"
     mcp_port: int = 8000
 
+    # ── HTTP hardening (Phase 6; see http_security.py) ────────────────────────
+    # CORS allowlist, comma-separated ("https://a.example,https://b.example").
+    # Empty: no cross-origin browser access.
+    http_allowed_origins: Annotated[list[str], NoDecode] = []
+    # Requests larger than this get 413.
+    http_max_request_bytes: int = 1_048_576
+    # Per client (MCP session, else address); 0 disables.
+    http_rate_limit_per_minute: int = 120
+    # Optional bearer token for the deployed demo; /health and /version stay open.
+    http_bearer_token: SecretStr | None = None
+
     # ── Data ──────────────────────────────────────────────────────────────────
     # DATA_DIR holds raw downloads (data/raw) and build outputs (data/build).
     # DUCKDB_PATH defaults to <DATA_DIR>/build/courts.duckdb (official tables);
@@ -58,6 +69,9 @@ class Settings(BaseSettings):
     # LOG_FORMAT=auto → JSON when serving HTTP, human-readable otherwise.
     log_level: LogLevel = "INFO"
     log_format: Literal["auto", "json", "pretty"] = "auto"
+    # Tool arguments are logged as a hash. Set true (with LOG_LEVEL=DEBUG) to
+    # also log them verbatim while debugging; never in a deployment.
+    log_tool_arguments: bool = False
 
     @field_validator("log_level", mode="before")
     @classmethod
@@ -68,12 +82,33 @@ class Settings(BaseSettings):
         "anthropic_api_key",
         "openai_api_key",
         "courtlistener_api_token",
+        "http_bearer_token",
         mode="before",
     )
     @classmethod
     def _blank_is_none(cls, value: object) -> object:
         # `FOO_API_KEY=` in a .env file means "not set", not "empty key".
         return None if isinstance(value, str) and not value.strip() else value
+
+    @field_validator("http_allowed_origins", mode="before")
+    @classmethod
+    def _split_origins(cls, value: object) -> object:
+        if isinstance(value, str):
+            return [v.strip().rstrip("/") for v in value.split(",") if v.strip()]
+        return value
+
+    def secrets(self) -> list[str]:
+        """Every configured secret value, for log redaction."""
+        return [
+            s.get_secret_value()
+            for s in (
+                self.anthropic_api_key,
+                self.openai_api_key,
+                self.courtlistener_api_token,
+                self.http_bearer_token,
+            )
+            if s is not None and len(s.get_secret_value()) >= 8
+        ]
 
     @property
     def resolved_duckdb_path(self) -> Path:

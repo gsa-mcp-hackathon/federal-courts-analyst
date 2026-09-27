@@ -316,7 +316,8 @@ def _data_breaks(db: Database, a: int, b: int, groups: Iterable[str]) -> list[Dr
         "SELECT id, field, codes, summary, detail FROM idb.data_breaks "
         "WHERE date > CAST(? AS DATE) AND date <= CAST(? AS DATE) "
         "AND id NOT IN ('release-snapshot', 'pandemic-2020')",
-        [f"{a}-09-30", f"{b}-09-30"],
+        # From the start of FY a: a break during FY a already splits that year.
+        [f"{a - 1}-09-30", f"{b}-09-30"],
     )
     from courts_analyst.core.enums import nos_entry
 
@@ -569,7 +570,16 @@ def _explain_count(
     drivers += rev
     warnings += rev_warn
     groups = [c.key for c in data.get("by_case_type", []) if c.key_contributor]
-    drivers += _data_breaks(db, a, b, groups)
+    breaks = _data_breaks(db, a, b, groups)
+    drivers += breaks
+    warnings += [
+        Caveat(
+            code="data_break",
+            message=f"The window crosses a data break: {d.title} "
+            f"({d.evidence.rsplit('(', 1)[-1]}",
+        )
+        for d in breaks
+    ]
     court_obj = COURTS[court]
     result = ChangeExplanation(
         measure=m.id,

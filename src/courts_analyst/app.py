@@ -18,6 +18,7 @@ from fastmcp import FastMCP
 
 from courts_analyst import SERVER_NAME, __version__
 from courts_analyst.config import settings
+from courts_analyst.http_security import http_middleware
 from courts_analyst.logging_config import configure_logging
 from courts_analyst.middleware import RequestLogging
 from courts_analyst.prompts import register_prompts
@@ -82,20 +83,28 @@ def main() -> None:
     json_logs = settings.log_format == "json" or (
         settings.log_format == "auto" and http
     )
-    configure_logging(settings.log_level, json_format=json_logs)
+    configure_logging(
+        settings.log_level, json_format=json_logs, secrets=settings.secrets()
+    )
     logger.info(
         "starting server",
         extra={
             "version": __version__,
             "transport": "http" if http else "stdio",
             "port": int(platform_port or settings.mcp_port) if http else None,
+            "auth": "bearer" if settings.http_bearer_token else "none",
+            "cors_origins": len(settings.http_allowed_origins),
         },
     )
 
-    if platform_port:
-        mcp.run(transport="http", host="0.0.0.0", port=int(platform_port))
-    elif http:
-        mcp.run(transport="http", host=settings.mcp_host, port=settings.mcp_port)
+    if http:
+        mcp.run(
+            transport="http",
+            host="0.0.0.0" if platform_port else settings.mcp_host,
+            port=int(platform_port) if platform_port else settings.mcp_port,
+            middleware=http_middleware(settings),
+            allowed_origins=list(settings.http_allowed_origins) or None,
+        )
     else:
         mcp.run(transport="stdio")
 
