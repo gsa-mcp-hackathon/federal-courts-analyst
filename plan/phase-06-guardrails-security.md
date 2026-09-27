@@ -125,13 +125,14 @@ Adversarial behaviour, run 2: decline precision **100%**, recall **100%** (32/32
 - `explain_change` looked for data breaks only after the first fiscal year ended, so a break during it (origin 13, July 2016) was missed for FY2016→FY2017.
 - `explain_change` for pending counts mixed a restated FY2019 (JB-2020) with a restated FY2020 (JB-2021); it now uses one consistent vintage.
 - PII-scanner false positives from composite keys ("LA-E|Insurance"), court citations followed by a verb, and a sentence break ("thresholds. The"), found by sweeping real results; each is now a boundary rule with a test.
+- Pointing DuckDB's spill directory at `/tmp` (for the read-only container) let SQL read and write anywhere in `/tmp` despite `enable_external_access = false`; CI on Linux caught it (macOS's temp dir is elsewhere). The spill directory is now a private random subdirectory, and a new test probes the platform's own temp dir.
 - The scorer read closing caveats ("There's no judge-level data") as refusals, and missed refusals worded "it doesn't cover", "no … to report", "zero cases match".
 
 ## Open issues
 
 Live status is on the [issue tracker](https://github.com/syedaun-techsur/federal-courts-analyst/issues).
 
-1. **"Just one number" still drops the revision** in the model's answer despite `citation` and the instructions; the P7 agent can render the citation itself. (new issue, phase 7)
-2. **No clarify items in the dev split**, so clarify precision/recall can't be tuned or measured on dev; the two clarify items (both held out) need the domain expert's call on "answer with both" vs "ask" ([#17](https://github.com/syedaun-techsur/federal-courts-analyst/issues/17), [#22](https://github.com/syedaun-techsur/federal-courts-analyst/issues/22)). (new issue)
-3. **Domain expert review of the guardrail policies**: thresholds (10/30), policy texts and the advocacy line in `core/data/guardrails.yaml`. (new issue)
-4. [#22](https://github.com/syedaun-techsur/federal-courts-analyst/issues/22) (Phase 6 inputs from Phase 5): addressed and re-run; closed with a summary.
+1. **"Just one number" still drops the revision** in the model's answer despite `citation` and the instructions; the P7 agent can render the citation itself. [#27](https://github.com/syedaun-techsur/federal-courts-analyst/issues/27)
+2. **No clarify items in the dev split**, so clarify precision/recall can't be tuned or measured on dev; the two clarify items (both held out) need the domain expert's call on "answer with both" vs "ask" ([#17](https://github.com/syedaun-techsur/federal-courts-analyst/issues/17), [#22](https://github.com/syedaun-techsur/federal-courts-analyst/issues/22)). [#28](https://github.com/syedaun-techsur/federal-courts-analyst/issues/28)
+3. **Domain expert review of the guardrail policies**: thresholds (10/30), policy texts and the advocacy line in `core/data/guardrails.yaml`. [#29](https://github.com/syedaun-techsur/federal-courts-analyst/issues/29)
+4. [#22](https://github.com/syedaun-techsur/federal-courts-analyst/issues/22) (Phase 6 inputs from Phase 5): addressed and re-run; closed by PR #26 with a summary.

@@ -75,10 +75,12 @@ class Database:
         con.execute(_attach_sql(self.tables_path, "cat"))
         if self.idb_path is not None and self.idb_path.is_file():
             con.execute(_attach_sql(self.idb_path, "idb"))
-        # Spill to the system temp dir: the container's filesystem is
-        # read-only except /tmp. Constant-derived path, quoted as a literal.
-        tmp = "'" + tempfile.gettempdir().replace("'", "''") + "'"
-        con.execute("SET temp_directory = " + tmp)
+        # Spill to a private, randomly named directory under the system temp
+        # dir (the container is read-only except /tmp). Not /tmp itself:
+        # DuckDB lets SQL read and write inside its temp directory even with
+        # external access disabled. The path is quoted as a literal.
+        spill = tempfile.mkdtemp(prefix="courts-duckdb-")
+        con.execute("SET temp_directory = '" + spill.replace("'", "''") + "'")
         # Nothing after this point may read or write files by path.
         con.execute("SET enable_external_access = false")
         return con

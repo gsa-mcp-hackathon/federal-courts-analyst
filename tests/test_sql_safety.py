@@ -89,6 +89,21 @@ def test_connection_is_read_only(core_db: Database, sql: str) -> None:
         core_db.rows(sql)
 
 
+def test_system_temp_dir_is_not_reachable(core_db: Database) -> None:
+    """The spill directory is private: SQL can't reach the system temp dir
+    (on Linux /tmp; macOS uses /var/folders), where other files live."""
+    import tempfile
+
+    tmp = tempfile.gettempdir().replace("'", "''")
+    for sql in (
+        f"COPY (SELECT 1) TO '{tmp}/fca-out.csv'",
+        f"ATTACH '{tmp}/fca-other.duckdb' AS other",
+    ):
+        with pytest.raises(Exception):  # noqa: B017
+            core_db.rows(sql)
+    assert not (Path(tempfile.gettempdir()) / "fca-out.csv").exists()
+
+
 def test_missing_catalog_is_a_typed_error(tmp_path: Path) -> None:
     from courts_analyst.core.errors import DataUnavailableError
 
