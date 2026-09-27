@@ -112,9 +112,11 @@ Build a throwaway server to confirm what actually works, then record the answers
 
 ## Open issues
 
+Live status is on the [issue tracker](https://github.com/syedaun-techsur/federal-courts-analyst/issues); unlinked items are notes, not filed.
+
 1. ~~CI on GitHub not yet run~~: green on PR #1 and merged.
-2. **Team items** (domain expert, what's public) need the team.
-3. **Claude Desktop** stdio connection not tried by hand (Claude Code and Inspector work over stdio).
-4. `~/.npm` has root-owned files, so `npx` fails with EACCES. We ran the Inspector with a scratch npm cache. Fix with `sudo chown -R 502:20 ~/.npm`, or `make inspector` will fail.
+2. **Team items** (domain expert, what's public) need the team. [#12](https://github.com/syedaun-techsur/federal-courts-analyst/issues/12)
+3. **Claude Desktop** stdio connection not tried by hand (Claude Code and Inspector work over stdio). [#13](https://github.com/syedaun-techsur/federal-courts-analyst/issues/13)
+4. `~/.npm` has root-owned files, so `npx` fails with EACCES. We ran the Inspector with a scratch npm cache. Fix with `sudo chown -R 502:20 ~/.npm`, or `make inspector` will fail. [#14](https://github.com/syedaun-techsur/federal-courts-analyst/issues/14)
 5. Inspector CLI quirk: `uv run --quiet …` is parsed as an Inspector flag. Use `uv run courts-analyst` (as `make inspector` does).
-6. ADR 0004 (default edition policy) is **Proposed**. Confirm with the domain expert before P1.
+6. ADR 0004 (default edition policy) is **Proposed**. Confirm with the domain expert before P1. [#4](https://github.com/syedaun-techsur/federal-courts-analyst/issues/4)

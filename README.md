@@ -121,6 +121,10 @@ The template's kits work unchanged with the renamed package. See
 Orchestrate / Code Engine. The `Dockerfile` builds a locked, non-root image
 serving `/mcp` on :8080.
 
+## Issues and phase tracking
+
+The build runs in phases ([plan/](plan/README.md)). Each phase file records what was built, the evidence, deviations and open issues. Open issues are filed on the [GitHub issue tracker](https://github.com/syedaun-techsur/federal-courts-analyst/issues), labelled by phase (`phase N`) and by what they need (`needs domain expert`, `needs team`, `data`, `dev environment`, `stretch`). When a phase finishes, Claude files its open issues there, and it updates or closes them as later work resolves them.
+
 ## License
 
 [MIT](LICENSE). See [SECURITY.md](SECURITY.md) for the vulnerability disclosure policy.

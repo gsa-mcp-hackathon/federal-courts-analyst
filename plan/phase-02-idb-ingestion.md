@@ -140,8 +140,10 @@ Key derived columns on `idb_civil`:
 
 ## Open issues
 
-1. **Domain expert review** of the codebook YAML (15 fields, 102 NOS codes; 12 NOS placements are marked `unverified`) and of `data_breaks.yaml`.
-2. **Release reproducibility:** the pinned release can only be re-downloaded until the FJC's next quarterly update (likely November 2026). Options: submit it to the Wayback Machine (an outward action, not done), or publish our build artifacts with the submission.
-3. **Pending counts for past dates** are reconstructions; FY2017 is 7.2% above C-1. Phase 4 reconciliation should own the explanation (and the pending rule, now in `profile.py`).
-4. Criminal, appellate and bankruptcy IDB remain stretch.
+Live status is on the [issue tracker](https://github.com/syedaun-techsur/federal-courts-analyst/issues); unlinked items are notes, not filed.
+
+1. **Domain expert review** of the codebook YAML (15 fields, 102 NOS codes; 12 NOS placements are marked `unverified`) and of `data_breaks.yaml`. [#6](https://github.com/syedaun-techsur/federal-courts-analyst/issues/6)
+2. **Release reproducibility:** the pinned release can only be re-downloaded until the FJC's next quarterly update (likely November 2026). Options: submit it to the Wayback Machine (an outward action, not done), or publish our build artifacts with the submission. [#10](https://github.com/syedaun-techsur/federal-courts-analyst/issues/10)
+3. **Pending counts for past dates** are reconstructions; FY2017 is 7.2% above C-1. Phase 4 reconciliation should own the explanation (and the pending rule, now in `profile.py`). [#11](https://github.com/syedaun-techsur/federal-courts-analyst/issues/11)
+4. Criminal, appellate and bankruptcy IDB remain stretch. [#15](https://github.com/syedaun-techsur/federal-courts-analyst/issues/15)
 5. The Inspector's "Add servers" menu didn't open under automation; the container was verified by `make docker-test`, not in the Inspector UI.

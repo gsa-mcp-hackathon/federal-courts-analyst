@@ -153,10 +153,12 @@ revision      (measure_id, court, fiscal_year, edition, value, prior_value, delt
 
 ## Open issues
 
-1. **Domain expert review** of `measures.yaml` definitions (drafted from the tables' notes).
-2. **Second-person check** of the 56 golden figures (a second method was used; a second person wasn't available).
-3. **ADR 0004 (default edition)** still Proposed. The catalog supports either default: `revision` has both `first_published` and the latest value for every figure.
-4. **AO confirmation** of why JFF-2023 revised the weighted series. The tables' notes don't say; the MDL explanation stays labelled as our inference.
-5. **Deferred to Phase 4:** C-2/C-3 (nature of suit), FCMS district profiles, Judicial Conference judgeship recommendations and emergencies. STFJ/FJCS (June, December, March periods) remain stretch.
+Live status is on the [issue tracker](https://github.com/syedaun-techsur/federal-courts-analyst/issues); unlinked items are notes, not filed.
+
+1. **Domain expert review** of `measures.yaml` definitions (drafted from the tables' notes). [#5](https://github.com/syedaun-techsur/federal-courts-analyst/issues/5)
+2. **Second-person check** of the 56 golden figures (a second method was used; a second person wasn't available). [#7](https://github.com/syedaun-techsur/federal-courts-analyst/issues/7)
+3. **ADR 0004 (default edition)** still Proposed. The catalog supports either default: `revision` has both `first_published` and the latest value for every figure. [#4](https://github.com/syedaun-techsur/federal-courts-analyst/issues/4)
+4. **AO confirmation** of why JFF-2023 revised the weighted series. The tables' notes don't say; the MDL explanation stays labelled as our inference. [#8](https://github.com/syedaun-techsur/federal-courts-analyst/issues/8)
+5. **Deferred to Phase 4:** C-2/C-3 (nature of suit), FCMS district profiles, Judicial Conference judgeship recommendations and emergencies. STFJ/FJCS (June, December, March periods) remain stretch. [#9](https://github.com/syedaun-techsur/federal-courts-analyst/issues/9), [#15](https://github.com/syedaun-techsur/federal-courts-analyst/issues/15)
 6. Chrome's built-in PDF viewer doesn't render page content in automated tabs (thumbnails only), and a tab crashed once while loading a PDF; PDFs were verified by local rendering instead.
-7. From Phase 0, still open: `~/.npm` permissions (the Inspector ran with a scratch cache again), Claude Desktop not tried by hand.
+7. From Phase 0, still open: `~/.npm` permissions (the Inspector ran with a scratch cache again), Claude Desktop not tried by hand. [#14](https://github.com/syedaun-techsur/federal-courts-analyst/issues/14), [#13](https://github.com/syedaun-techsur/federal-courts-analyst/issues/13)
