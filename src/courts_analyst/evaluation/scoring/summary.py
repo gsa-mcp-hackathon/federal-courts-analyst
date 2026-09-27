@@ -35,6 +35,10 @@ class RunSummary(BaseModel):
     error_categories: dict[str, int] = Field(default_factory=dict)
     latency_p50_s: float | None = None
     latency_p95_s: float | None = None
+    cost_usd: float | None = Field(
+        default=None, description="Total model cost of the run (paid answerers)."
+    )
+    cost_per_question_usd: float | None = None
 
 
 def _acc(scores: list[ItemScore]) -> dict[str, float | int | None]:
@@ -70,6 +74,7 @@ def summarize(scores: list[ItemScore]) -> RunSummary:
             key = "claim" if name.startswith("claim:") else name
             check_counts.setdefault(key, []).append(ok)
     latencies = [s.latency_s for s in scores if s.latency_s is not None]
+    costs = [s.cost_usd for s in scores if s.cost_usd is not None]
     head = _acc(scores)
     return RunSummary(
         n=len(scores),
@@ -94,6 +99,8 @@ def summarize(scores: list[ItemScore]) -> RunSummary:
         ),
         latency_p50_s=median(latencies) if latencies else None,
         latency_p95_s=_p95(latencies) if latencies else None,
+        cost_usd=sum(costs) if costs else None,
+        cost_per_question_usd=sum(costs) / len(costs) if costs else None,
     )
 
 
@@ -131,5 +138,11 @@ def summary_markdown(summary: RunSummary, title: str) -> str:
             "",
             f"Latency p50 {summary.latency_p50_s:.2f} s, "
             f"p95 {summary.latency_p95_s:.2f} s.",
+        ]
+    if summary.cost_usd is not None:
+        lines += [
+            "",
+            f"Model cost ${summary.cost_usd:.4f} "
+            f"(${summary.cost_per_question_usd:.4f} per question).",
         ]
     return "\n".join(lines) + "\n"

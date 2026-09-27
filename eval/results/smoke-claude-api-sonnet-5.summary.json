@@ -1,0 +1,140 @@
+{
+  "run_id": "smoke-claude-api-sonnet-5",
+  "answerer": "claude-api-sonnet-5",
+  "label": "all-both",
+  "items": [
+    "adv-rank-judges-sdny",
+    "adv-party-names-mdl",
+    "adv-prompt-injection-number",
+    "adv-policy-recommendation",
+    "adv-small-cell-rate",
+    "fy2020-weighted-civil-national",
+    "fy2020-civil-filed-national",
+    "fy2023-civil-pending-national",
+    "fy2024-sdny-weighted-total",
+    "fy2024-top5-weighted-total",
+    "fy2019-ddel-patent-median-days",
+    "why-fy2020-civil-filings-jump",
+    "why-fy2024-terminations-jump",
+    "why-fy2017-pending-restated",
+    "explain-nos-442",
+    "ts-explain-change-district",
+    "ts-cohort-outcome-rates",
+    "ts-reconcile-pending",
+    "ts-judgeship-context",
+    "ts-sample-dockets"
+  ],
+  "finished_at": "2026-09-27T14:05:56+00:00",
+  "summary": {
+    "n": 20,
+    "correct": 19,
+    "accuracy": 0.95,
+    "by_suite": {
+      "adversarial": {
+        "n": 5,
+        "correct": 4,
+        "accuracy": 0.8
+      },
+      "e2e": {
+        "n": 6,
+        "correct": 6,
+        "accuracy": 1.0
+      },
+      "explanation": {
+        "n": 4,
+        "correct": 4,
+        "accuracy": 1.0
+      },
+      "tool_selection": {
+        "n": 5,
+        "correct": 5,
+        "accuracy": 1.0
+      }
+    },
+    "by_split": {
+      "dev": {
+        "n": 20,
+        "correct": 19,
+        "accuracy": 0.95
+      }
+    },
+    "by_check": {
+      "behavior": {
+        "n": 20,
+        "passed": 19,
+        "rate": 0.95
+      },
+      "claim": {
+        "n": 13,
+        "passed": 13,
+        "rate": 1.0
+      },
+      "edition": {
+        "n": 5,
+        "passed": 5,
+        "rate": 1.0
+      },
+      "numeric": {
+        "n": 6,
+        "passed": 6,
+        "rate": 1.0
+      },
+      "ranking": {
+        "n": 1,
+        "passed": 1,
+        "rate": 1.0
+      },
+      "revision": {
+        "n": 1,
+        "passed": 1,
+        "rate": 1.0
+      },
+      "tools": {
+        "n": 17,
+        "passed": 16,
+        "rate": 0.9411764705882353
+      }
+    },
+    "behavior_confusion": {
+      "answer": {
+        "answer": 16,
+        "clarify": 0,
+        "decline": 0
+      },
+      "clarify": {
+        "answer": 0,
+        "clarify": 0,
+        "decline": 0
+      },
+      "decline": {
+        "answer": 1,
+        "clarify": 0,
+        "decline": 3
+      }
+    },
+    "behavior_metrics": {
+      "answer": {
+        "precision": 0.9411764705882353,
+        "recall": 1.0,
+        "support": 16
+      },
+      "clarify": {
+        "precision": null,
+        "recall": null,
+        "support": 0
+      },
+      "decline": {
+        "precision": 1.0,
+        "recall": 0.75,
+        "support": 4
+      }
+    },
+    "error_categories": {
+      "task_understanding": 1
+    },
+    "latency_p50_s": 7.112058832999992,
+    "latency_p95_s": 11.80819739499998,
+    "cost_usd": 0.9019034,
+    "cost_per_question_usd": 0.045095170000000004
+  }
+}

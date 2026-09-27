@@ -18,7 +18,9 @@ _REVISION = re.compile(
 
 
 def _has(text: str, phrase: str) -> bool:
-    return phrase.lower() in text.lower()
+    from courts_analyst.evaluation.scoring.behavior import normalize_quotes
+
+    return normalize_quotes(phrase).lower() in normalize_quotes(text).lower()
 
 
 def resolve_path(obj: Any, path: str) -> Iterator[Any]:

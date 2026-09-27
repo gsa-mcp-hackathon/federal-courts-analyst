@@ -16,7 +16,7 @@ import sys
 from collections import Counter
 from pathlib import Path
 
-from courts_analyst.evaluation.answerers import ANSWERERS
+from courts_analyst.evaluation.answerers import ANSWERERS, PAID
 from courts_analyst.evaluation.bank import DEFAULT_BANK, BankError, load_bank, select
 from courts_analyst.evaluation.runner import DEFAULT_RESULTS, run
 from courts_analyst.evaluation.schema import HELD_OUT_PERCENT, SUITES
@@ -40,6 +40,17 @@ def _parser() -> argparse.ArgumentParser:
     r.add_argument("--run-id")
     r.add_argument("--quiet", action="store_true")
     r.add_argument("--workers", type=int, default=1, help="answer N items at once")
+    r.add_argument(
+        "--budget-usd",
+        type=float,
+        default=1.00,
+        help="paid answerers: stop sending requests once the run has spent this",
+    )
+    r.add_argument(
+        "--allow-full-bank",
+        action="store_true",
+        help="paid answerers: allow runs beyond the smoke set",
+    )
     r.add_argument(
         "--expect-accuracy",
         type=float,
@@ -94,6 +105,17 @@ def main(argv: list[str] | None = None) -> int:
     if args.answerer not in ANSWERERS:
         print(f"unknown answerer {args.answerer!r}; pick from {sorted(ANSWERERS)}")
         return 2
+    if (
+        args.answerer in PAID
+        and not args.allow_full_bank
+        and (args.tags != ["smoke"] and not args.ids)
+    ):
+        print(
+            f"{args.answerer} costs money per question: run it with --tag smoke "
+            "(20 questions), a few --id values, or pass --allow-full-bank.",
+            file=sys.stderr,
+        )
+        return 2
     chosen = select(items, args.suite, args.split, args.tags, args.ids)
     if args.limit:
         chosen = chosen[: args.limit]
@@ -108,8 +130,14 @@ def main(argv: list[str] | None = None) -> int:
             extra = "" if score.correct else f"  [{score.error_category}]"
             print(f"{mark} {item.id}{extra}", flush=True)
 
+    answerer = ANSWERERS[args.answerer]()
+    if args.answerer in PAID:
+        from courts_analyst.evaluation.budget import Budget
+
+        answerer.budget = Budget(args.budget_usd)  # type: ignore[attr-defined]
+        print(f"budget: ${args.budget_usd:.2f} for {len(chosen)} questions")
     result = run(
-        ANSWERERS[args.answerer](),
+        answerer,
         chosen,
         label=label,
         results_dir=args.results_dir,

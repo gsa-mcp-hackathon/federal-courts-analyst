@@ -30,7 +30,7 @@
     "adv-mix-editions-ranking",
     "adv-filings-ambiguous-type"
   ],
-  "finished_at": "2026-09-27T01:52:20+00:00",
+  "finished_at": "2026-09-27T14:07:46+00:00",
   "summary": {
     "n": 26,
     "correct": 22,
@@ -125,6 +125,8 @@
       "output_interpretation": 1
     },
     "latency_p50_s": 6.0395,
-    "latency_p95_s": 16.015
+    "latency_p95_s": 16.015,
+    "cost_usd": null,
+    "cost_per_question_usd": null
   }
 }

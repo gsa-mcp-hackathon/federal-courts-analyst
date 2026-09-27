@@ -2,7 +2,7 @@
 .DEFAULT_GOAL := help
 .PHONY: help setup lint format typecheck test test-full cov data data-tables \
         data-discover data-idb data-idb-sample serve serve-http \
-        variance-report schemas inspector docker-build docker-run docker-test web eval eval-validate eval-claude clean
+        variance-report schemas inspector docker-build docker-run docker-test web eval eval-validate eval-claude eval-api clean
 
 IMAGE ?= federal-courts-analyst:dev
 PORT  ?= 8000
@@ -12,7 +12,7 @@ help: ## List targets
 	  awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-16s\033[0m %s\n", $$1, $$2}'
 
 setup: ## Install dev deps and git hooks
-	uv sync --group dev --group pipeline
+	uv sync --group dev --group pipeline --group eval
 	@if [ -d .git ]; then uv run pre-commit install; fi
 	@[ -f .env ] || cp .env.example .env
 
@@ -36,11 +36,11 @@ test-full: ## Everything, including @fulldata tests (needs `make data`)
 data: data-tables data-idb ## Download and build every dataset
 
 data-tables: ## Fetch the official tables in the manifest and build courts.duckdb
-	uv sync --group dev --group pipeline
+	uv sync --group dev --group pipeline --group eval
 	uv run python -m courts_analyst.pipeline.tables all
 
 data-idb: ## Fetch the pinned civil IDB release (~330 MB) and build idb.duckdb (~1.5 min)
-	uv sync --group dev --group pipeline
+	uv sync --group dev --group pipeline --group eval
 	uv run python -m courts_analyst.pipeline.idb all
 
 data-idb-sample: ## Rebuild the committed IDB test fixture from the downloaded release
@@ -81,6 +81,11 @@ eval-validate: ## Validate the question bank (schema, ids, splits)
 
 eval-claude: ## 20-question smoke run with Claude (needs a logged-in `claude` CLI)
 	uv run courts-eval run --answerer claude-code --tag smoke --workers 4
+
+eval-api: ## Smoke set on the Claude and OpenAI APIs (paid; capped at $2 each; keys in .env)
+	uv sync --group dev --group pipeline --group eval
+	uv run courts-eval run --answerer claude-api --tag smoke --budget-usd 2 --workers 4
+	uv run courts-eval run --answerer openai-api --tag smoke --budget-usd 2 --workers 4
 
 eval: ## Harness self-check: gold must score 100%, null 0%
 	uv run courts-eval run --answerer gold --quiet --expect-accuracy 1

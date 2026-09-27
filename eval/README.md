@@ -127,7 +127,23 @@ Answerers other than `gold` must read only `item.question`.
 | `null` | Says nothing; must score 0% (every item has a check silence fails) | 3 |
 | `engine` | Our analytics core computing the `engine` suite directly | 4 |
 | `claude-code`, `claude-code-haiku` | Claude Sonnet / Haiku through headless Claude Code (`claude -p`), with every built-in tool off and only this MCP server connected; needs a logged-in `claude` CLI | 5 |
+| `claude-api`, `claude-api-opus` | Claude Sonnet 5 / Opus 5 through the Messages API with this server's tools; prompt caching; **paid** | 5 |
+| `openai-api` | GPT-5.6 Sol through the Responses API with this server's tools; **paid** | 5 |
 | our agent, web search, Genie | Baselines | 7, 10 |
+
+**Paid answerers are fenced.** They run only on the smoke set (`--tag smoke`)
+or a few `--id` values unless you pass `--allow-full-bank`, and every run has a
+hard cap (`--budget-usd`, default $1): the budget is checked before every model
+request, and once it's spent the remaining questions are recorded as
+`answerer_failure: budget exhausted`. Each question is limited to 8 model
+turns. Token counts and cost are recorded per answer and totalled in the run
+summary (prices in `evaluation/budget.py`, with sources).
+
+Measured on the smoke set (2026-09-27, 20 questions): Claude Sonnet 5 **$0.90
+total, $0.045 a question**, 20/20; GPT-5.6 Sol **$0.19 total, $0.009 a
+question**, 19/20. Most of Claude's cost is input: the nine tool definitions
+(~14k tokens) go with every request, cached after the first. `make eval-api`
+runs both.
 
 ## Held-out policy
 

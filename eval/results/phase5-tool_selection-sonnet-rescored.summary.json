@@ -29,7 +29,7 @@
     "ts-official-pending",
     "ts-official-median-time"
   ],
-  "finished_at": "2026-09-27T01:52:18+00:00",
+  "finished_at": "2026-09-27T14:07:44+00:00",
   "summary": {
     "n": 25,
     "correct": 25,
@@ -101,6 +101,8 @@
     },
     "error_categories": {},
     "latency_p50_s": 6.198,
-    "latency_p95_s": 15.139
+    "latency_p95_s": 15.139,
+    "cost_usd": null,
+    "cost_per_question_usd": null
   }
 }

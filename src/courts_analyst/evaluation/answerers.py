@@ -121,11 +121,38 @@ def _claude_code(model: str) -> Callable[[], Answerer]:
     return make
 
 
+def _paid(module: str, cls: str, model: str) -> Callable[[], Answerer]:
+    def make() -> Answerer:
+        import importlib
+
+        answerer: Answerer = getattr(importlib.import_module(module), cls)(model)
+        return answerer
+
+    return make
+
+
 ANSWERERS: dict[str, Callable[[], Answerer]] = {
     "gold": GoldAnswerer,
     "null": NullAnswerer,
     "engine": _engine,
     "claude-code": _claude_code("sonnet"),
     "claude-code-haiku": _claude_code("haiku"),
+    # Paid API answerers (`uv sync --group eval`; keys in .env). The CLI runs
+    # them on the smoke set only, under --budget-usd, unless told otherwise.
+    "claude-api": _paid(
+        "courts_analyst.evaluation.anthropic_agent",
+        "AnthropicAnswerer",
+        "claude-sonnet-5",
+    ),
+    "claude-api-opus": _paid(
+        "courts_analyst.evaluation.anthropic_agent",
+        "AnthropicAnswerer",
+        "claude-opus-5",
+    ),
+    "openai-api": _paid(
+        "courts_analyst.evaluation.openai_agent", "OpenAIAnswerer", "gpt-5.6-sol"
+    ),
 }
+PAID = frozenset({"claude-api", "claude-api-opus", "openai-api"})
+"""Answerers that spend money on every question."""
 """Answerers the CLI can build by name. Later phases register more."""
