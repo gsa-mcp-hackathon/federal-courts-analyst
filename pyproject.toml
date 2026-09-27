@@ -62,8 +62,10 @@ api = [
     "uvicorn>=0.32",
 ]
 # P3/P10: benchmark harness. The harness itself needs only the runtime deps;
-# model SDKs and tracing are added in P10.
+# the model SDKs are for the paid API answerers (`uv sync --group eval`).
 eval = [
+    "anthropic>=1.0",
+    "openai>=2.0",
     "pyyaml>=6.0",
 ]
 

@@ -52,6 +52,10 @@ class AnswerRecord(BaseModel):
     latency_s: float | None = None
     input_tokens: int | None = None
     output_tokens: int | None = None
+    cost_usd: float | None = Field(
+        default=None, description="What the model calls for this answer cost."
+    )
+    model_requests: int | None = None
     error: str | None = Field(
         default=None, description="Set when the answerer itself failed."
     )
@@ -89,3 +93,4 @@ class ItemScore(BaseModel):
     error_category: ErrorCategory | None = None
     notes: list[str] = Field(default_factory=list)
     latency_s: float | None = None
+    cost_usd: float | None = None

@@ -52,6 +52,13 @@ def rec(text: str = "", **kw: object) -> AnswerRecord:
         ("This tool covers district courts, not bankruptcy courts: a separate "
          "system this data doesn't include. If you meant appeals, I can look.",
          "decline"),
+        # Seen in the Phase 5 smoke runs (GPT-5.6 Sol, Claude Sonnet 5):
+        ("I can\u2019t rank individual S.D.N.Y. judges with the available "
+         "statistics.", "decline"),
+        ("No reportable share can be calculated: there are no matching FOIA "
+         "filings, so there is no denominator.", "decline"),
+        ("There were zero cases, so there's nothing to compute a rate on; the "
+         "result is undefined rather than 0%.", "decline"),
         ("E.D. Tex. had 894 weighted filings per judgeship. " + "Detail. " * 90
          + "The server doesn't provide vacancy data.", "answer"),
     ],

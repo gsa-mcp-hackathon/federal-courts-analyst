@@ -7,7 +7,7 @@
   claims:
     - id: names_ndfla
       kind: mentions
-      any: [Northern District of Florida, N.D. Fla, FL-N, "Florida, Northern"]
+      any: [Northern District of Florida, N.D. Fla, N.D. Florida, FL-N, "Florida, Northern"]
     - id: names_mdl
       kind: mentions
       any: [MDL, multidistrict]
@@ -37,7 +37,7 @@
       any: [inferred, inference, not official, unconfirmed, not confirmed, no published note, not explained]
     - id: names_ndfla
       kind: mentions
-      any: [Northern District of Florida, N.D. Fla, FL-N]
+      any: [Northern District of Florida, N.D. Fla, N.D. Florida, FL-N]
   expected_tools: [get_official_figure]
   acceptable_tools: [explain_change]
   tags: [demo, fy2020, edition_trap, weighted]
@@ -49,7 +49,7 @@
   claims:
     - id: names_ndfla
       kind: mentions
-      any: [Northern District of Florida, N.D. Fla, FL-N]
+      any: [Northern District of Florida, N.D. Fla, N.D. Florida, FL-N]
     - id: names_mdl
       kind: mentions
       any: [MDL, multidistrict]
@@ -61,7 +61,7 @@
   claims:
     - id: names_ndfla
       kind: mentions
-      any: [Northern District of Florida, N.D. Fla, FL-N]
+      any: [Northern District of Florida, N.D. Fla, N.D. Florida, FL-N]
     - id: names_new_jersey
       kind: mentions
       any: [New Jersey, D.N.J]
@@ -91,7 +91,7 @@
   claims:
     - id: names_ndfla
       kind: mentions
-      any: [Northern District of Florida, N.D. Fla, FL-N]
+      any: [Northern District of Florida, N.D. Fla, N.D. Florida, FL-N]
   expected_tools: [explain_change]
   tags: [smoke, change, mdl, terminations]
   notes: C-1 terminations 293,677 (FY2023) → 396,635 (FY2024); IDB N.D. Fla. +104,167.
@@ -196,7 +196,7 @@
   claims:
     - id: names_ndfla_decline
       kind: mentions
-      any: [Northern District of Florida, N.D. Fla, FL-N]
+      any: [Northern District of Florida, N.D. Fla, N.D. Florida, FL-N]
     - id: names_south_carolina
       kind: mentions
       any: [South Carolina, D.S.C]
@@ -236,7 +236,7 @@
       any: [MDL, multidistrict]
     - id: names_ndfla
       kind: mentions
-      any: [Northern District of Florida, N.D. Fla, FL-N]
+      any: [Northern District of Florida, N.D. Fla, N.D. Florida, FL-N]
   expected_tools: [explain_change]
   tags: [change, pending, mdl]
 - id: why-weighted-ndfla-drop-fy2025

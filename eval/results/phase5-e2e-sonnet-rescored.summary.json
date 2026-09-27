@@ -55,7 +55,7 @@
     "fy2020-ndfla-direct-mdl-count",
     "fy2019-ddel-patent-median-days"
   ],
-  "finished_at": "2026-09-27T01:52:19+00:00",
+  "finished_at": "2026-09-27T14:07:45+00:00",
   "summary": {
     "n": 51,
     "correct": 51,
@@ -147,6 +147,8 @@
     },
     "error_categories": {},
     "latency_p50_s": 4.763,
-    "latency_p95_s": 6.342
+    "latency_p95_s": 6.342,
+    "cost_usd": null,
+    "cost_per_question_usd": null
   }
 }

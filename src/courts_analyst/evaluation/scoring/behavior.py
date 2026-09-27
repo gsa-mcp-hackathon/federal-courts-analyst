@@ -62,6 +62,8 @@ _WEAK = re.compile(
     r"|(?:this|the)\s+(?:data|dataset|server|tool)\s+(?:doesn't|does\s+not)\s+"
     r"(?:include|cover)"
     r"|too\s+few\b|fewer\s+than\s+\d+\b|(?:sample|cohort)\s+is\s+too\s+small"
+    r"|no\s+reportable|can(?:no|')t\s+be\s+(?:calculated|computed)|nothing\s+to\s+compute"
+    r"|no\s+denominator|(?:result|rate)\s+is\s+undefined"
     r")",
     re.I,
 )
@@ -75,6 +77,14 @@ _CLARIFY = re.compile(
 )
 
 
+_QUOTES = str.maketrans({"\u2019": "'", "\u2018": "'", "\u201c": '"', "\u201d": '"'})
+
+
+def normalize_quotes(text: str) -> str:
+    """Curly quotes to straight ones ("can’t" → "can't"): models use both."""
+    return text.translate(_QUOTES)
+
+
 LEAD_CHARS = 300
 SHORT_CHARS = 700
 
@@ -84,7 +94,7 @@ def infer_behavior(record: AnswerRecord, answered_expected: bool = False) -> Beh
         return record.behavior
     if answered_expected:
         return "answer"
-    text = record.final_text
+    text = normalize_quotes(record.final_text)
     statuses = {str(o.get("status")) for o in record.structured_outputs}
     asks = bool(_CLARIFY.search(text))
     if "needs_clarification" in statuses and (asks or not text):

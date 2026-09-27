@@ -2,7 +2,7 @@
 .DEFAULT_GOAL := help
 .PHONY: help setup lint format typecheck test test-full cov data data-tables \
         data-discover data-idb data-idb-sample serve serve-http \
-        variance-report schemas inspector docker-build docker-run docker-test web eval eval-validate eval-claude clean
+        variance-report schemas inspector docker-build docker-run docker-test web eval eval-validate eval-claude eval-api clean
 
 IMAGE ?= federal-courts-analyst:dev
 PORT  ?= 8000
@@ -81,6 +81,11 @@ eval-validate: ## Validate the question bank (schema, ids, splits)
 
 eval-claude: ## 20-question smoke run with Claude (needs a logged-in `claude` CLI)
 	uv run courts-eval run --answerer claude-code --tag smoke --workers 4
+
+eval-api: ## Smoke set on the Claude and OpenAI APIs (paid; capped at $2 each; keys in .env)
+	uv sync --group dev --group pipeline --group eval
+	uv run courts-eval run --answerer claude-api --tag smoke --budget-usd 2 --workers 4
+	uv run courts-eval run --answerer openai-api --tag smoke --budget-usd 2 --workers 4
 
 eval: ## Harness self-check: gold must score 100%, null 0%
 	uv run courts-eval run --answerer gold --quiet --expect-accuracy 1

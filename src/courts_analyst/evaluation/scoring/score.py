@@ -143,4 +143,5 @@ def score_item(item: QuestionItem, record: AnswerRecord) -> ItemScore:
         error_category=None if correct else _category(item, record, checks),
         notes=notes,
         latency_s=record.latency_s,
+        cost_usd=record.cost_usd,
     )
