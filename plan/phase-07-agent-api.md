@@ -135,6 +135,8 @@ Call the core directly (no LLM), return the same `ToolResult` envelopes, so the 
 
 Issue #27: in both adversarial runs the model answered "322 (JFF-2025)" and the agent appended "Source: 322 (JFF-2025, Table 6.2); revised: first published as 554 (JB-2020)."; the item passes every check including `revision`. The test-split misses differ between runs (variance on held-out items; not tuned): a 1992 decline and a clarification the scorer misreads ([#35](https://github.com/syedaun-techsur/federal-courts-analyst/issues/35)), a small-cell claim, and `adv-mix-editions-ranking` (read "the national figure from JFF-2023" as FY2023). The Phase 6 comparison (45/47) was headless Claude Code, a different harness. Latency p50 4.8 s, p95 6–11 s; $0.03–0.05 a question. e2e dev on prompt .2 and the other suites are still to run ([#36](https://github.com/syedaun-techsur/federal-courts-analyst/issues/36)). Runs: [eval/results/](../eval/results/README.md).
 
+**CI:** green on [PR #40](https://github.com/syedaun-techsur/federal-courts-analyst/pull/40) (lint, security, test 3.11, test 3.12, docker).
+
 **Automated tests:** 1,018 passed in the default suite (up from 885 in Phase 6), coverage **93.7%** overall, **97%** on `core/` (92% on the new `agent/` and `api/` code). `make docker-test` 8/8 with the image read-only, `--cap-drop ALL`: REST (`/api/figures` equal to the MCP result), a judge request declined over SSE, a typed `model_not_configured` error with no key, `/api/eval/runs`. Lint, format, mypy clean.
 
 | Suite | Checks |
