@@ -86,7 +86,8 @@ def ok(
     """Build an ``ok`` result. Every result must carry provenance."""
     if not provenance:
         raise ValueError("a result without provenance is not allowed")
-    return Result[T](
+    model: type[Result[T]] = Result[type(data)]  # type: ignore[misc, assignment]
+    return model(
         data=data,
         provenance=provenance,
         warnings=warnings or [],
@@ -94,5 +95,7 @@ def ok(
     )
 
 
-def clarify(clarification: Clarification) -> Result[T]:
-    return Result[T](status="needs_clarification", clarification=clarification)
+def clarify(clarification: Clarification, data_type: type[T]) -> Result[T]:
+    """A ``needs_clarification`` result for a tool whose data type is ``data_type``."""
+    model: type[Result[T]] = Result[data_type]  # type: ignore[valid-type]
+    return model(status="needs_clarification", clarification=clarification)

@@ -8,13 +8,17 @@ the 554 → 322 story is visible without anyone having to ask for it.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-from datetime import date
-from itertools import pairwise
 from typing import Literal
 
 from pydantic import BaseModel, Field
 
+from courts_analyst.core.chain import (
+    Row,
+    history_text,
+    later_revisions,
+    load_chain,
+    revision_status,
+)
 from courts_analyst.core.courts import COURTS, TERRITORIAL, CourtLevel
 from courts_analyst.core.db import Database
 from courts_analyst.core.enums import EDITIONS
@@ -34,16 +38,7 @@ from courts_analyst.core.provenance import (
     series_title,
 )
 from courts_analyst.core.results import Caveat, Result, ok
-
-CHAIN_SQL = """
-SELECT o.edition, o.table_code, o.value, o.decimals, e.pub_order, o.cell_ref,
-       s.url, o.period_end, o.footnote_ids
-FROM cat.observation o
-JOIN cat.edition e USING (edition)
-JOIN cat.source_file s USING (file_id)
-WHERE o.measure_id = ? AND o.court = ? AND o.fiscal_year = ? AND o.value IS NOT NULL
-ORDER BY e.pub_order
-"""
+from courts_analyst.core.revisions import RevisionNote, revision_notes
 
 YEARS_SQL = """
 SELECT DISTINCT fiscal_year FROM cat.observation
@@ -68,32 +63,6 @@ WHERE o.measure_id = ? AND o.fiscal_year = ? AND o.edition = ? AND o.value IS NO
 """
 
 
-@dataclass(frozen=True)
-class _Row:
-    edition: str
-    table_code: str
-    value: float
-    decimals: int
-    pub_order: int
-    cell_ref: str | None
-    url: str | None
-    period_end: date
-    footnote_ids: list[str]
-
-    @property
-    def shown(self) -> float:
-        return round_half_up(self.value, self.decimals)
-
-    def ref(self) -> FigureRef:
-        return FigureRef(
-            value=self.shown,
-            edition=self.edition,
-            table_code=self.table_code,
-            url=self.url,
-            cell_ref=self.cell_ref,
-        )
-
-
 class OfficialFigure(BaseModel):
     """A published statistic in one edition, with its full edition history."""
 
@@ -114,6 +83,11 @@ class OfficialFigure(BaseModel):
         description="Every edition that printed this figure, oldest first."
     )
     footnotes: list[str] = Field(default_factory=list)
+    revision_notes: list[RevisionNote] = Field(
+        default_factory=list,
+        description="Why the editions differ: the official history, and our "
+        "inference (basis 'inferred') only where the district figures support it.",
+    )
 
 
 class CourtRow(BaseModel):
@@ -155,13 +129,6 @@ def _check_court(court: str) -> None:
         raise UnknownCourtError(f"Unknown court code {court!r}.", ["explain_term"])
 
 
-def _chain(db: Database, measure: str, court: str, fy: int) -> list[_Row]:
-    return [
-        _Row(e, t, v, d if d is not None else 0, p, c, u, pe, list(f or []))
-        for e, t, v, d, p, c, u, pe, f in db.rows(CHAIN_SQL, [measure, court, fy])
-    ]
-
-
 def _years(db: Database, measure: str, court: str) -> list[int]:
     return [r[0] for r in db.rows(YEARS_SQL, [measure, court])]
 
@@ -194,30 +161,7 @@ def _missing(db: Database, m: Measure, court: str, fy: int) -> Exception:
     )
 
 
-def revision_status(chain: list[_Row]) -> RevisionStatus:
-    if len(chain) == 1:
-        return "only_edition"
-    return "revised" if len({r.shown for r in chain}) > 1 else "original"
-
-
-def _later_revisions(chain: list[_Row]) -> list[FigureRef]:
-    return [cur.ref() for prev, cur in pairwise(chain) if cur.shown != prev.shown]
-
-
-def history_text(chain: list[_Row]) -> str:
-    """'554 (JB-2020 to JFF-2022) → 322 (JFF-2023 to JFF-2025)'."""
-    runs: list[tuple[float, str, str]] = []
-    for r in chain:
-        if runs and runs[-1][0] == r.shown:
-            runs[-1] = (r.shown, runs[-1][1], r.edition)
-        else:
-            runs.append((r.shown, r.edition, r.edition))
-    return " → ".join(
-        f"{fmt(v)} ({a})" if a == b else f"{fmt(v)} ({a} to {b})" for v, a, b in runs
-    )
-
-
-def _select(chain: list[_Row], edition: str | None) -> _Row:
+def _select(chain: list[Row], edition: str | None) -> Row:
     if edition in (None, "latest"):
         return chain[-1]
     if edition == "first_published":
@@ -244,7 +188,7 @@ def get_official_figure(
     """A published figure with its edition, definition and revision history."""
     m = get_measure(measure)
     _check_court(court)
-    chain = _chain(db, measure, court, fiscal_year)
+    chain = load_chain(db, measure, court, fiscal_year)
     if not chain:
         raise _missing(db, m, court, fiscal_year)
     row = _select(chain, edition)
@@ -255,6 +199,7 @@ def get_official_figure(
         [r[0] for r in db.rows(FOOTNOTES_SQL, [footnote_ids])] if footnote_ids else []
     )
     period = Period.for_end(fiscal_year, row.period_end)
+    notes, note_warnings = revision_notes(db, m, court, fiscal_year, chain)
     court_obj = COURTS[court]
     figure = OfficialFigure(
         measure=m.id,
@@ -272,6 +217,7 @@ def get_official_figure(
         latest=latest.ref(),
         editions=[r.ref() for r in chain],
         footnotes=footnotes,
+        revision_notes=notes,
     )
     warnings: list[Caveat] = []
     nxt: list[str] = []
@@ -294,10 +240,7 @@ def get_official_figure(
                     f"({latest.edition}).",
                 )
             )
-        nxt.append(
-            f"explain_change or courts://revisions for why {m.label} FY{fiscal_year} "
-            "changed between editions"
-        )
+        warnings += note_warnings
     if period.period_type == "statistical_year":
         warnings.append(
             Caveat(
@@ -319,7 +262,7 @@ def get_official_figure(
         cell_ref=row.cell_ref,
         revision_status=status,
         first_published=first.ref(),
-        later_revisions=_later_revisions(chain),
+        later_revisions=later_revisions(chain),
     )
     return ok(figure, [prov], warnings, nxt)
 
@@ -391,7 +334,7 @@ def compare_courts(
         )
         for i, (c, v, d, cell, *_rest) in enumerate(ranked, 1)
     ]
-    national_chain = _chain(db, measure, "US", fiscal_year)
+    national_chain = load_chain(db, measure, "US", fiscal_year)
     national = next((r for r in national_chain if r.edition == chosen), None)
     latest_national = national_chain[-1] if national_chain else None
     warnings: list[Caveat] = []

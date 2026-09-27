@@ -16,10 +16,33 @@ Built on the [GSA MCP hackathon template](https://github.com/GSA-TTS/mcp-hackath
 with [FastMCP 4](https://gofastmcp.com) (MCP spec 2026-07-28, backward compatible
 with 2025-11-25 clients) and [uv](https://docs.astral.sh/uv/).
 
-> **Status: Phase 1 (official tables catalog).** `make data-tables` builds an
-> edition-aware catalog of six uscourts.gov tables (FY2016–FY2025, 60 editions,
-> ~32,600 values) in DuckDB, with a generated revision log. The server still
-> exposes only `server_info`; the IDB (P2) and statistics tools (P4–P5) follow.
+> **Status: Phase 5 (MCP server).** Nine analysis tools plus `server_info`,
+> six resources and four prompts over an edition-aware catalog of the official
+> tables (FY2016–FY2025, 60 table editions) and the FJC civil IDB
+> (FY2015–FY2025). An eval benchmark of 152 questions scores every answer
+> deterministically. Guardrails (P6), the agent API (P7) and the web app (P8)
+> follow.
+
+## Tools
+
+| Tool | Answers |
+| --- | --- |
+| `explain_change` | Why a measure changed between two fiscal years: exact breakdowns by district and case type, drivers labelled official / IDB-derived / inferred |
+| `get_official_figure` | One published statistic in the latest edition, with the first-published value, every edition and why they differ |
+| `compare_courts` | Courts ranked on one measure, all from one edition |
+| `find_cases` / `analyze_cohort` | A cohort of IDB civil cases by handle; medians, outcome rates and trends with n and 95% CIs |
+| `reconcile` | Whether the IDB reproduces a published count, and why not |
+| `judgeship_context` | Weighted filings against the Judicial Conference's 430/600 thresholds and its 2025 recommendations (never its own) |
+| `explain_term` | Definitions of terms, measures and nature-of-suit codes |
+| `sample_dockets` | Example docket references for CourtListener, labelled "match may be inexact" |
+| `server_info` | Version, protocols and which datasets are loaded |
+
+Resources: `courts://catalog`, `courts://revisions`, `courts://glossary`,
+`courts://editions/{edition}/{table}` (immutable), `courts://codebook/{field}`,
+`courts://methodology/{topic}`. Prompts: `district_caseload_profile`,
+`what_changed_and_why`, `judgeship_briefing`, `compare_editions`. An ambiguous
+question (raw or weighted filings?) is asked back through elicitation on
+clients that support it, and returned as `needs_clarification` otherwise.
 
 ---
 
@@ -38,8 +61,21 @@ make help         # every target
 ```
 
 Connect Claude Code: the repo ships a project `.mcp.json`, so opening Claude Code
-in this directory offers the `courts-analyst` server. For Claude Desktop, see
-[QUICKSTART.md](QUICKSTART.md).
+in this directory offers the `courts-analyst` server. For Claude Desktop or
+another directory, add:
+
+```json
+{
+  "mcpServers": {
+    "courts-analyst": {
+      "command": "uv",
+      "args": ["run", "--quiet", "--directory", "/absolute/path/to/this/repo", "courts-analyst"]
+    }
+  }
+}
+```
+
+More in [QUICKSTART.md](QUICKSTART.md).
 
 ## Make targets
 
@@ -57,7 +93,11 @@ in this directory offers the `courts-analyst` server. For Claude Desktop, see
 | `data-idb-sample` | Rebuild the committed IDB test sample from the download |
 | `data-discover` | Re-crawl uscourts.gov and rewrite the table manifest (review the diff) |
 | `data` | Both datasets (`data-tables` + `data-idb`) |
-| `web` / `eval` | Placeholders until Phases 8 and 3 |
+| `eval-validate` / `eval` | Validate the question bank / harness self-check (gold 100%, null 0%) |
+| `eval-claude` | Tool-selection and e2e dev split with Claude (headless Claude Code + this server) |
+| `variance-report` | Reconcile every court-year into `docs/variance-report.md` |
+| `schemas` | Export result JSON Schemas for the frontend |
+| `web` | Placeholder until Phase 8 |
 
 ## Repository layout
 

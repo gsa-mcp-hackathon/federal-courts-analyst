@@ -39,11 +39,16 @@ def _parser() -> argparse.ArgumentParser:
     r.add_argument("--results-dir", type=Path, default=DEFAULT_RESULTS)
     r.add_argument("--run-id")
     r.add_argument("--quiet", action="store_true")
+    r.add_argument("--workers", type=int, default=1, help="answer N items at once")
     r.add_argument(
         "--expect-accuracy",
         type=float,
         help="exit 1 unless accuracy equals this (harness self-checks: 1 or 0)",
     )
+    rs = sub.add_parser("rescore", help="Score a past run's records again")
+    rs.add_argument("records", type=Path, help="<run_id>.jsonl")
+    rs.add_argument("--results-dir", type=Path, default=DEFAULT_RESULTS)
+    rs.add_argument("--run-id")
     s = sub.add_parser("show", help="Print a past run's summary as Markdown")
     s.add_argument("summary", type=Path, help="<run_id>.summary.json")
     return p
@@ -63,6 +68,12 @@ def main(argv: list[str] | None = None) -> int:
     except BankError as exc:
         print(f"invalid question bank: {exc}", file=sys.stderr)
         return 1
+    if args.cmd == "rescore":
+        from courts_analyst.evaluation.runner import rescore
+
+        result = rescore(args.records, items, args.results_dir, args.run_id)
+        print(result.paths["markdown"].read_text())
+        return 0
     if args.cmd == "validate":
         held = sum(i.resolved_split == "test" for i in items)
         print(
@@ -104,6 +115,7 @@ def main(argv: list[str] | None = None) -> int:
         results_dir=args.results_dir,
         run_id=args.run_id,
         progress=progress,
+        workers=args.workers,
     )
     print()
     print(result.paths["markdown"].read_text())

@@ -71,13 +71,13 @@ If the client supports elicitation: send a schema-constrained request (enum choi
 
 ## Tasks
 
-- [ ] Implement each tool file as a thin adapter: validate → call core → wrap `ToolResult`
-- [ ] Declare output schemas from the Pydantic models
-- [ ] Resources and prompts modules
-- [ ] Elicitation + fallback
-- [ ] Tool description review against the dev split (iterate, track tool-selection accuracy per revision)
-- [ ] MCP Inspector walkthrough recorded for the deck
-- [ ] Claude Desktop/Code config snippet in the README
+- [x] Implement each tool file as a thin adapter: validate → call core → return its `Result`
+- [x] Declare output schemas from the Pydantic models
+- [x] Resources and prompts modules
+- [x] Elicitation + fallback (MRTR, legacy `ctx.elicit`, structured `needs_clarification`)
+- [x] Tool description review against the dev split (two revisions, tracked in Evidence)
+- [x] MCP Inspector walkthrough recorded for the deck
+- [x] Claude Desktop/Code config snippet in the README
 
 ## Tests
 
@@ -97,7 +97,81 @@ If the client supports elicitation: send a schema-constrained request (enum choi
 
 ## Exit criteria
 
-- [ ] All tools callable from Claude Desktop/Code and MCP Inspector over stdio and HTTP
-- [ ] Schema, protocol and snapshot tests green
-- [ ] Tool-selection accuracy on dev ≥ 90% (Claude); first numbers for a second model family
-- [ ] First eval e2e run with our server recorded as the baseline for P6–P10
+- [x] All tools callable from Claude Code and MCP Inspector over stdio, and over HTTP in-process and in the container (Claude Desktop by hand is still [#13](https://github.com/syedaun-techsur/federal-courts-analyst/issues/13))
+- [x] Schema, protocol and snapshot tests green
+- [x] Tool-selection accuracy on dev ≥ 90% (Claude): 16/16 Sonnet, 16/16 Haiku; a second model *family* needs an API key ([#18](https://github.com/syedaun-techsur/federal-courts-analyst/issues/18))
+- [x] First eval e2e run with our server recorded as the baseline for P6–P10
+
+## Deviations
+
+| Plan said | We did | Why |
+| --- | --- | --- |
+| Tool inputs as one Pydantic model each (`OfficialFigureInput`, …) | Flat, typed arguments (`Annotated[...]`), validated by the core's models and closed vocabularies ([ADR 0009](../docs/adr/0009-mcp-tool-surface.md)) | A single nested `input` object is harder for models to fill; the schema is the same set of constraints |
+| `court="national"` | `court="US"` (the registry's code), with every code in the schema's `enum` | One vocabulary across tools, tables and the IDB |
+| `reconcile(handle \| figure_ref)` | `reconcile(measure, court, fiscal_year)` or `reconcile(handle)` | Plain arguments are easier to fill than a union type |
+| `find_cases` + separate refine | `find_cases(parent_handle=…)` refines | One tool for "narrow this cohort" keeps the surface at nine tools |
+| Elicitation triggers: raw vs weighted, fiscal vs statistical year, MDL in/out, edition | Only **ambiguous measure aliases** (`filings_per_judgeship`, `civil_filings`) ask. Statistical year and edition apply the default with a warning; MDL in/out is always answered both ways by `explain_change` | Asking about soft ambiguities blocks headless agents for no gain; the result already carries both answers |
+| Per-resource cache hints | One server-wide TTL (1 h) and `_meta.immutable` on edition resources | FastMCP 4 has server-wide hints only (ADR 0001) |
+| — | `revision_notes` on `get_official_figure` (official history + gated inference), via new `core/revisions.py` | The concept promises the reason editions differ with the figure; the first baseline showed the model couldn't find it without calling `explain_change` |
+| — | `core/catalog.py` (catalog, published tables, revision log) and `core/dockets.py` (sampling, CourtListener ids and links) | The resources and `sample_dockets` need core functions, not SQL in adapters |
+| Tool-selection eval with Claude (API) | `claude-code` answerers: headless Claude Code (`claude -p`, built-in tools off, only this server) | No API keys ([#18](https://github.com/syedaun-techsur/federal-courts-analyst/issues/18)); the CLI gives the same tool-calling transcript |
+| — | `courts-eval rescore`, `--workers`; behaviour scorer rewritten (strong vs weak refusal phrases, "answered" when the expected figures are present, sentence-scoped edition pairing) | The first baseline's behaviour scores were mostly scorer errors; saved transcripts are re-scored instead of re-asking the model |
+| — | Request-logging middleware (tool, argument hash, latency, bytes, status) | Plan's "request logging"; OpenTelemetry waits for Phase 10 |
+
+**Changes made after looking at eval results** (held-out policy, eval/README.md):
+
+- *Harness* (scorer, bank): refusal and clarification phrases, sentence-scoped edition pairing, "answered" shortcut; bank fixes to `ts-cohort-trend` (`analyze_cohort` optional: `find_cases` already returns counts by year), the prompt-injection claim ("Neither figure is 900" had tripped `not_mentions: "is 900"`), and `what-changed-weighted-2023-edition` ("dropped" now counts as revised down). All are general rules or corrections of wrong checks; every scorer rule has a unit test drawn from a real transcript.
+- *System*: descriptions now say a plain "civil filings" means the count (from dev item `why-fy2025-filings-changed`, which passed the alias and got a clarification back) and to name the edition and flag revisions even when asked for one number (dev item `adv-one-number-please`); `revision_notes` implement the concept's principle above. No change was made to fit a held-out item's wording.
+
+## Evidence
+
+**Surface:** 10 tools (9 analysis + `server_info`), 3 resources + 3 resource templates, 4 prompts. Every tool has an `outputSchema`, read-only annotations and a four-part description (≤ 1,200 characters, linted).
+
+**Eval baseline (Claude Sonnet via headless Claude Code, only this server; full data; 2026-09-26):**
+
+| Suite | Run 1 (as scored then) | Run 1, re-scored | **Run 2 (baseline)** | Held-out (test) in run 2 |
+| --- | ---: | ---: | ---: | ---: |
+| Tool selection | 24/25 | 25/25 | **25/25 (100%)** | 9/9 |
+| End-to-end factual | 50/51 | 51/51 | **51/51 (100%)** | 13/13 |
+| Explanation | 18/20 | 18/20 | **20/20 (100%)** | 6/6 |
+| Adversarial | 12/26 | 23/26 | **22/26 (85%)** | 12/13 |
+| **All four** | 104/122 | 117/122 | **118/122 (96.7%)** | 40/41 |
+
+Claude Haiku, tool selection: **24/25** (dev 16/16). Latency p50 5–9 s, p95 6–16 s per question (the model's whole turn, not the tools'). Adversarial behaviour in run 2: decline precision 100% / recall 88%. The four remaining misses are Phase 6 inputs ([#22](https://github.com/syedaun-techsur/federal-courts-analyst/issues/22)). Runs are in [eval/results/](../eval/results/README.md).
+
+**Tool calls on the full data** (in-memory client): `get_official_figure` FY2020 weighted → 322 (JFF-2025) with `revision_notes`: *554 (JB-2020 to JFF-2022) → 322 (JFF-2023 to JFF-2025)* and the inferred N.D. Fla. note (211 of 232 points); `explain_change` FY2019→FY2020 filings → +172,704, N.D. Fla. +199,881; `compare_courts` FY2024 top 5 → N.D. Fla., E.D.N.C., E.D. Cal., E.D. Tex., W.D. Tex.; `find_cases` N.D. Fla. FY2020 direct-filed MDL → 202,463 (`coh_1385a2b1481d`).
+
+**CI:** green on [PR #23](https://github.com/syedaun-techsur/federal-courts-analyst/pull/23) (lint, test 3.11, test 3.12, docker).
+
+**Automated tests:** 716 passed in the default suite (83 new for this phase), `@fulldata` 14/14. `make docker-test` 6/6: the container answers `get_official_figure`, `find_cases` and `analyze_cohort` over streamable HTTP with the data mounted read-only. Lint, format and mypy clean.
+
+| Suite | Checks |
+| --- | --- |
+| `test_registration.py` | exactly the 10 tools in a fixed order, resources, templates, prompts; description, schema and annotations on every tool; `openWorldHint` only on `sample_dockets`; legacy clients |
+| `test_tools_happy_path.py` | one call per tool on the fixture data, validated against its `outputSchema` (jsonschema) and snapshotted; the find → analyze → sample → refine → reconcile chain; circuit expansion; a legacy client calling a data tool |
+| `test_tools_errors.py` | 15 bad inputs → typed, actionable errors (unknown court, bad year, out of scope, territorial, wrong edition, unknown or malformed handle, n > 10, bad cohort, unsupported measure); missing catalog and missing IDB |
+| `test_enum_constraints.py` | the schema lists every court, measure and edition; invented values rejected |
+| `test_elicitation.py` | modern (MRTR) and legacy (`ctx.elicit`) handlers: the choice is honoured; declined → `needs_clarification`; no handler → structured choices, and the choice works as an argument; the other tools ask too |
+| `test_resources.py` | catalog, revisions, glossary, edition tables (value + cell ref, immutable `_meta`), codebook, methodology; unknown table/field/topic errors |
+| `test_prompts.py` | all four render with their arguments and the reporting rules |
+| `test_output_budget.py` | the largest results (all districts, national explanations, 11-year cohorts, grouped analyses) stay under 64 KB |
+| `test_description_lint.py` | four parts in order, a named neighbour, ≤ 1,200 characters |
+| `test_scorer_refusal.py` (extended) | refusal/clarification phrases from real Phase 5 transcripts |
+
+**Claude in Chrome (MCP Inspector v2.8.0 web UI, stdio, 2025-11-25):** connected; the Tools tab lists all ten tools with their titles and READ-ONLY / IDEMPOTENT badges; `explain_change` (civil_cases_filed, US, 2019→2020) returned the structured result with the official change, IDB breakdown and drivers ([screenshot](../docs/evidence/phase-05/inspector-explain-change.jpg)); Resources lists the 3 URIs and 3 templates, and `courts://methodology/weighted-filings` renders as Markdown with its audience and priority annotations ([screenshot](../docs/evidence/phase-05/inspector-methodology-resource.jpg)). No console errors. The Inspector needed the scratch npm cache again ([#14](https://github.com/syedaun-techsur/federal-courts-analyst/issues/14)).
+
+**Found and fixed during the phase:**
+- `Result[T]` built with an unbound type variable made Pydantic warn on every serialisation; results are now parametrised by their data type.
+- The legacy and modern elicitation paths return answers in different shapes (`{"value": …}` vs our form's `choice`); both are handled.
+- The first Claude run's adversarial score (12/26) was mostly the scorer: refusals like "it can't provide names" or "isn't published for FY1992" weren't recognised, and correct answers to injection attempts were read as refusals. Rewritten and re-scored from the saved transcripts (23/26).
+- Court abbreviations ("Ga., M.D. Ga.") split sentences and broke edition pairing for a correct circuit answer.
+
+## Open issues
+
+Live status is on the [issue tracker](https://github.com/syedaun-techsur/federal-courts-analyst/issues).
+
+1. **Adversarial misses for Phase 6** (policy framing, dropped revision flag, ambiguous "how busy", improvised period facts). [#22](https://github.com/syedaun-techsur/federal-courts-analyst/issues/22)
+2. **Second model family** for tool selection needs an API key. [#18](https://github.com/syedaun-techsur/federal-courts-analyst/issues/18) (comment added)
+3. **Claude Desktop** not tried by hand (Claude Code, the Inspector and headless Claude Code all work). [#13](https://github.com/syedaun-techsur/federal-courts-analyst/issues/13)
+4. `~/.npm` permissions for `make inspector`. [#14](https://github.com/syedaun-techsur/federal-courts-analyst/issues/14) (comment added)
+5. Cohort handles live in one process unless `COHORT_STORE_PATH` is set; with several HTTP replicas an agent may have to call `find_cases` again (handles are deterministic, so it gets the same one). Note only.

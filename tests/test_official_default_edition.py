@@ -155,3 +155,21 @@ def test_compare_first_published(core_db: Database) -> None:
     assert c is not None and c.edition == "JB-2017"
     latest = compare_courts(core_db, "civil_cases_pending", 2017, courts=["WV-S"]).data
     assert latest is not None and latest.edition == "JB-2018"
+
+
+def test_revision_notes_explain_the_editions(core_db: Database) -> None:
+    r = get_official_figure(core_db, W, "US", 2020)
+    notes = r.data.revision_notes  # type: ignore[union-attr]
+    assert [n.basis for n in notes] == ["official", "inferred"]
+    assert "554 (JB-2020 to JFF-2022) → 322 (JFF-2023 to JFF-2025)" in notes[0].text
+    inferred = notes[1]
+    assert inferred.district == "FL-N" and round(inferred.points or 0) == 211
+    assert inferred.revision == -232 and "Unconfirmed" in inferred.text
+    assert any(w.code == "inferred_not_official" for w in r.warnings)
+    # FY2019: no single district explains the revision, so no inference.
+    r19 = get_official_figure(core_db, W, "US", 2019)
+    assert [n.basis for n in r19.data.revision_notes] == ["official"]  # type: ignore[union-attr]
+    assert not any(w.code == "inferred_not_official" for w in r19.warnings)
+    # Unrevised figures have no notes.
+    same = get_official_figure(core_db, W, "FL-N", 2020).data
+    assert same is not None and same.revision_notes == []

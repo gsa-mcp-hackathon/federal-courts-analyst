@@ -6,10 +6,44 @@ from fastmcp import Client
 
 from courts_analyst import SERVER_NAME, __version__
 
-# Update these as tools, resources and prompts are added (P5).
-EXPECTED_TOOLS = {"server_info"}
-EXPECTED_RESOURCES: set[str] = set()
-EXPECTED_PROMPTS: set[str] = set()
+EXPECTED_TOOLS = {
+    "explain_change",
+    "get_official_figure",
+    "compare_courts",
+    "find_cases",
+    "analyze_cohort",
+    "reconcile",
+    "judgeship_context",
+    "explain_term",
+    "sample_dockets",
+    "server_info",
+}
+TOOL_ORDER = [
+    "explain_change",
+    "get_official_figure",
+    "compare_courts",
+    "find_cases",
+    "analyze_cohort",
+    "reconcile",
+    "judgeship_context",
+    "explain_term",
+    "sample_dockets",
+    "server_info",
+]
+EXPECTED_RESOURCES = {
+    "courts://catalog",
+    "courts://revisions",
+    "courts://glossary",
+    "courts://editions/{edition}/{table}",
+    "courts://codebook/{field}",
+    "courts://methodology/{topic}",
+}
+EXPECTED_PROMPTS = {
+    "district_caseload_profile",
+    "what_changed_and_why",
+    "judgeship_briefing",
+    "compare_editions",
+}
 
 
 async def test_lists_expected_tools(client: Client) -> None:
@@ -21,7 +55,7 @@ async def test_tool_order_is_deterministic(client: Client) -> None:
     # Spec 2026-07-28 asks for a stable tools/list order (prompt-cache friendly).
     first = [t.name for t in await client.list_tools()]
     second = [t.name for t in await client.list_tools()]
-    assert first == second
+    assert first == second == TOOL_ORDER
 
 
 async def test_lists_expected_resources_and_prompts(client: Client) -> None:
@@ -42,6 +76,10 @@ async def test_every_tool_has_description_schema_and_annotations(
         assert tool.output_schema, f"{tool.name} has no outputSchema"
         assert tool.annotations is not None, tool.name
         assert tool.annotations.read_only_hint is True, tool.name
+        assert tool.annotations.destructive_hint is False, tool.name
+        assert tool.annotations.title, tool.name
+        # Only sample_dockets points outside this server (CourtListener links).
+        assert tool.annotations.open_world_hint is (tool.name == "sample_dockets")
 
 
 async def test_server_info_structured_output(client: Client) -> None:

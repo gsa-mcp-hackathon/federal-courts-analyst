@@ -28,7 +28,7 @@ EDITIONS: Final[tuple[str, ...]] = tuple(
 EDITION_ALIASES: Final[tuple[str, ...]] = ("latest", "first_published")
 
 
-def _closed(values: Iterable[str], what: str, description: str) -> Any:
+def closed_str(values: Iterable[str], what: str, description: str) -> Any:
     allowed = tuple(values)
     allowed_set = frozenset(allowed)
 
@@ -51,7 +51,7 @@ DISTRICT_CODES: Final[tuple[str, ...]] = tuple(
     c for c, v in COURTS.items() if v.level is CourtLevel.DISTRICT
 )
 
-_CourtCode = _closed(
+_CourtCode = closed_str(
     COURT_CODES,
     "court",
     "Court code: US (all district courts), a circuit (CIR-01 … CIR-11, CIR-DC) "
@@ -69,13 +69,13 @@ def _measures_yaml() -> dict[str, dict[str, Any]]:
 
 MEASURE_IDS: Final[tuple[str, ...]] = tuple(_measures_yaml())
 
-_MeasureId = _closed(
+_MeasureId = closed_str(
     MEASURE_IDS,
     "measure",
     "A published statistic (see courts://glossary or explain_term for definitions).",
 )
 
-_EditionId = _closed(
+_EditionId = closed_str(
     EDITIONS,
     "edition",
     "A publication: JB-<year> (Judicial Business, first publication of that "
@@ -83,7 +83,7 @@ _EditionId = _closed(
     "sometimes revises earlier years).",
 )
 
-_EditionSelector = _closed(
+_EditionSelector = closed_str(
     (*EDITION_ALIASES, *EDITIONS),
     "edition",
     "Which edition's figure to return: 'latest' (default: the current official "
@@ -116,30 +116,32 @@ JURISDICTION_GROUPS: Final[tuple[str, ...]] = _distinct("juris", "group")
 DISPOSITION_GROUPS: Final[tuple[str, ...]] = _distinct("disp", "group")
 PRO_SE_GROUPS: Final[tuple[str, ...]] = _distinct("prose", "group")
 
-_NosCode = _closed(NOS_CODES, "nature-of-suit code", "Three-digit nature-of-suit code.")
-_NosGroup = _closed(
+_NosCode = closed_str(
+    NOS_CODES, "nature-of-suit code", "Three-digit nature-of-suit code."
+)
+_NosGroup = closed_str(
     NOS_GROUPS, "nature-of-suit group", "Table C-2 nature-of-suit group."
 )
-_NosCategory = _closed(
+_NosCategory = closed_str(
     NOS_CATEGORIES, "nature-of-suit category", "Table C-2 top-level category."
 )
-_OriginGroup = _closed(
+_OriginGroup = closed_str(
     ORIGIN_GROUPS,
     "origin",
     "How the case arrived: original, removed, remanded, reopened, transferred, "
     "mdl_transfer (sent by the JPML), mdl_direct (filed directly in the MDL "
     "court, from July 2016), appeal_from_magistrate.",
 )
-_JurisdictionGroup = _closed(
+_JurisdictionGroup = closed_str(
     JURISDICTION_GROUPS, "jurisdiction", "us (U.S. a party) or private."
 )
-_DispositionGroup = _closed(
+_DispositionGroup = closed_str(
     DISPOSITION_GROUPS,
     "disposition",
     "dismissed, judgment (including settlements entered as judgments and "
     "statistical closings) or transferred_or_remanded.",
 )
-_ProSeGroup = _closed(
+_ProSeGroup = closed_str(
     PRO_SE_GROUPS,
     "pro se",
     "Who was pro se at filing: plaintiff, defendant, both, none.",

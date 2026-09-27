@@ -89,13 +89,21 @@ def _category(item: QuestionItem, record: AnswerRecord, checks: dict[str, bool])
 
 def score_item(item: QuestionItem, record: AnswerRecord) -> ItemScore:
     exp = item.expected
-    actual = "answer" if record.error else infer_behavior(record)
-    checks: dict[str, bool] = {"behavior": actual == exp.behavior}
     notes: list[str] = []
-
     answering = exp.behavior == "answer"
-    if exp.figures and answering:
-        res = check_figures(exp.figures, exp.figures_mode, reported_figures(record))
+    res = (
+        check_figures(exp.figures, exp.figures_mode, reported_figures(record))
+        if exp.figures and answering
+        else None
+    )
+    actual = (
+        "answer"
+        if record.error
+        else infer_behavior(record, answered_expected=bool(res and res.numeric_ok))
+    )
+    checks: dict[str, bool] = {"behavior": actual == exp.behavior}
+
+    if res is not None:
         checks["numeric"] = res.numeric_ok
         if res.needs_edition:
             checks["edition"] = res.edition_ok

@@ -19,6 +19,8 @@ make eval                               # harness self-check: gold 100%, null 0%
 uv run courts-eval stats                # counts by suite, split and tag
 uv run courts-eval run --answerer gold --suite e2e --split dev
 uv run courts-eval show eval/results/<run_id>.summary.json
+uv run courts-eval run --answerer claude-code --suite e2e --split dev --workers 4
+uv run courts-eval rescore eval/results/<run_id>.jsonl   # re-score saved answers
 ```
 
 A run writes `<run_id>.jsonl` (each answer record and its score),
@@ -84,9 +86,13 @@ All deterministic ([`scoring/`](../src/courts_analyst/evaluation/scoring/)):
   number with the wrong or no edition is wrong.
 - **Claims.** Phrases in the final text, fields in structured tool outputs
   (`provenance[].revision_status`), or tools called.
-- **Behaviour.** Declared, else inferred from our tools' `status`
-  (`needs_clarification`, `declined`) and conservative phrases. Reported as a
-  confusion matrix with precision and recall for answer, clarify and decline.
+- **Behaviour.** Declared; else "answered" when the expected figures are
+  there; else our tools' `status` (`needs_clarification`, `declined`) and
+  phrase rules (strong refusal phrases anywhere, weaker ones only in an
+  answer's opening, then clarifying questions). Reported as a confusion matrix
+  with precision and recall for answer, clarify and decline. The phrase rules
+  are unit-tested against real transcripts; `courts-eval rescore` re-scores a
+  saved run after a scorer change, without asking the model again.
 - **Tools.** Every expected tool must be called. It decides correctness only in
   `tool_selection`; elsewhere it's a diagnostic.
 - **Error taxonomy** (MCP-Atlas style), one per failure: `tool_selection`,
@@ -108,7 +114,7 @@ Answerers other than `gold` must read only `item.question`.
 | `gold` | Builds the expected answer from the item; must score 100% | 3 |
 | `null` | Says nothing; must score 0% (every item has a check silence fails) | 3 |
 | `engine` | Our analytics core computing the `engine` suite directly | 4 |
-| `claude-code` | Claude (headless Claude Code) with this MCP server | 5 |
+| `claude-code`, `claude-code-haiku` | Claude Sonnet / Haiku through headless Claude Code (`claude -p`), with every built-in tool off and only this MCP server connected; needs a logged-in `claude` CLI | 5 |
 | our agent, web search, Genie | Baselines | 7, 10 |
 
 ## Held-out policy
@@ -116,8 +122,8 @@ Answerers other than `gold` must read only `item.question`.
 - **Split.** An item is in the held-out `test` split when the first 32 bits of
   `sha256("split:" + id)` modulo 100 fall below 30; otherwise it's in `dev`.
   The split depends only on the id, so it can't drift when items are added,
-  and `tests/test_split_stability.py` pins known assignments. Today 49 of 152
-  items (32%) are held out, in every suite.
+  and `tests/test_split_stability.py` pins known assignments. Today 50 of 152
+  items (33%) are held out, in every suite.
 - **Who looks at `test`.** Nobody tunes against it. Tool descriptions, prompts
   and the agent are tuned only on `dev` runs; `courts-eval run` without
   `--split` scores both, so pass `--split dev` while iterating.

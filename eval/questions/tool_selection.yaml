@@ -52,8 +52,10 @@
   tags: [cohort]
 - id: ts-cohort-trend
   question: Show the trend in patent case filings in the Western District of Texas from FY2016 to FY2025.
-  expected_tools: [find_cases, analyze_cohort]
+  expected_tools: [find_cases]
+  acceptable_tools: [analyze_cohort]
   tags: [cohort]
+  notes: find_cases returns counts by fiscal year, so analyze_cohort(metric='trend') is optional.
 - id: ts-reconcile-figure
   question: Does the IDB reproduce the official count of civil cases filed nationally in FY2023?
   expected_tools: [reconcile]

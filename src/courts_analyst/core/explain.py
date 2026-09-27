@@ -34,15 +34,16 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
+from courts_analyst.core.chain import Row, load_chain
 from courts_analyst.core.cohorts import expand_courts, idb_provenance
 from courts_analyst.core.courts import COURTS, CourtLevel
 from courts_analyst.core.db import Database
 from courts_analyst.core.errors import InvalidCohortError, OutOfScopeError
 from courts_analyst.core.measures import PENDING_WHERE, Measure, get_measure
 from courts_analyst.core.numbers import fmt, round_half_up
-from courts_analyst.core.official import CHAIN_SQL, _Row, history_text
 from courts_analyst.core.provenance import FigureRef, Period, Provenance, series_title
 from courts_analyst.core.results import Caveat, Result, ok
+from courts_analyst.core.revisions import revision_notes
 
 KEY_SHARE = 0.8
 """Contributors are marked key until they explain this share of the change."""
@@ -125,15 +126,8 @@ class ChangeExplanation(BaseModel):
 # ── helpers ──────────────────────────────────────────────────────────────────
 
 
-def _chain(db: Database, measure: str, court: str, fy: int) -> list[_Row]:
-    return [
-        _Row(e, t, v, d if d is not None else 0, p, c, u, pe, list(f or []))
-        for e, t, v, d, p, c, u, pe, f in db.rows(CHAIN_SQL, [measure, court, fy])
-    ]
-
-
-def _need_chain(db: Database, m: Measure, court: str, fy: int) -> list[_Row]:
-    chain = _chain(db, m.id, court, fy)
+def _need_chain(db: Database, m: Measure, court: str, fy: int) -> list[Row]:
+    chain = load_chain(db, m.id, court, fy)
     if not chain:
         raise OutOfScopeError(
             f"{m.label} for {court} isn't published for FY{fy}.",
@@ -329,122 +323,37 @@ def _data_breaks(db: Database, a: int, b: int, groups: Iterable[str]) -> list[Dr
     return out
 
 
-def _revisions(
-    db: Database, m: Measure, court: str, years: Iterable[int]
-) -> list[tuple[int, list[_Row]]]:
-    out = []
-    for fy in years:
-        chain = _chain(db, m.id, court, fy)
-        if len({r.shown for r in chain}) > 1:
-            out.append((fy, chain))
-    return out
-
-
 def _revision_drivers(
     db: Database, m: Measure, court: str, a: int, b: int
 ) -> tuple[list[Driver], list[Caveat]]:
     drivers: list[Driver] = []
     warnings: list[Caveat] = []
-    for fy, chain in _revisions(db, m, court, (a, b)):
-        first, latest = chain[0], chain[-1]
-        drivers.append(
-            Driver(
-                code="methodology_revision",
-                title=f"FY{fy} figure revised between editions",
-                basis="official",
-                evidence=f"FY{fy} {m.label}: {history_text(chain)}. "
-                + (
-                    "Judicial Business restates the prior year's closing pending "
-                    "count in the next edition's Table C-1."
-                    if m.id.endswith("pending")
-                    else "The tables' notes don't explain the change."
-                ),
-                magnitude=latest.shown - first.shown,
+    for fy in (a, b):
+        chain = load_chain(db, m.id, court, fy)
+        notes, note_warnings = revision_notes(db, m, court, fy, chain)
+        warnings += note_warnings
+        for n in notes:
+            inferred = n.basis == "inferred"
+            drivers.append(
+                Driver(
+                    code="methodology_revision",
+                    title=(
+                        f"Inference: {_name(n.district or '')} accounts for most of "
+                        f"the FY{fy} revision"
+                        if inferred
+                        else f"FY{fy} figure revised between editions"
+                    ),
+                    basis=n.basis,
+                    evidence=n.text,
+                    magnitude=-(n.points or 0) if inferred else n.revision,
+                    share_of_change=(
+                        (n.points or 0) / abs(n.revision)
+                        if inferred and n.revision
+                        else None
+                    ),
+                )
             )
-        )
-        if (
-            m.family == "per_judgeship"
-            and court == "US"
-            and first.edition.startswith("JB")
-        ):
-            inferred = _largest_district_share(db, m, fy, first.edition)
-            revision = latest.shown - first.shown
-            if (
-                inferred
-                and _mdl_dominated(db, inferred[0], fy)
-                and (inferred[1] >= INFERENCE_SHARE * abs(revision))
-            ):
-                code, points = inferred
-                drivers.append(
-                    Driver(
-                        code="methodology_revision",
-                        title=f"Inference: {_name(code)} accounts for most of "
-                        f"the FY{fy} revision",
-                        basis="inferred",
-                        evidence=(
-                            f"In {first.edition} Table X-1A, {_name(code)}'s filings "
-                            f"contribute {points:.0f} points to the national "
-                            f"{fmt(first.shown)}; the later edition's figure is "
-                            f"{abs(revision):.0f} points lower. That is consistent "
-                            "with the revised series excluding or down-weighting "
-                            "those cases (mostly directly filed MDL cases), but no "
-                            "published note says so. Unconfirmed: needs AO "
-                            "confirmation."
-                        ),
-                        magnitude=-points,
-                        share_of_change=points / abs(revision) if revision else None,
-                    )
-                )
-                warnings.append(
-                    Caveat(
-                        code="inferred_not_official",
-                        message=(
-                            f"The explanation of the FY{fy} revision is our "
-                            "inference from the district figures, not an official "
-                            "statement."
-                        ),
-                    )
-                )
     return drivers, warnings
-
-
-INFERENCE_SHARE = 0.5
-"""A district's contribution must cover this share of a revision before we
-offer (labelled) the inference that the revision concerns its cases."""
-
-
-def _mdl_dominated(db: Database, court: str, fy: int) -> bool:
-    """Most of the district's filings that year were directly filed MDL cases."""
-    if not db.has_idb:
-        return False
-    row = db.one(
-        "SELECT avg(CAST(is_mdl_direct_filed AS INTEGER)) FROM idb.idb_civil "
-        "WHERE court = ? AND filing_fy = ?",
-        [court, fy],
-    )
-    return bool(row and row[0] is not None and row[0] >= 0.5)
-
-
-def _largest_district_share(
-    db: Database, m: Measure, fy: int, edition: str
-) -> tuple[str, float] | None:
-    """(district, points of the national figure it contributes) in one edition."""
-    rows = db.rows(
-        "SELECT v.court, v.value * j.value FROM cat.observation v "
-        "JOIN cat.observation j ON j.court = v.court AND j.fiscal_year = v.fiscal_year "
-        "AND j.edition = v.edition AND j.measure_id = 'authorized_judgeships' "
-        "WHERE v.measure_id = ? AND v.fiscal_year = ? AND v.edition = ? "
-        "AND v.court NOT LIKE 'CIR-%' AND v.court <> 'US' ORDER BY 2 DESC LIMIT 1",
-        [m.id, fy, edition],
-    )
-    national_j = db.one(
-        "SELECT value FROM cat.observation WHERE measure_id = 'authorized_judgeships' "
-        "AND court = 'US' AND fiscal_year = ? AND edition = ?",
-        [fy, edition],
-    )
-    if not rows or not national_j or not national_j[0]:
-        return None
-    return str(rows[0][0]), float(rows[0][1]) / float(national_j[0])
 
 
 def _mdl_driver(

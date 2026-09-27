@@ -161,3 +161,25 @@ def full_db() -> Iterator[Any]:
     db = Database(FULL_TABLES, FULL_IDB)
     yield db
     db.close()
+
+
+# ── MCP server over the fixture data (Phase 5) ───────────────────────────────
+
+
+@pytest.fixture
+def server_data(
+    catalog: Catalog, idb: IdbBuild, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Point the server's settings at the fixture catalog and IDB."""
+    from courts_analyst.config import settings
+
+    monkeypatch.setattr(settings, "duckdb_path", catalog.db)
+    monkeypatch.setattr(settings, "idb_duckdb_path", idb.db)
+    monkeypatch.setattr(settings, "cohort_store_path", None)
+
+
+@pytest.fixture
+async def tools(server_data: None) -> AsyncIterator[Client]:
+    """Modern in-memory client, server reading the fixture data."""
+    async with Client(mcp) as c:
+        yield c

@@ -64,6 +64,10 @@ Tested with FastMCP 4.0.10 and MCP SDK 2.2.0 on 2026-09-26. "Modern" means a
 | Sampling, roots, server logging to client | Deprecated | — | **Not used.** The agent calls model APIs directly (P7) and we log to stderr/JSON | — |
 | Background tasks | Extension | — | Not needed (queries take well under a second); needs `fastmcp[tasks]` | — |
 
+> **Phase 5 update:** the three elicitation paths below are implemented in
+> `tools/_common.py` (`ask`) and tested for modern, legacy and no-handler
+> clients (`tests/test_elicitation.py`). See [ADR 0009](0009-mcp-tool-surface.md).
+
 ## Fallback plans
 
 1. **Elicitation (the risky one).** A single helper in the tools layer will

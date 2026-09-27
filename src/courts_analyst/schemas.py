@@ -13,6 +13,7 @@ from pathlib import Path
 from pydantic import BaseModel
 
 from courts_analyst.core.cohorts import CohortAnalysis, CohortSpec, CohortSummary
+from courts_analyst.core.dockets import DocketSample
 from courts_analyst.core.explain import ChangeExplanation
 from courts_analyst.core.glossary import TermLookup
 from courts_analyst.core.judgeships import JudgeshipContext
@@ -33,6 +34,7 @@ MODELS: dict[str, type[BaseModel]] = {
     "reconciliation": Result[Reconciliation],
     "judgeship-context": Result[JudgeshipContext],
     "term-lookup": Result[TermLookup],
+    "docket-sample": Result[DocketSample],
 }
 
 

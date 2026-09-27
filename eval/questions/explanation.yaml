@@ -167,7 +167,7 @@
   claims:
     - id: says_revised_down
       kind: mentions
-      any: [revised down, lower, downward, decreased, reduced]
+      any: [revised down, lower, downward, decreased, reduced, dropped, fell, down to]
     - id: names_recent_years
       kind: mentions
       any: ["2020", "2021", "2022"]

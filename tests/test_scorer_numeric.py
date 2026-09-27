@@ -111,8 +111,17 @@ def test_nearest_edition_prefers_following_mention() -> None:
 
 
 def test_far_edition_does_not_pair() -> None:
-    text = "The value was 322. " + "x " * 60 + "Source: JFF-2023."
+    text = "The value was 322. " + "Other context follows here. " * 4 + "See JFF-2023."
     assert figures_in_text(text)[0].edition is None
+
+
+def test_edition_later_in_the_same_sentence_pairs() -> None:
+    text = (
+        "**37,003** civil cases were filed in the Eleventh Circuit's district courts "
+        "(N.D. Ga., M.D. Ga., S.D. Ga., N.D. Fla., M.D. Fla., S.D. Fla., N.D. Ala., "
+        "M.D. Ala., S.D. Ala.) in FY2025 (JB-2025, Table C-1)."
+    )
+    assert figures_in_text(text)[0] == ReportedFigure(value=37003, edition="JB-2025")
 
 
 def test_cited_figures_come_first() -> None:

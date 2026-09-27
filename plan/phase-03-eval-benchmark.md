@@ -76,7 +76,7 @@ tags: [edition_trap, weighted, fy2020]
 
 ## Exit criteria
 
-- [x] ~150 validated questions, 30% held out (152; 49 held out = 32%)
+- [x] ~150 validated questions, 30% held out (152; 50 held out = 33%; an earlier count of 49 missed the last item added)
 - [x] Gold/null answerers give 100%/0%
 - [x] Runner writes results and a summary table
 - [x] Held-out policy written in `eval/README.md` (who can look at test split items, and when)
@@ -109,7 +109,7 @@ tags: [edition_trap, weighted, fy2020]
 
 ## Evidence
 
-**Bank (2026-09-26):** 152 questions: engine 30, e2e 51, explanation 20, tool_selection 25, adversarial 26. Held out: 49 (32%), present in every suite. Behaviours: 133 answer, 2 clarify, 17 decline. 83 expected figures, 63 claims, 5 rankings, 16 items that must flag a revision.
+**Bank (2026-09-26):** 152 questions: engine 30, e2e 51, explanation 20, tool_selection 25, adversarial 26. Held out: 50 (33%), present in every suite. Behaviours: 133 answer, 2 clarify, 17 decline. 83 expected figures, 63 claims, 5 rankings, 16 items that must flag a revision.
 
 | Check | Result |
 | --- | --- |
