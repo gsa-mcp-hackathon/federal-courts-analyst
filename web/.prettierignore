@@ -1,0 +1,13 @@
+dist
+node_modules
+public/geo
+public/demo
+src/api/schemas
+src/api/types.gen.ts
+src/geo
+playwright-report
+test-results
+e2e/fixtures
+lighthouse
+.lighthouseci
+package-lock.json

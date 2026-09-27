@@ -555,3 +555,110 @@ def official_series(
             )
         )
     return ok(data, provenance, warnings)
+
+
+# ── Vintages: every edition's own series ─────────────────────────────────────
+
+VINTAGES_SQL = """
+SELECT o.edition, e.pub_order, o.fiscal_year, o.value, o.decimals, o.table_code,
+       o.cell_ref, s.url, o.period_end
+FROM cat.observation o
+JOIN cat.edition e USING (edition)
+JOIN cat.source_file s USING (file_id)
+WHERE o.measure_id = ? AND o.court = ? AND o.value IS NOT NULL
+ORDER BY e.pub_order, o.fiscal_year
+"""
+
+
+class VintagePoint(BaseModel):
+    fiscal_year: int
+    value: float
+    table_code: str
+    cell_ref: str | None = None
+    period: Period
+
+
+class EditionVintage(BaseModel):
+    """One edition's figures for the measure, exactly as that edition prints
+    them: a single edition is always one consistent vintage."""
+
+    edition: str
+    series: str | None
+    url: str | None
+    points: list[VintagePoint]
+
+
+class EditionVintages(BaseModel):
+    """Every edition that prints this measure for this court, oldest first
+    (the Edition Tracker draws one line per edition)."""
+
+    measure: str
+    measure_label: str
+    unit: str
+    court: str
+    court_name: str
+    editions: list[EditionVintage]
+
+
+@guarded
+def edition_vintages(db: Database, measure: str, court: str) -> Result[EditionVintages]:
+    """Each edition's own series for ``measure`` and ``court``. Lines are never
+    spliced across editions; compare them, don't join them."""
+    m = get_measure(measure)
+    _check_court(court)
+    rows = db.rows(VINTAGES_SQL, [measure, court])
+    if not rows:
+        raise NotPublishedError(
+            f"No edition prints {m.label} for {COURTS[court].name}.",
+            ["compare_courts for the courts an edition does print"],
+        )
+    by_ed: dict[str, EditionVintage] = {}
+    for ed, _order, fy, value, dec, table, cell, url, period_end in rows:
+        v = by_ed.get(ed)
+        if v is None:
+            v = by_ed[ed] = EditionVintage(
+                edition=ed, series=series_title(ed), url=url, points=[]
+            )
+        v.points.append(
+            VintagePoint(
+                fiscal_year=fy,
+                value=round_half_up(value, dec or 0),
+                table_code=table,
+                cell_ref=cell,
+                period=Period.for_end(fy, period_end),
+            )
+        )
+    court_obj = COURTS[court]
+    data = EditionVintages(
+        measure=m.id,
+        measure_label=m.label,
+        unit=m.unit,
+        court=court,
+        court_name=court_obj.citation or court_obj.name,
+        editions=list(by_ed.values()),
+    )
+    prov = [
+        Provenance(
+            source="official_table",
+            table_code=v.points[-1].table_code,
+            series=v.series,
+            edition=v.edition,
+            period=v.points[-1].period,
+            definition=m.definition,
+            url=v.url,
+            note=f"{len(v.points)} fiscal years as printed in {v.edition}.",
+        )
+        for v in data.editions
+    ]
+    warnings = []
+    if len({v.edition.split("-")[0] for v in data.editions}) > 1:
+        warnings.append(
+            Caveat(
+                code="mixed_editions",
+                severity="info",
+                message="Each edition is listed separately, exactly as printed; "
+                "compare the editions, don't join them into one series "
+                "(use official_series for that).",
+            )
+        )
+    return ok(data, prov, warnings)

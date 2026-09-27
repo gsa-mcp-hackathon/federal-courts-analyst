@@ -17,10 +17,10 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.requests import Request
 from starlette.routing import Mount
-from starlette.staticfiles import StaticFiles
 
 from courts_analyst import SERVER_NAME, __version__
-from courts_analyst.api.routes import ask, courts, eval, explain, figures
+from courts_analyst.api.routes import ask, courts, eval, explain, figures, methodology
+from courts_analyst.api.web import WebApp
 from courts_analyst.config import Settings, settings
 from courts_analyst.http_security import http_middleware
 
@@ -58,7 +58,7 @@ def build_api() -> FastAPI:
             status_code=422,
         )
 
-    for module in (figures, courts, explain, eval, ask):
+    for module in (figures, courts, explain, eval, methodology, ask):
         api.include_router(module.router)
     return api
 
@@ -78,9 +78,5 @@ def build_app(cfg: Settings = settings, **http_app_kwargs: Any) -> Any:
     app.state.api = api
     app.router.routes.insert(0, Mount("/api", app=api))
     if cfg.web_dist_dir.is_dir():
-        app.router.routes.append(
-            Mount(
-                "/", app=StaticFiles(directory=cfg.web_dist_dir, html=True), name="web"
-            )
-        )
+        app.router.routes.append(Mount("/", app=WebApp(cfg.web_dist_dir), name="web"))
     return app

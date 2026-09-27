@@ -1,0 +1,68 @@
+{
+ "districts": 90,
+ "counties": 3142,
+ "unassigned": [],
+ "smoothed": [
+  {
+   "county": "48269",
+   "from": "TX-S",
+   "to": "TX-N",
+   "pass": 0
+  },
+  {
+   "county": "51157",
+   "from": "VA-E",
+   "to": "VA-W",
+   "pass": 0
+  },
+  {
+   "county": "48155",
+   "from": "TX-W",
+   "to": "TX-N",
+   "pass": 0
+  },
+  {
+   "county": "36041",
+   "from": "NY-E",
+   "to": "NY-N",
+   "pass": 0
+  },
+  {
+   "county": "40063",
+   "from": "OK-W",
+   "to": "OK-E",
+   "pass": 0
+  },
+  {
+   "county": "01001",
+   "from": "AL-N",
+   "to": "AL-M",
+   "pass": 0
+  },
+  {
+   "county": "13309",
+   "from": "GA-N",
+   "to": "GA-S",
+   "pass": 0
+  },
+  {
+   "county": "48373",
+   "from": "TX-S",
+   "to": "TX-E",
+   "pass": 0
+  },
+  {
+   "county": "13165",
+   "from": "GA-N",
+   "to": "GA-S",
+   "pass": 0
+  },
+  {
+   "county": "13209",
+   "from": "GA-N",
+   "to": "GA-S",
+   "pass": 0
+  }
+ ],
+ "bytes": 169345
+}

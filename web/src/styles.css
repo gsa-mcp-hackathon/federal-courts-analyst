@@ -1,0 +1,194 @@
+@import "tailwindcss";
+
+/* Design tokens ("official record, modern instrument"). Every color is a
+   role; light and dark are each selected, not flipped. Chart ramps were
+   checked with the dataviz palette validator (ordinal, both surfaces). */
+:root {
+  color-scheme: light;
+  --paper: #fbf8f3;
+  --paper-2: #f3eee5;
+  --card: #ffffff;
+  --ink: #14213d;
+  --ink-2: #3d4659;
+  --muted: #5d6576;
+  --rule: #e2dccf;
+  --accent: #1f5fad;
+  --accent-ink: #ffffff;
+  --focus: #1f5fad;
+  /* Reserved: "this figure was revised". Nothing else is amber. */
+  --revision: #9a5b00;
+  --revision-bg: #fdf1dc;
+  --revision-rule: #e7b35a;
+  /* Status (with icon + label, never alone). */
+  --good: #0a7d0a;
+  --warning: #8a5a00;
+  --critical: #b42323;
+  --info: #1f5fad;
+  /* Magnitude ramp (map bins, edition lines): low → high. */
+  --seq-1: #6da7ec;
+  --seq-2: #3987e5;
+  --seq-3: #1c5cab;
+  --seq-4: #0d366b;
+  --pole-up: #2a78d6;
+  --pole-down: #e34948;
+  --chart-grid: #e8e3d8;
+}
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) {
+    color-scheme: dark;
+    --paper: #15171c;
+    --paper-2: #1c1f26;
+    --card: #1f232b;
+    --ink: #eef0f4;
+    --ink-2: #c9cdd6;
+    --muted: #9aa1ae;
+    --rule: #333844;
+    --accent: #7fb2f0;
+    --accent-ink: #0d1b2e;
+    --focus: #9ec5f4;
+    --revision: #f3b54f;
+    --revision-bg: #3a2c12;
+    --revision-rule: #8a6420;
+    --good: #4cc44c;
+    --warning: #f2b233;
+    --critical: #f07171;
+    --info: #7fb2f0;
+    --seq-1: #1c5cab;
+    --seq-2: #2a78d6;
+    --seq-3: #5598e7;
+    --seq-4: #9ec5f4;
+    --pole-up: #3987e5;
+    --pole-down: #e66767;
+    --chart-grid: #2b303a;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --paper: #15171c;
+  --paper-2: #1c1f26;
+  --card: #1f232b;
+  --ink: #eef0f4;
+  --ink-2: #c9cdd6;
+  --muted: #9aa1ae;
+  --rule: #333844;
+  --accent: #7fb2f0;
+  --accent-ink: #0d1b2e;
+  --focus: #9ec5f4;
+  --revision: #f3b54f;
+  --revision-bg: #3a2c12;
+  --revision-rule: #8a6420;
+  --good: #4cc44c;
+  --warning: #f2b233;
+  --critical: #f07171;
+  --info: #7fb2f0;
+  --seq-1: #1c5cab;
+  --seq-2: #2a78d6;
+  --seq-3: #5598e7;
+  --seq-4: #9ec5f4;
+  --pole-up: #3987e5;
+  --pole-down: #e66767;
+  --chart-grid: #2b303a;
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-paper-2: var(--paper-2);
+  --color-card: var(--card);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-muted: var(--muted);
+  --color-rule: var(--rule);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-revision: var(--revision);
+  --color-revision-bg: var(--revision-bg);
+  --color-revision-rule: var(--revision-rule);
+  --color-good: var(--good);
+  --color-warning: var(--warning);
+  --color-critical: var(--critical);
+  --color-info: var(--info);
+  --font-sans: "Public Sans Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Source Serif 4 Variable", ui-serif, Georgia, serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+}
+
+@layer base {
+  html {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    min-height: 100vh;
+  }
+  :focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+    border-radius: 3px;
+  }
+  ::selection {
+    background: color-mix(in oklab, var(--accent) 25%, transparent);
+  }
+}
+
+@layer utilities {
+  /* Every figure uses tabular numerals so columns and updates don't jitter. */
+  .num {
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+  .prose-answer {
+    font-family: var(--font-serif);
+    font-size: 1.125rem;
+    line-height: 1.65;
+  }
+  .prose-answer h1,
+  .prose-answer h2,
+  .prose-answer h3 {
+    font-weight: 600;
+    margin: 1.2em 0 0.4em;
+    line-height: 1.25;
+  }
+  .prose-answer h2 {
+    font-size: 1.3rem;
+  }
+  .prose-answer p {
+    margin: 0.6em 0;
+  }
+  .prose-answer ul,
+  .prose-answer ol {
+    margin: 0.6em 0;
+    padding-left: 1.4em;
+  }
+  .prose-answer ul {
+    list-style: disc;
+  }
+  .prose-answer ol {
+    list-style: decimal;
+  }
+  .prose-answer table {
+    font-family: var(--font-sans);
+    font-size: 0.9rem;
+    border-collapse: collapse;
+    margin: 0.8em 0;
+  }
+  .prose-answer th,
+  .prose-answer td {
+    border-bottom: 1px solid var(--rule);
+    padding: 0.3em 0.6em;
+    text-align: left;
+  }
+  .prose-answer code {
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

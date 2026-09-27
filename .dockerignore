@@ -23,6 +23,9 @@ build/
 plan/
 docs/
 web/node_modules/
+web/dist/
+web/test-results/
+web/playwright-report/
 data/raw/
 data/private/
 .mypy_cache/
