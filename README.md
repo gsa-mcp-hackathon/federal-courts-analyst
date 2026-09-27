@@ -24,8 +24,11 @@ with 2025-11-25 clients) and [uv](https://docs.astral.sh/uv/).
 > periods not held, structured declines for judge-level and party-name
 > requests, and an output scanner for party names. The HTTP endpoint and
 > container are hardened ([SECURITY.md](SECURITY.md)). An eval benchmark of
-> 173 questions scores every answer deterministically. The agent API (P7) and
-> the web app (P8) follow.
+> 173 questions scores every answer deterministically. Over HTTP the same
+> process serves a REST API (same envelopes as the tools) and an agent that
+> streams answers as typed server-sent events (`POST /api/ask`), with
+> CourtListener docket lookups ([ADR 0011](docs/adr/0011-agent-and-api.md)).
+> The web app (P8) follows.
 
 ## Tools
 
@@ -120,8 +123,8 @@ src/courts_analyst/
 │   └── numbers.py    #   Excel-style rounding for published figures
 ├── pipeline/         # data ingestion: tables/ (P1), idb/ (P2)
 │   └── tables/       #   official tables: discover, fetch, parse, load (ADR 0006)
-├── api/              # FastAPI REST + agent SSE (P7)
-└── agent/            # model adapters (P7)
+├── api/              # FastAPI REST + agent SSE at /api (ADR 0011)
+└── agent/            # agent loop, model providers, CourtListener wrappers
 tests/                # unit, golden, MCP protocol, transport, container tests
 ├── fixtures/tables/  # real uscourts.gov files (≈2 MB) so CI builds the catalog
 └── golden/           # hand-verified official figures
@@ -144,9 +147,31 @@ Every setting is optional; see [`.env.example`](.env.example) and
 | `MCP_HOST` / `MCP_PORT` | `0.0.0.0` / `8000` | HTTP bind address |
 | `DATA_DIR` | `data` | Downloads (`raw/`) and build outputs (`build/`) |
 | `DUCKDB_PATH` | `$DATA_DIR/build/courts.duckdb` | Analytical store |
-| `ANTHROPIC_API_KEY`, `OPENAI_API_KEY` | unset | Agent and eval models (P7, P10) |
-| `COURTLISTENER_API_TOKEN` | unset | CourtListener handoff (P7) |
+| `ANTHROPIC_API_KEY`, `OPENAI_API_KEY` | unset | Agent and eval models |
+| `AGENT_MODEL` | `anthropic:claude-sonnet-5` | Model behind `/api/ask` (`openai:<model>` also works) |
+| `COURTLISTENER_API_TOKEN` / `AGENT_COURTLISTENER` | unset / `auto` | Live CourtListener lookups (else a labelled synthetic fixture) |
 | `LOG_LEVEL` / `LOG_FORMAT` | `INFO` / `auto` | `auto` = JSON over HTTP, text on stdio |
+
+## HTTP API
+
+`make serve-http` serves everything on one port: MCP at `/mcp`, the REST
+explorer and agent at `/api` (schema at `/api/openapi.json`), `/health`.
+
+| Endpoint | Same as |
+| --- | --- |
+| `GET /api/figures?measure&fiscal_year&court&edition` | `get_official_figure` |
+| `GET /api/figures/{measure}/{court}/series?from&to` | never-mix-vintages series |
+| `GET /api/compare?measure&fiscal_year&courts&top_n` | `compare_courts` |
+| `GET /api/explain-change?measure&court&from&to` | `explain_change` |
+| `GET /api/courts`, `/api/courts/{court}/profile` | court registry, `judgeship_context` |
+| `GET /api/revisions`, `/api/eval/runs[/{id}]` | revision log, committed eval runs |
+| `POST /api/ask` → SSE | the agent (`turn_start` … `turn_end`; schema in `web/src/api/schemas/agent-event.schema.json`) |
+| `POST /api/ask/{turn_id}/clarify` | answers a `clarify` event; the stream resumes |
+
+```bash
+make serve-http PORT=8000
+make ask Q="Why did weighted civil filings per judgeship change in FY2020?"
+```
 
 ## Adding a tool
 

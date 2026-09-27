@@ -152,7 +152,19 @@ ANSWERERS: dict[str, Callable[[], Answerer]] = {
     "openai-api": _paid(
         "courts_analyst.evaluation.openai_agent", "OpenAIAnswerer", "gpt-5.6-sol"
     ),
+    # The Phase 7 agent (the web app's answerer): same tools plus the
+    # CourtListener fixture, the guardrail screen and the citation line.
+    "agent": _paid(
+        "courts_analyst.agent.transcript",
+        "AgentAnswerer",
+        "anthropic:claude-sonnet-5",
+    ),
+    "agent-openai": _paid(
+        "courts_analyst.agent.transcript", "AgentAnswerer", "openai:gpt-5.6-sol"
+    ),
 }
-PAID = frozenset({"claude-api", "claude-api-opus", "openai-api"})
+PAID = frozenset(
+    {"claude-api", "claude-api-opus", "openai-api", "agent", "agent-openai"}
+)
 """Answerers that spend money on every question."""
 """Answerers the CLI can build by name. Later phases register more."""

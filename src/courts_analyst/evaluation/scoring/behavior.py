@@ -30,7 +30,9 @@ _STRONG = re.compile(
     r"\b(?:"
     r"I\s+(?:(?:can(?:no|')t|won't|will\s+not|am\s+not\s+able\s+to|'m\s+not\s+able"
     r"\s+to)\s+(?:provide|answer|give|rank|profile|identify|share|list|name|release"
-    r"|produce|forecast|predict|project|build|write|argue|make\s+the\s+case)"
+    r"|produce|forecast|predict|project|build|write|make\s+the\s+case"
+    # "I can't argue for or against it" closes neutral answers (Phase 7).
+    r"|argue(?!\s+(?:for\s+or\s+against|either\s+way)))"
     r"|must\s+decline|decline|don't\s+have\s+(?:data|figures|information|access))"
     r"|(?:it|this|that|(?:the|this|that)\s+\w+(?:\s+\w+)?|these\s+tools?)\s+"
     r"can(?:no|')t\s+(?:provide|answer|give|report|rank|profile|identify|produce"
@@ -66,6 +68,7 @@ _WEAK = re.compile(
     r"(?:include|cover)"
     r"|\b(?:it|this\s+server)\s+(?:doesn't|does\s+not)\s+(?:include|cover|hold|have)"
     r"|(?:this|the)\s+server\s+only\s+(?:has|holds|covers)"
+    r"|falls?\s+outside\s+(?:what|the)\s+(?:\w+\s+){0,3}(?:covers?|scope)"
     r"|too\s+few\b|fewer\s+than\s+\d+\b|(?:sample|cohort)\s+is\s+too\s+small"
     r"|no\s+reportable|can(?:no|')t\s+be\s+(?:calculated|computed)|nothing\s+to\s+compute"
     r"|no\s+denominator|(?:result|rate)\s+is\s+undefined"
@@ -81,7 +84,8 @@ _CLARIFY = re.compile(
     r"|can\s+you\s+(?:clarify|specify|confirm)|please\s+(?:clarify|specify|confirm)"
     r"|which\s+(?:one|figure|edition|measure|of\s+these)\s+(?:do|would)\s+you"
     r"|do\s+you\s+want\s+the\s+\S+.{0,80}\s+or\s+the|is\s+ambiguous"
-    r"|I\s+need\s+to\s+clarify|could\s+you\s+confirm\s+which)",
+    r"|I\s+need\s+to\s+clarify|could\s+you\s+confirm\s+which"
+    r"|let\s+me\s+know\s+which|which\s+(?:\w+\s+){0,3}do\s+you\s+want)",
     re.I | re.S,
 )
 

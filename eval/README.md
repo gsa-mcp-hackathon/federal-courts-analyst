@@ -129,7 +129,8 @@ Answerers other than `gold` must read only `item.question`.
 | `claude-code`, `claude-code-haiku` | Claude Sonnet / Haiku through headless Claude Code (`claude -p`), with every built-in tool off and only this MCP server connected; needs a logged-in `claude` CLI | 5 |
 | `claude-api`, `claude-api-opus` | Claude Sonnet 5 / Opus 5 through the Messages API with this server's tools; prompt caching; **paid** | 5 |
 | `openai-api` | GPT-5.6 Sol through the Responses API with this server's tools; **paid** | 5 |
-| our agent, web search, Genie | Baselines | 7, 10 |
+| `agent`, `agent-openai` | The Phase 7 agent (the web app's answerer): same tools plus the request screen, the citation line for revised figures and the CourtListener fixture; **paid** (`make eval-agent-smoke`: 5 questions, $0.50 cap) | 7 |
+| web search, Genie | Baselines | 10 |
 
 **Paid answerers are fenced.** They run only on the smoke set (`--tag smoke`)
 or a few `--id` values unless you pass `--allow-full-bank`, and every run has a

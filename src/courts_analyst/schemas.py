@@ -10,8 +10,9 @@ import json
 import sys
 from pathlib import Path
 
-from pydantic import BaseModel
+from pydantic import BaseModel, TypeAdapter
 
+from courts_analyst.agent.events import EVENT_ADAPTER
 from courts_analyst.core.cohorts import CohortAnalysis, CohortSpec, CohortSummary
 from courts_analyst.core.dockets import DocketSample
 from courts_analyst.core.explain import ChangeExplanation
@@ -36,12 +37,18 @@ MODELS: dict[str, type[BaseModel]] = {
     "term-lookup": Result[TermLookup],
     "docket-sample": Result[DocketSample],
 }
+ADAPTERS: dict[str, TypeAdapter] = {  # type: ignore[type-arg]
+    # The agent's SSE events (Phase 7), one discriminated union.
+    "agent-event": EVENT_ADAPTER,
+}
 
 
 def render() -> dict[str, str]:
+    schemas = {name: model.model_json_schema() for name, model in MODELS.items()}
+    schemas |= {name: a.json_schema() for name, a in ADAPTERS.items()}
     return {
-        f"{name}.schema.json": json.dumps(model.model_json_schema(), indent=2) + "\n"
-        for name, model in MODELS.items()
+        f"{name}.schema.json": json.dumps(schema, indent=2) + "\n"
+        for name, schema in schemas.items()
     }
 
 
@@ -49,7 +56,7 @@ def main(out: Path = OUT) -> int:
     out.mkdir(parents=True, exist_ok=True)
     for name, text in render().items():
         (out / name).write_text(text)
-    print(f"wrote {len(MODELS)} schemas to {out}", file=sys.stderr)
+    print(f"wrote {len(MODELS) + len(ADAPTERS)} schemas to {out}", file=sys.stderr)
     return 0
 
 

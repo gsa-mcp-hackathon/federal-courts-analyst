@@ -42,6 +42,8 @@ RUN uv sync --frozen --no-dev --no-install-project
 
 COPY src ./src
 RUN uv sync --frozen --no-dev --no-editable
+# Committed eval runs, for GET /api/eval/runs (Phase 7).
+COPY eval/results ./eval/results
 
 # Run as an unprivileged user.
 RUN useradd --system --uid 10001 app && mkdir -p /app/data && chown -R app /app/data

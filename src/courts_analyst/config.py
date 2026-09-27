@@ -47,6 +47,9 @@ class Settings(BaseSettings):
     http_rate_limit_per_minute: int = 120
     # Optional bearer token for the deployed demo; /health and /version stay open.
     http_bearer_token: SecretStr | None = None
+    # POST /api/ask per client per minute (each one calls a paid model); 0
+    # disables. On top of the general limit above.
+    http_ask_rate_limit_per_minute: int = 10
 
     # ── Data ──────────────────────────────────────────────────────────────────
     # DATA_DIR holds raw downloads (data/raw) and build outputs (data/build).
@@ -65,6 +68,21 @@ class Settings(BaseSettings):
     anthropic_api_key: SecretStr | None = None
     openai_api_key: SecretStr | None = None
     courtlistener_api_token: SecretStr | None = None
+
+    # ── Agent (Phase 7) ───────────────────────────────────────────────────────
+    # "anthropic:<model>" or "openai:<model>"; the web app's /api/ask uses it.
+    agent_model: str = "anthropic:claude-sonnet-5"
+    # CourtListener docket lookups: "auto" (live with a token, else the cached
+    # fixture), "fixture" (never call out) or "off".
+    agent_courtlistener: Literal["auto", "fixture", "off"] = "auto"
+    # Put question, answer and tool arguments in trace spans verbatim (else a
+    # hash). Local debugging only, like LOG_TOOL_ARGUMENTS.
+    agent_trace_content: bool = False
+
+    # ── Web app and eval results (served over HTTP) ──────────────────────────
+    # Relative to the working directory, like DATA_DIR (/app in the image).
+    web_dist_dir: Path = Path("web/dist")
+    eval_results_dir: Path = Path("eval/results")
 
     # ── Logging ───────────────────────────────────────────────────────────────
     # LOG_FORMAT=auto → JSON when serving HTTP, human-readable otherwise.

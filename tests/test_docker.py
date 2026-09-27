@@ -226,6 +226,33 @@ async def test_container_reads_built_catalog(catalog, idb, tmp_path) -> None:  #
         assert fig.structured_content["data"]["value"] == 322
         assert fig.structured_content["data"]["first_published"]["value"] == 554
         assert median.structured_content["data"]["results"][0]["n"] > 0
+        # Phase 7: REST and the agent stream from the same container.
+        rest = httpx.get(
+            f"{base}/api/figures",
+            params={
+                "measure": "weighted_civil_filings_per_judgeship",
+                "fiscal_year": 2020,
+            },
+            timeout=10,
+        )
+        assert rest.status_code == 200 and rest.headers["etag"]
+        assert rest.json()["data"] == fig.structured_content["data"]
+        declined = httpx.post(
+            f"{base}/api/ask",
+            json={"question": "Rank the judges in S.D.N.Y. by speed"},
+            timeout=30,
+        )
+        assert "event: warning" in declined.text
+        assert '"stop_reason":"declined"' in declined.text
+        # No model key in the container: a typed error, then turn_end.
+        no_key = httpx.post(
+            f"{base}/api/ask", json={"question": "What data is loaded?"}, timeout=30
+        )
+        assert '"code":"model_not_configured"' in no_key.text
+        assert no_key.text.rstrip().splitlines()[-1].startswith("data: ")
+        assert "event: turn_end" in no_key.text
+        runs = httpx.get(f"{base}/api/eval/runs", timeout=10).json()["runs"]
+        assert any(r["run_id"] == "phase3-gold-all" for r in runs)
         # The analytics core runs in the image against the mounted data.
         core = subprocess.run(
             ["docker", "exec", name, "python", "-c", CORE_SMOKE],

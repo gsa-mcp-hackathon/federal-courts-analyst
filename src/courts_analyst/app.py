@@ -18,7 +18,6 @@ from fastmcp import FastMCP
 
 from courts_analyst import SERVER_NAME, __version__
 from courts_analyst.config import settings
-from courts_analyst.http_security import http_middleware
 from courts_analyst.logging_config import configure_logging
 from courts_analyst.middleware import RequestLogging
 from courts_analyst.prompts import register_prompts
@@ -104,16 +103,37 @@ def main() -> None:
     )
 
     if http:
-        mcp.run(
-            transport="http",
+        serve_http(
             # A container must listen on every interface.
             host="0.0.0.0" if platform_port else settings.mcp_host,  # nosec B104
             port=int(platform_port) if platform_port else settings.mcp_port,
-            middleware=http_middleware(settings),
-            allowed_origins=list(settings.http_allowed_origins) or None,
         )
     else:
         mcp.run(transport="stdio")
+
+
+def serve_http(host: str, port: int) -> None:
+    """MCP at /mcp, the REST and agent API at /api, the web build at /
+    (``api/main.py``), on one port."""
+    import fastmcp
+    import uvicorn
+
+    from courts_analyst.agent.telemetry import configure_tracing
+    from courts_analyst.api.main import build_app
+
+    # Same Host allowlist `mcp.run` uses: a loopback bind accepts its own name.
+    allowed_hosts = list(fastmcp.settings.http_allowed_hosts or [])
+    if host in ("127.0.0.1", "localhost", "::1"):
+        allowed_hosts.append(host)
+    configure_tracing()
+    uvicorn.run(
+        build_app(settings, allowed_hosts=allowed_hosts or None),
+        host=host,
+        port=port,
+        lifespan="on",
+        timeout_graceful_shutdown=2,
+        log_level=settings.log_level.lower(),
+    )
 
 
 if __name__ == "__main__":

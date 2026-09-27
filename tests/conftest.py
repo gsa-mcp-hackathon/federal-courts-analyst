@@ -183,3 +183,74 @@ async def tools(server_data: None) -> AsyncIterator[Client]:
     """Modern in-memory client, server reading the fixture data."""
     async with Client(mcp) as c:
         yield c
+
+
+# ── Agent and API (Phase 7) ──────────────────────────────────────────────────
+
+
+@pytest.fixture
+def no_courtlistener_token(monkeypatch: pytest.MonkeyPatch) -> None:
+    from courts_analyst.config import settings
+
+    monkeypatch.setattr(settings, "courtlistener_api_token", None)
+
+
+@pytest.fixture
+def api_app(server_data: None, no_courtlistener_token: None) -> Any:
+    """The combined HTTP app (MCP + /api) over the fixture data."""
+    from courts_analyst.api.main import build_app
+    from courts_analyst.config import Settings
+
+    return build_app(Settings(_env_file=None))  # type: ignore[call-arg]
+
+
+@pytest.fixture
+def api(api_app: Any) -> Iterator[Any]:
+    from starlette.testclient import TestClient
+
+    with TestClient(api_app, base_url="http://localhost") as c:
+        yield c
+
+
+@dataclass
+class LiveApi:
+    base: str
+    app: Any
+
+    def use_agent(self, factory: Any) -> None:
+        self.app.state.api.state.agent_factory = factory
+
+
+@pytest.fixture
+def live_api(api_app: Any) -> Iterator[LiveApi]:
+    """The combined app served by uvicorn in a thread (real streaming)."""
+    import socket
+    import threading
+    import time
+
+    import httpx
+    import uvicorn
+
+    with socket.socket() as s:
+        s.bind(("127.0.0.1", 0))
+        port = int(s.getsockname()[1])
+    server = uvicorn.Server(
+        uvicorn.Config(api_app, host="127.0.0.1", port=port, log_level="warning")
+    )
+    thread = threading.Thread(target=server.run, daemon=True)
+    thread.start()
+    base = f"http://127.0.0.1:{port}"
+    deadline = time.monotonic() + 15
+    while time.monotonic() < deadline:
+        try:
+            if httpx.get(f"{base}/health", timeout=0.5).status_code == 200:
+                break
+        except httpx.TransportError:
+            time.sleep(0.05)
+    else:
+        pytest.fail("live API did not start")
+    try:
+        yield LiveApi(base, api_app)
+    finally:
+        server.should_exit = True
+        thread.join(timeout=10)

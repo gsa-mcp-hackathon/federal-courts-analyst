@@ -2,7 +2,7 @@
 .DEFAULT_GOAL := help
 .PHONY: help setup lint format typecheck test test-full cov data data-tables \
         data-discover data-idb data-idb-sample data-pii-index serve serve-http security \
-        variance-report schemas inspector docker-build docker-run docker-test web eval eval-validate eval-claude eval-api clean
+        variance-report schemas inspector docker-build docker-run docker-test web eval eval-validate eval-claude eval-api eval-agent-smoke ask clean
 
 IMAGE ?= federal-courts-analyst:dev
 PORT  ?= 8000
@@ -67,7 +67,7 @@ data-discover: ## Re-crawl uscourts.gov and rewrite data/manifest/tables.yaml
 serve: ## Run the MCP server over stdio
 	uv run courts-analyst
 
-serve-http: ## Run the MCP server over streamable HTTP on $(PORT)
+serve-http: ## Serve MCP (/mcp), the REST + agent API (/api) and the web build on $(PORT)
 	MCP_TRANSPORT=streamable-http MCP_PORT=$(PORT) uv run courts-analyst
 
 inspector: ## Open the MCP Inspector against the stdio server
@@ -83,6 +83,13 @@ docker-run: docker-build ## Run the container on :8080 (read-only root fs, no ca
 
 docker-test: docker-build ## Integration tests against the running container
 	uv run pytest -m docker tests/test_docker.py -v
+
+eval-agent-smoke: ## Live smoke: 5 smoke questions through the P7 agent (Claude; paid, capped at $0.50)
+	uv run courts-eval run --answerer agent --tag smoke --limit 5 --budget-usd 0.50
+
+ask: ## Stream one question from a running `make serve-http` (Q="...")
+	curl -sN -X POST http://127.0.0.1:$(PORT)/api/ask -H 'content-type: application/json' \
+	  -d "$$(python3 -c 'import json,sys; print(json.dumps({"question": sys.argv[1]}))' "$(Q)")"
 
 web: ## Frontend dev server (P8)
 	@echo "make web: the frontend arrives in Phase 8."

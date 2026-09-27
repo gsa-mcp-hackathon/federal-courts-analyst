@@ -87,3 +87,14 @@ def test_engine_items_accept_any_edition() -> None:
     assert s.correct
     s = score_item(item, rec(f"{value * 1.02:.0f}"))
     assert not s.correct
+
+
+def test_unicode_hyphen_in_edition_id() -> None:
+    """From the Phase 7 e2e run: 'JB‑2024' with a non-breaking hyphen."""
+    item = ITEMS["fy2024-total-filings-per-judgeship"]
+    text = (
+        "Total filings per judgeship in FY2024 were 553 (JFF‑2024, Table 6.2). "
+        "This was revised down from 554 as first published (JB‑2024, Table X‑1A)."
+    )
+    s = score_item(item, rec(text))
+    assert s.checks["edition"] is True, s.notes

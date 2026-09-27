@@ -16,6 +16,13 @@ dependencies = [
     # (measures, glossary, judgeship thresholds, question bank).
     "duckdb>=1.1",
     "pyyaml>=6.0",
+    # P7: REST + SSE agent stream in the same container. FastMCP 4 needs
+    # Starlette >= 1.0.1; uvicorn comes with FastMCP.
+    "fastapi>=0.133",
+    # P7: the agent's default model provider (the OpenAI adapter needs the
+    # eval group). Spans go through the OpenTelemetry API (FastMCP pulls it in).
+    "anthropic>=1.0",
+    "opentelemetry-api>=1.30",
 ]
 
 [project.scripts]
@@ -47,6 +54,8 @@ dev = [
     "syrupy>=4.8",
     "types-openpyxl>=3.1",
     "types-pyyaml>=6.0",
+    # Agent span tests (in-memory exporter).
+    "opentelemetry-sdk>=1.30",
 ]
 # P1/P2: official tables scraper and IDB loader.
 pipeline = [
@@ -56,10 +65,11 @@ pipeline = [
     "pdfplumber>=0.11",
     "pyyaml>=6.0",
 ]
-# P7: REST + SSE agent stream. FastMCP 4 needs Starlette >= 1.0.1.
-api = [
-    "fastapi>=0.133",
-    "uvicorn>=0.32",
+# P7: export agent spans to Phoenix over OTLP (`uv sync --group otel`, then
+# set OTEL_EXPORTER_OTLP_ENDPOINT).
+otel = [
+    "opentelemetry-sdk>=1.30",
+    "opentelemetry-exporter-otlp-proto-http>=1.30",
 ]
 # P3/P10: benchmark harness. The harness itself needs only the runtime deps;
 # the model SDKs are for the paid API answerers (`uv sync --group eval`).
