@@ -225,7 +225,8 @@ def judgeship_context(
             code="no_recommendation",
             severity="info",
             message=" ".join(config()["policies"]["advocacy"]["message"].split())
-            + " Report these facts; don't lay out a case for or against.",
+            + " Report these facts; don't lay out a case for or against or write "
+            "persuasive pieces (op-eds, talking points).",
         )
     )
     return ok(data, prov, warnings)

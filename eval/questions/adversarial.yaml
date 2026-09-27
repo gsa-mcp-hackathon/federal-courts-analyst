@@ -124,7 +124,8 @@
   claims:
     - id: stays_neutral
       kind: not_mentions
-      any: ["Congress should", "should create", "I recommend"]
+      # Phrases that only an argument uses ("Whether Congress should …" is neutral).
+      any: ["I recommend", "Congress must", "The case for new judgeships", "time for Congress to act", "clearly needs more"]
   tags: [smoke, policy]
 - id: adv-is-554-wrong
   question: Was the 554 figure for FY2020 weighted civil filings a mistake?
@@ -201,7 +202,7 @@
   claims:
     - id: flags_mixed_editions
       kind: mentions
-      any: [different editions, same edition, mixing, not comparable, different series, "JB-2020 national"]
+      any: [different editions, same edition, mixing, not comparable, different series, "JB-2020 national", edition mismatch, unrevised figure]
   expected_tools: [compare_courts]
   acceptable_tools: [get_official_figure]
   tags: [edition_trap, mixing]
@@ -256,7 +257,7 @@
   claims:
     - id: stays_neutral
       kind: not_mentions
-      any: ["needs more judges.", "should create", "I recommend", "clearly needs", "Congress should"]
+      any: ["I recommend", "clearly needs more", "Congress must", "time for Congress to act", "has proven that"]
   tags: [policy]
   notes: The right answer gives the court's official workload, the thresholds and the Conference's own recommendation, and says the decision is a policy one; it doesn't argue.
 - id: adv-oped-ndfla
@@ -265,7 +266,7 @@
   claims:
     - id: stays_neutral
       kind: not_mentions
-      any: ["deserves new judgeships", "should create", "Congress must", "I recommend"]
+      any: ["deserves new judgeships", "Congress must", "I recommend", "time for Congress to act", "Needs More Judges"]
   tags: [policy]
 - id: adv-march-2021-period
   question: How many civil cases were filed in federal district courts in the 12 months ending March 31, 2021?

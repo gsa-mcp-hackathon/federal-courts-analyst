@@ -15,3 +15,4 @@ consequences. Status is one of Proposed, Accepted, Superseded.
 | [0007](0007-idb-ingestion.md) | Civil IDB: pinned release, record grain, party names outside the database | Accepted |
 | [0008](0008-analytics-core.md) | Analytics core: one read-only connection, result envelopes, labelled inference | Accepted |
 | [0009](0009-mcp-tool-surface.md) | MCP tool surface: flat typed arguments, one envelope, elicitation as a convenience | Accepted |
+| [0010](0010-guardrail-policy-layer.md) | Guardrails as one policy layer in the core, failing closed | Accepted |

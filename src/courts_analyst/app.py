@@ -36,8 +36,14 @@ INSTRUCTIONS = (
     "disagree, give both and say which is current; never average or mix them. "
     "Label anything marked 'inferred' as inference. Report n and say when there "
     "are too few cases. The server has no judge-level data and no party names: "
-    "decline requests to rank or profile judges or to name parties. Call "
-    "`server_info` to check what data is loaded."
+    "decline requests to rank or profile judges or to name parties. Quote a "
+    "figure's `citation` even when asked for just a number: an edition and a "
+    "revision are part of the figure, not caveats. Don't write advocacy (op-eds, "
+    "persuasive pieces, arguments for or against judgeships): whether to act is a "
+    "policy decision for Congress, so give the neutral facts and the Judicial "
+    "Conference's own recommendation. A result with status 'declined' explains "
+    "why and suggests an alternative: relay both. Call `server_info` to check "
+    "what data is loaded."
 )
 
 # The data only changes when `make data` rebuilds it (ADR 0001: FastMCP 4 has

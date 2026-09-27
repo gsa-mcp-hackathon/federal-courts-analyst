@@ -17,9 +17,8 @@ from courts_analyst.tools._vocab import AMBIGUOUS, MeasureOrAlias
 
 DESCRIPTION = """\
 Use this when the user asks for a single published statistic: one measure, \
-one court (or the nation), one fiscal year. For example weighted civil \
-filings per judgeship nationally in FY2020, civil cases pending in S.D.N.Y. in \
-FY2023, or the national median time to disposition.
+one court (or the nation), one fiscal year, e.g. civil cases pending in \
+S.D.N.Y. in FY2023 or the national median time to disposition.
 
 Not for rankings across courts (use compare_courts), for why a number changed \
 between years (use explain_change), or for counts with filters such as case \
@@ -31,8 +30,9 @@ revision_notes on why. Quote `citation` with the number, even if asked for \
 one number: it names the edition and any revision. Relay an 'inferred' note \
 as inference. For a 12-month period not ending September 30 (e.g. ending \
 June 30), pass period_ending and relay what the server says. A plain "civil \
-filings" means civil_cases_filed; pass 'filings_per_judgeship' only when the \
-user didn't say weighted or unweighted.
+filings" means civil_cases_filed and "civil filings per judgeship" the \
+unweighted civil_filings_per_judgeship (the tables' own labels); pass \
+'filings_per_judgeship' only for vague asks that name neither.
 
 Example: measure='weighted_civil_filings_per_judgeship', court='US', \
 fiscal_year=2020 → 322 (JFF-2025), first published as 554 (JB-2020)."""

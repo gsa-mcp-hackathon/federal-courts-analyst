@@ -770,7 +770,7 @@
       }),
       dict({
         'code': 'no_recommendation',
-        'message': "Whether a court should get more judgeships is a policy decision for Congress. The server reports the court's official workload, the Judicial Conference's published standards and its own recommendation, without arguing for or against. Report these facts; don't lay out a case for or against.",
+        'message': "Whether a court should get more judgeships is a policy decision for Congress. The server reports the court's official workload, the Judicial Conference's published standards and its own recommendation, without arguing for or against. Report these facts; don't lay out a case for or against or write persuasive pieces (op-eds, talking points).",
         'severity': 'info',
       }),
     ]),

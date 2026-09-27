@@ -75,6 +75,25 @@ Call the core directly (no LLM), return the same `ToolResult` envelopes, so the 
 | `test_rest_contracts.py` | API | Status codes, validation errors, ETag caching |
 | Live smoke | nightly | 5 real questions through Claude end to end; results recorded |
 
+## Inputs from Phase 6
+
+- **Screen every user message** with `core.guardrails.intent.screen()` before the
+  agent loop: judge-level and party-name requests return the structured
+  `Decline` (as a `warning` + final `text` event) without calling the model;
+  advocacy requests pass with the neutral-framing guidance added to the system
+  prompt.
+- **REST returns the same envelope**, including `status: "declined"` and
+  `declined` (reason, message, policy, alternative). Map `declined` to HTTP 200
+  (it's an answer), `mixed_editions`/`out_of_scope` to 422 with the message.
+- **Series endpoint.** `GET /api/figures/{measure}/{court}/series?from&to&edition&allow_mixed`
+  over `core.official.official_series` (the never-mix-vintages rule); the
+  Edition Tracker's vintage chart (P8) reads it.
+- **HTTP hardening** (`http_security.http_middleware`) wraps the FastAPI app
+  too, and the bearer token covers `/api/*`.
+- **`test_injection_corpus.py`** (moved here from Phase 6): injected docket
+  texts through the agent don't change tool arguments or cause policy
+  violations.
+
 ## Exit criteria
 
 - [ ] `curl -N /api/ask` streams a full FY2020 storyline answer with tool calls, citations, a chart event and docket cards

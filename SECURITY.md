@@ -29,6 +29,22 @@ Security researchers shall:
 - Only use exploits to the extent necessary to confirm a vulnerability. Do not use an exploit to compromise or exfiltrate data, establish command line access and/or persistence, or use the exploit to "pivot" to other systems. Once you've established that a vulnerability exists, or encountered any of the sensitive data outlined above, you must stop your test and notify us immediately.
 - Keep confidential any information about discovered vulnerabilities for up to 90 calendar days after you have notified GSA. For details, please review Coordinated Disclosure.
 
-## Hackathon note
+## This project's security posture
 
-MCP servers built from this template expose their `/mcp` endpoint **without authentication** by default (matching the public-data pilot posture). This is acceptable for a hackathon over public data. Before any non-hackathon use, front the endpoint with authentication and review your agency's ATO requirements. Never commit secrets — keep API keys in environment variables / `.env` (git-ignored), not in source.
+See the [threat model](docs/security/threat-model.md) and
+[ADR 0010](docs/adr/0010-guardrail-policy-layer.md). In short:
+
+- The server serves public statistics. IDB party names never enter its
+  database, and an output scanner withholds any result that matches one.
+- The HTTP endpoint sends security headers, enforces a CORS allowlist (closed
+  by default), a request size limit and a per-client rate limit, and can
+  require a bearer token (`HTTP_BEARER_TOKEN`). **Set the token for any
+  deployment reachable from the internet.** `/health` and `/version` stay open
+  for platform health checks.
+- The container runs as a non-root user and is meant to run with a read-only
+  root filesystem (`make docker-run` shows the flags).
+- Secrets come only from the environment and are redacted from logs. CI runs
+  `pip-audit`, `bandit` and `detect-secrets` (`make security` locally).
+
+Never commit secrets: keep API keys in environment variables or `.env`
+(git-ignored), not in source.
