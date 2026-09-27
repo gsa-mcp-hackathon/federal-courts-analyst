@@ -23,14 +23,22 @@ pytestmark = pytest.mark.docker
 
 IMAGE = os.getenv("IMAGE", "federal-courts-analyst:dev")
 
+# How the image is meant to run (Phase 6): read-only root filesystem with a
+# small writable /tmp, no Linux capabilities, no privilege escalation.
+HARDENED = [
+    "--read-only", "--tmpfs", "/tmp:rw,noexec,nosuid,size=64m",
+    "--cap-drop", "ALL", "--security-opt", "no-new-privileges",
+]  # fmt: skip
+
 
 @pytest.fixture(scope="module")
 def container_name() -> Iterator[str]:
     if not shutil.which("docker"):
         pytest.skip("docker not installed")
     name = f"fca-test-{uuid.uuid4().hex[:8]}"
+    cmd = ["docker", "run", "-d", "--rm", "--name", name, "-p", "127.0.0.1::8080"]
     subprocess.run(
-        ["docker", "run", "-d", "--rm", "--name", name, "-p", "127.0.0.1::8080", IMAGE],
+        [*cmd, *HARDENED, IMAGE],
         check=True,
         capture_output=True,
     )
@@ -88,6 +96,27 @@ async def test_mcp_server_info(container: str, mode: str) -> None:
     assert result.structured_content["data_status"] == "not_built"
 
 
+def test_container_is_hardened(container_name: str) -> None:
+    """Non-root, read-only root filesystem, writable /tmp only."""
+    name = container_name.split()[0]
+
+    def sh(cmd: str) -> subprocess.CompletedProcess[str]:
+        return subprocess.run(
+            ["docker", "exec", name, "sh", "-c", cmd], capture_output=True, text=True
+        )
+
+    assert sh("id -u").stdout.strip() == "10001"
+    assert sh("touch /app/x").returncode != 0
+    assert sh("touch /app/data/x").returncode != 0
+    assert sh("touch /tmp/x && rm /tmp/x").returncode == 0
+
+
+def test_security_headers(container: str) -> None:
+    r = httpx.get(f"{container}/health")
+    assert r.headers["x-content-type-options"] == "nosniff"
+    assert r.headers["x-frame-options"] == "DENY"
+
+
 def test_logs_are_json(container_name: str) -> None:
     import json
 
@@ -117,7 +146,7 @@ def _run_with_catalog(db_dir: str) -> tuple[str, str]:
     subprocess.run(
         [
             "docker", "run", "-d", "--rm", "--name", name, "-p", "127.0.0.1::8080",
-            "-v", f"{db_dir}:/app/data/build:ro", IMAGE,
+            *HARDENED, "-v", f"{db_dir}:/app/data/build:ro", IMAGE,
         ],
         check=True,
         capture_output=True,
@@ -155,9 +184,10 @@ async def test_container_reads_built_catalog(catalog, idb, tmp_path) -> None:  #
     build_dir.mkdir()
     shutil.copy(catalog.db, build_dir / "courts.duckdb")
     shutil.copy(idb.db, build_dir / "idb.duckdb")
+    shutil.copy(idb.db.with_name("pii_index.bin"), build_dir / "pii_index.bin")
     build_dir.chmod(0o755)
-    (build_dir / "courts.duckdb").chmod(0o644)
-    (build_dir / "idb.duckdb").chmod(0o644)
+    for f in build_dir.iterdir():
+        f.chmod(0o644)
     name, base = _run_with_catalog(str(build_dir))
     try:
         async with Client(f"{base}/mcp") as c:
@@ -192,6 +222,7 @@ async def test_container_reads_built_catalog(catalog, idb, tmp_path) -> None:  #
                 "analyze_cohort",
                 {"handle": handle, "metric": "median_days_to_disposition"},
             )
+        assert cases.structured_content["status"] == "ok"  # PII scanner loaded
         assert fig.structured_content["data"]["value"] == 322
         assert fig.structured_content["data"]["first_published"]["value"] == 554
         assert median.structured_content["data"]["results"][0]["n"] > 0

@@ -33,7 +33,8 @@ class Settings(BaseSettings):
     # app.py also auto-selects HTTP when a platform injects DATABRICKS_APP_PORT
     # or PORT, so you usually do NOT need to set this on a cloud host.
     mcp_transport: Literal["stdio", "streamable-http"] = "stdio"
-    mcp_host: str = "0.0.0.0"
+    # Containers; set 127.0.0.1 locally.
+    mcp_host: str = "0.0.0.0"  # nosec B104
     mcp_port: int = 8000
 
     # ── HTTP hardening (Phase 6; see http_security.py) ────────────────────────

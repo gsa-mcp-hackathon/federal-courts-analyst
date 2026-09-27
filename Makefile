@@ -1,7 +1,7 @@
 # Federal Courts Analyst — developer entry points. Run `make help`.
 .DEFAULT_GOAL := help
 .PHONY: help setup lint format typecheck test test-full cov data data-tables \
-        data-discover data-idb data-idb-sample serve serve-http \
+        data-discover data-idb data-idb-sample data-pii-index serve serve-http security \
         variance-report schemas inspector docker-build docker-run docker-test web eval eval-validate eval-claude eval-api clean
 
 IMAGE ?= federal-courts-analyst:dev
@@ -46,6 +46,15 @@ data-idb: ## Fetch the pinned civil IDB release (~330 MB) and build idb.duckdb (
 data-idb-sample: ## Rebuild the committed IDB test fixture from the downloaded release
 	uv run python -m courts_analyst.pipeline.idb sample
 
+data-pii-index: ## Rebuild only the output scanner's hashed party-name index
+	uv run python -m courts_analyst.pipeline.idb pii-index
+
+security: ## pip-audit, bandit and detect-secrets, as CI runs them
+	uv export --frozen --all-groups --no-hashes --no-emit-project -q > $(TMPDIR)/fca-requirements.txt
+	uvx pip-audit==2.9.0 -r $(TMPDIR)/fca-requirements.txt --no-deps --disable-pip --strict
+	uvx bandit==1.9.4 -q -c pyproject.toml -r src
+	uv run pre-commit run detect-secrets --all-files
+
 variance-report: ## Reconcile every court-year (IDB vs Table C-1) into docs/variance-report.md
 	uv run python -m courts_analyst.pipeline.reports variance
 
@@ -67,8 +76,10 @@ inspector: ## Open the MCP Inspector against the stdio server
 docker-build: ## Build the container image
 	docker build --build-arg GIT_SHA=$$(git rev-parse --short HEAD) -t $(IMAGE) .
 
-docker-run: docker-build ## Run the container on :8080
-	docker run --rm -p 8080:8080 $(IMAGE)
+docker-run: docker-build ## Run the container on :8080 (read-only root fs, no capabilities)
+	docker run --rm -p 8080:8080 --read-only --tmpfs /tmp:rw,noexec,nosuid,size=64m \
+	  --cap-drop ALL --security-opt no-new-privileges \
+	  -v $(CURDIR)/data/build:/app/data/build:ro $(IMAGE)
 
 docker-test: docker-build ## Integration tests against the running container
 	uv run pytest -m docker tests/test_docker.py -v

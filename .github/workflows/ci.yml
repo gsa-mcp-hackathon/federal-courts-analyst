@@ -64,6 +64,26 @@ jobs:
             htmlcov/
             junit.xml
 
+  security:
+    # Phase 6: known-vulnerable dependencies, risky Python patterns, committed
+    # secrets. npm audit joins in web.yml once the frontend exists (Phase 8).
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - name: pip-audit (every dependency group, as locked)
+        run: |
+          uv export --frozen --all-groups --no-hashes --no-emit-project -q > /tmp/requirements.txt
+          uvx pip-audit==2.9.0 -r /tmp/requirements.txt --no-deps --disable-pip --strict
+      - name: bandit
+        run: uvx bandit==1.9.4 -c pyproject.toml -r src
+      - name: detect-secrets
+        run: |  # pragma: allowlist secret
+          git ls-files | grep -vE '^(uv\.lock|data/|eval/results/|web/src/api/schemas/|tests/fixtures/)|\.ambr$' \
+            | xargs uvx --from detect-secrets==1.5.0 detect-secrets-hook --baseline .secrets.baseline
+
   docker:
     runs-on: ubuntu-latest
     steps:

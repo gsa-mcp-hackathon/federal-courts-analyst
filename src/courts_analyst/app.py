@@ -100,7 +100,8 @@ def main() -> None:
     if http:
         mcp.run(
             transport="http",
-            host="0.0.0.0" if platform_port else settings.mcp_host,
+            # A container must listen on every interface.
+            host="0.0.0.0" if platform_port else settings.mcp_host,  # nosec B104
             port=int(platform_port) if platform_port else settings.mcp_port,
             middleware=http_middleware(settings),
             allowed_origins=list(settings.http_allowed_origins) or None,

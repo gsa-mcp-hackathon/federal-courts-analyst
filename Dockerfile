@@ -8,6 +8,14 @@
 #
 # The server serves MCP over streamable-HTTP at :8080/mcp with a health check
 # at :8080/health. app.py auto-selects HTTP because PORT is set below.
+#
+# Run it hardened (Phase 6; what `make docker-run` and the docker tests do):
+#   docker run --read-only --tmpfs /tmp:rw,noexec,nosuid,size=64m \
+#     --cap-drop ALL --security-opt no-new-privileges \
+#     -v "$PWD/data/build:/app/data/build:ro" federal-courts-analyst:dev
+# The app writes nothing outside /tmp (DuckDB spills there). data/private
+# (IDB party names) is never mounted; data/build holds only the hashed
+# party-name index the output scanner reads.
 
 FROM python:3.12-slim
 

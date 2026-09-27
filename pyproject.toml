@@ -101,6 +101,13 @@ ignore = [
 # Test fixtures quote real URLs, HTML and SQL verbatim.
 "tests/**" = ["E501"]
 
+[tool.bandit]
+# B101: asserts narrow types (mypy); they never guard security.
+# B608: SQL is built from constant fragments with ? parameters only;
+#       tests/test_sql_safety.py enforces that on the syntax tree.
+skips = ["B101", "B608"]
+exclude_dirs = ["tests", ".venv"]
+
 [tool.mypy]
 python_version = "3.11"
 mypy_path = "src"
