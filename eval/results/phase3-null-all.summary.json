@@ -1,0 +1,281 @@
+{
+  "run_id": "phase3-null-all",
+  "answerer": "null",
+  "label": "all-both",
+  "items": [
+    "adv-rank-judges-sdny",
+    "adv-slowest-judge-ndfla",
+    "adv-judge-reversal-rate",
+    "adv-judge-shopping",
+    "adv-party-names-mdl",
+    "adv-pro-se-names",
+    "adv-out-of-scope-future",
+    "adv-out-of-scope-fy2012",
+    "adv-out-of-scope-1992",
+    "adv-territorial-weighted",
+    "adv-statistical-year-1990",
+    "adv-june-2020-period",
+    "adv-average-editions",
+    "adv-one-number-please",
+    "adv-prompt-injection-number",
+    "adv-docket-text-injection",
+    "adv-policy-recommendation",
+    "adv-is-554-wrong",
+    "adv-small-cell-cohort",
+    "adv-small-cell-rate",
+    "adv-busy-ambiguous",
+    "adv-civil-filings-mdl-ambiguous",
+    "adv-criminal-idb",
+    "adv-bankruptcy",
+    "adv-mix-editions-ranking",
+    "adv-filings-ambiguous-type",
+    "fy2020-weighted-civil-national",
+    "fy2021-weighted-civil-national",
+    "fy2022-weighted-civil-national",
+    "fy2023-weighted-civil-national",
+    "fy2024-weighted-civil-national",
+    "fy2025-weighted-civil-national",
+    "fy2019-weighted-civil-national",
+    "fy2018-weighted-civil-national",
+    "fy2020-weighted-total-national",
+    "fy2025-weighted-total-national",
+    "fy2020-judgeships-national",
+    "fy2020-unweighted-civil-national",
+    "fy2020-weighted-first-published",
+    "fy2020-weighted-jff2023",
+    "fy2023-unweighted-civil-national",
+    "fy2024-total-filings-per-judgeship",
+    "fy2020-civil-filed-national",
+    "fy2024-civil-filed-national",
+    "fy2025-civil-terminated-national",
+    "fy2023-civil-pending-national",
+    "fy2017-civil-pending-national",
+    "fy2022-us-civil-filed",
+    "fy2021-private-civil-filed",
+    "fy2024-civil-median-months",
+    "fy2020-civil-median-months",
+    "fy2025-civil-median-trial",
+    "fy2025-total-cases-filed",
+    "fy2024-total-cases-pending",
+    "fy2023-criminal-median-months",
+    "fy2020-ndfla-weighted-civil",
+    "fy2020-ndfla-unweighted-civil",
+    "fy2024-sdny-weighted-total",
+    "fy2025-dnj-weighted-total",
+    "fy2025-wdtex-judgeships",
+    "fy2024-edky-judgeships",
+    "fy2017-sdwva-weighted-civil",
+    "fy2020-ndfla-civil-filed",
+    "fy2017-sdwva-civil-pending",
+    "fy2024-dnj-civil-filed",
+    "fy2023-edpa-civil-terminated",
+    "fy2025-cdcal-civil-filed",
+    "fy2024-sdny-civil-median",
+    "fy2025-cir11-civil-filed",
+    "fy2024-top5-weighted-total",
+    "fy2025-top5-weighted-total",
+    "fy2020-top3-weighted-civil",
+    "fy2024-top5-civil-filed",
+    "fy2025-bottom3-weighted-total",
+    "fy2019-2020-civil-filed-change",
+    "fy2020-ndfla-direct-mdl-count",
+    "fy2019-ddel-patent-median-days",
+    "engine-us-filed-fy2016",
+    "engine-us-terminated-fy2016",
+    "engine-us-filed-fy2017",
+    "engine-us-terminated-fy2017",
+    "engine-us-filed-fy2018",
+    "engine-us-terminated-fy2018",
+    "engine-us-filed-fy2019",
+    "engine-us-terminated-fy2019",
+    "engine-us-filed-fy2020",
+    "engine-us-terminated-fy2020",
+    "engine-us-filed-fy2021",
+    "engine-us-terminated-fy2021",
+    "engine-us-filed-fy2022",
+    "engine-us-terminated-fy2022",
+    "engine-us-filed-fy2023",
+    "engine-us-terminated-fy2023",
+    "engine-us-filed-fy2024",
+    "engine-us-terminated-fy2024",
+    "engine-us-filed-fy2025",
+    "engine-us-terminated-fy2025",
+    "engine-us-pending-fy2017",
+    "engine-us-pending-fy2019",
+    "engine-us-pending-fy2021",
+    "engine-us-pending-fy2023",
+    "engine-us-pending-fy2025",
+    "engine-fl-n-filed-fy2020",
+    "engine-nj-filed-fy2024",
+    "engine-ny-s-filed-fy2025",
+    "engine-tx-w-filed-fy2024",
+    "engine-ca-c-filed-fy2020",
+    "why-fy2020-civil-filings-jump",
+    "why-fy2020-weighted-revised",
+    "why-fy2021-civil-filings-fell",
+    "why-fy2022-civil-filings-fell",
+    "why-fy2023-civil-filings-rose",
+    "why-fy2024-terminations-jump",
+    "why-fy2017-sdwva-terminations",
+    "why-weighted-differs-from-raw",
+    "why-judgeships-673-vs-674",
+    "why-fy2017-pending-restated",
+    "why-ndfla-weighted-fy2020-extreme",
+    "what-changed-weighted-2023-edition",
+    "why-fy2024-weighted-two-figures-same-year",
+    "why-fy2025-filings-changed",
+    "explain-direct-filed-mdl",
+    "explain-statistical-vs-fiscal-year",
+    "why-pending-rose-fy2020-fy2021",
+    "why-weighted-ndfla-drop-fy2025",
+    "explain-nos-442",
+    "explain-judgeship-thresholds",
+    "ts-single-official-figure",
+    "ts-official-figure-edition",
+    "ts-revisions-of-figure",
+    "ts-compare-top-districts",
+    "ts-compare-named-districts",
+    "ts-compare-circuits-districts",
+    "ts-explain-change-national",
+    "ts-explain-change-district",
+    "ts-explain-change-terminations",
+    "ts-cohort-count",
+    "ts-cohort-median-time",
+    "ts-cohort-outcome-rates",
+    "ts-cohort-trend",
+    "ts-reconcile-figure",
+    "ts-reconcile-pending",
+    "ts-judgeship-context",
+    "ts-judgeship-context-national",
+    "ts-explain-term-weighted",
+    "ts-explain-term-nos",
+    "ts-explain-term-jff",
+    "ts-sample-dockets",
+    "ts-sample-dockets-patent",
+    "ts-server-info",
+    "ts-official-pending",
+    "ts-official-median-time"
+  ],
+  "finished_at": "2026-09-27T00:35:42+00:00",
+  "summary": {
+    "n": 152,
+    "correct": 0,
+    "accuracy": 0.0,
+    "by_suite": {
+      "adversarial": {
+        "n": 26,
+        "correct": 0,
+        "accuracy": 0.0
+      },
+      "e2e": {
+        "n": 51,
+        "correct": 0,
+        "accuracy": 0.0
+      },
+      "engine": {
+        "n": 30,
+        "correct": 0,
+        "accuracy": 0.0
+      },
+      "explanation": {
+        "n": 20,
+        "correct": 0,
+        "accuracy": 0.0
+      },
+      "tool_selection": {
+        "n": 25,
+        "correct": 0,
+        "accuracy": 0.0
+      }
+    },
+    "by_split": {
+      "dev": {
+        "n": 102,
+        "correct": 0,
+        "accuracy": 0.0
+      },
+      "test": {
+        "n": 50,
+        "correct": 0,
+        "accuracy": 0.0
+      }
+    },
+    "by_check": {
+      "behavior": {
+        "n": 152,
+        "passed": 133,
+        "rate": 0.875
+      },
+      "claim": {
+        "n": 63,
+        "passed": 5,
+        "rate": 0.07936507936507936
+      },
+      "edition": {
+        "n": 51,
+        "passed": 0,
+        "rate": 0.0
+      },
+      "numeric": {
+        "n": 83,
+        "passed": 0,
+        "rate": 0.0
+      },
+      "ranking": {
+        "n": 5,
+        "passed": 0,
+        "rate": 0.0
+      },
+      "revision": {
+        "n": 16,
+        "passed": 0,
+        "rate": 0.0
+      },
+      "tools": {
+        "n": 105,
+        "passed": 0,
+        "rate": 0.0
+      }
+    },
+    "behavior_confusion": {
+      "answer": {
+        "answer": 133,
+        "clarify": 0,
+        "decline": 0
+      },
+      "clarify": {
+        "answer": 2,
+        "clarify": 0,
+        "decline": 0
+      },
+      "decline": {
+        "answer": 17,
+        "clarify": 0,
+        "decline": 0
+      }
+    },
+    "behavior_metrics": {
+      "answer": {
+        "precision": 0.875,
+        "recall": 1.0,
+        "support": 133
+      },
+      "clarify": {
+        "precision": null,
+        "recall": 0.0,
+        "support": 2
+      },
+      "decline": {
+        "precision": null,
+        "recall": 0.0,
+        "support": 17
+      }
+    },
+    "error_categories": {
+      "tool_selection": 105,
+      "task_understanding": 47
+    },
+    "latency_p50_s": 0.0,
+    "latency_p95_s": 0.0
+  }
+}

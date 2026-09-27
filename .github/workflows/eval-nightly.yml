@@ -1,11 +1,12 @@
-# Nightly agent evaluation on a small model budget.
-# Placeholder until Phase 3/10: add the schedule trigger and API key secrets then.
+# Nightly evaluation. Today: validate the question bank and self-check the
+# harness (gold must score 100%, null 0%) with no model calls. Phase 10 adds
+# the model runs (needs API key secrets) on a small budget.
 name: Eval (nightly)
 
 on:
   workflow_dispatch:
-  # schedule:
-  #   - cron: "0 7 * * *"   # 03:00 ET
+  schedule:
+    - cron: "0 7 * * *"   # 03:00 ET
 
 permissions:
   contents: read
@@ -15,5 +16,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Placeholder
-        run: echo "The benchmark harness arrives in Phase 3 (make eval)."
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - run: uv sync --group dev --frozen
+      - name: Validate question bank
+        run: uv run courts-eval validate
+      - name: Harness self-check (gold)
+        run: uv run courts-eval run --answerer gold --quiet --expect-accuracy 1 --results-dir eval-results
+      - name: Harness self-check (null)
+        run: uv run courts-eval run --answerer null --quiet --expect-accuracy 0 --results-dir eval-results
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: eval-results
+          path: eval-results/

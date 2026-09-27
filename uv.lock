@@ -491,9 +491,11 @@ name = "courts-analyst"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
+    { name = "duckdb" },
     { name = "fastmcp" },
     { name = "pydantic" },
     { name = "pydantic-settings" },
+    { name = "pyyaml" },
 ]
 
 [package.dev-dependencies]
@@ -527,9 +529,11 @@ pipeline = [
 
 [package.metadata]
 requires-dist = [
+    { name = "duckdb", specifier = ">=1.1" },
     { name = "fastmcp", specifier = ">=4.0.10,<5" },
     { name = "pydantic", specifier = ">=2.12" },
     { name = "pydantic-settings", specifier = ">=2.6" },
+    { name = "pyyaml", specifier = ">=6.0" },
 ]
 
 [package.metadata.requires-dev]

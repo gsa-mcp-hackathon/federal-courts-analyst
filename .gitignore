@@ -59,3 +59,7 @@ web/dist/
 
 # macOS
 .DS_Store
+
+# Eval runs (commit a run on purpose with `git add -f`, e.g. a phase baseline)
+eval/results/*
+!eval/results/README.md

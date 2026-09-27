@@ -12,11 +12,17 @@ dependencies = [
     "fastmcp>=4.0.10,<5",
     "pydantic>=2.12",
     "pydantic-settings>=2.6",
+    # The server reads the DuckDB catalog and IDB (P4) and YAML registries
+    # (measures, glossary, judgeship thresholds, question bank).
+    "duckdb>=1.1",
+    "pyyaml>=6.0",
 ]
 
 [project.scripts]
 # Lets you run the server with `uv run courts-analyst`.
 courts-analyst = "courts_analyst.app:main"
+# The evaluation harness (P3): `uv run courts-eval run --answerer gold`.
+courts-eval = "courts_analyst.evaluation.cli:main"
 
 [build-system]
 requires = ["hatchling"]
@@ -54,7 +60,8 @@ api = [
     "fastapi>=0.133",
     "uvicorn>=0.32",
 ]
-# P3/P10: benchmark harness. Model SDKs and tracing are added in those phases.
+# P3/P10: benchmark harness. The harness itself needs only the runtime deps;
+# model SDKs and tracing are added in P10.
 eval = [
     "pyyaml>=6.0",
 ]

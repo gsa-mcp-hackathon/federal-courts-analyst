@@ -2,7 +2,7 @@
 .DEFAULT_GOAL := help
 .PHONY: help setup lint format typecheck test test-full cov data data-tables \
         data-discover data-idb data-idb-sample serve serve-http \
-        inspector docker-build docker-run docker-test web eval clean
+        inspector docker-build docker-run docker-test web eval eval-validate clean
 
 IMAGE ?= federal-courts-analyst:dev
 PORT  ?= 8000
@@ -70,8 +70,12 @@ docker-test: docker-build ## Integration tests against the running container
 web: ## Frontend dev server (P8)
 	@echo "make web: the frontend arrives in Phase 8."
 
-eval: ## Run the evaluation benchmark (P3)
-	@echo "make eval: the benchmark arrives in Phase 3."
+eval-validate: ## Validate the question bank (schema, ids, splits)
+	uv run courts-eval validate
+
+eval: ## Harness self-check: gold must score 100%, null 0%
+	uv run courts-eval run --answerer gold --quiet --expect-accuracy 1
+	uv run courts-eval run --answerer null --quiet --expect-accuracy 0
 
 clean: ## Remove caches and build outputs (keeps downloads in data/raw)
 	rm -rf .pytest_cache .mypy_cache .ruff_cache htmlcov .coverage coverage.xml

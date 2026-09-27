@@ -1,0 +1,1079 @@
+# e2e suite — drafted from the official tables catalog; see eval/README.md
+- id: fy2020-weighted-civil-national
+  question: What were weighted civil filings per judgeship nationally in FY2020?
+  expected:
+    figures:
+    - value: 322
+      edition:
+      - JFF-2023
+      - JFF-2024
+      - JFF-2025
+      ref:
+        measure: weighted_civil_filings_per_judgeship
+        court: US
+        fiscal_year: 2020
+        edition: JFF-2025
+      label: current official (latest edition)
+    - value: 554
+      edition:
+      - JB-2020
+      - JFF-2020
+      - JFF-2021
+      - JFF-2022
+      ref:
+        measure: weighted_civil_filings_per_judgeship
+        court: US
+        fiscal_year: 2020
+        edition: JB-2020
+      label: as first published
+    must_mention_revision: true
+  expected_tools:
+  - get_official_figure
+  tags:
+  - edition_trap
+  - weighted
+  - fy2020
+  - demo
+  - revised
+- id: fy2021-weighted-civil-national
+  question: How many weighted civil filings per authorized judgeship did U.S. district courts have in
+    fiscal year 2021?
+  expected:
+    figures:
+    - value: 318
+      edition:
+      - JFF-2023
+      - JFF-2024
+      ref:
+        measure: weighted_civil_filings_per_judgeship
+        court: US
+        fiscal_year: 2021
+        edition: JFF-2024
+      label: current official (latest edition)
+    - value: 434
+      edition:
+      - JB-2021
+      - JFF-2021
+      - JFF-2022
+      ref:
+        measure: weighted_civil_filings_per_judgeship
+        court: US
+        fiscal_year: 2021
+        edition: JB-2021
+      label: as first published
+    must_mention_revision: true
+  expected_tools:
+  - get_official_figure
+  tags:
+  - weighted
+  - edition_trap
+  - revised
+- id: fy2022-weighted-civil-national
+  question: Give me the national weighted civil filings per judgeship for FY2022.
+  expected:
+    figures:
+    - value: 309
+      edition:
+      - JFF-2023
+      - JFF-2024
+      ref:
+        measure: weighted_civil_filings_per_judgeship
+        court: US
+        fiscal_year: 2022
+        edition: JFF-2024
+      label: current official (latest edition)
+    - value: 355
+      edition:
+      - JB-2022
+      - JFF-2022
+      ref:
+        measure: weighted_civil_filings_per_judgeship
+        court: US
+        fiscal_year: 2022
+        edition: JB-2022
+      label: as first published
+    must_mention_revision: true
+  expected_tools:
+  - get_official_figure
+  tags:
+  - weighted
+  - edition_trap
+  - revised
+- id: fy2023-weighted-civil-national
+  question: What was the weighted civil caseload per judgeship across all district courts in FY2023?
+  expected:
+    figures:
+    - value: 332
+      edition: JFF-2024
+      ref:
+        measure: weighted_civil_filings_per_judgeship
+        court: US
+        fiscal_year: 2023
+        edition: JFF-2024
+      label: current official (latest edition)
+    - value: 431
+      edition:
+      - JB-2023
+      - JFF-2023
+      ref:
+        measure: weighted_civil_filings_per_judgeship
+        court: US
+        fiscal_year: 2023
+        edition: JB-2023
+      label: as first published
+    must_mention_revision: true
+  expected_tools:
+  - get_official_figure
+  tags:
+  - weighted
+  - edition_trap
+  - revised
+- id: fy2024-weighted-civil-national
+  question: National weighted civil filings per judgeship, fiscal 2024?
+  expected:
+    figures:
+    - value: 335
+      edition: JFF-2024
+      ref:
+        measure: weighted_civil_filings_per_judgeship
+        court: US
+        fiscal_year: 2024
+        edition: JFF-2024
+      label: current official (latest edition)
+    - value: 384
+      edition: JB-2024
+      ref:
+        measure: weighted_civil_filings_per_judgeship
+        court: US
+        fiscal_year: 2024
+        edition: JB-2024
+      label: as first published
+    must_mention_revision: true
+  expected_tools:
+  - get_official_figure
+  tags:
+  - weighted
+  - edition_trap
+  - revised
+- id: fy2025-weighted-civil-national
+  question: What is the most recent official figure for weighted civil filings per judgeship in FY2025,
+    nationally?
+  expected:
+    figures:
+    - value: 372
+      edition: JFF-2025
+      ref:
+        measure: weighted_civil_filings_per_judgeship
+        court: US
+        fiscal_year: 2025
+        edition: JFF-2025
+      label: current official (latest edition)
+    - value: 414
+      edition: JB-2025
+      ref:
+        measure: weighted_civil_filings_per_judgeship
+        court: US
+        fiscal_year: 2025
+        edition: JB-2025
+      label: as first published
+    must_mention_revision: true
+  expected_tools:
+  - get_official_figure
+  tags:
+  - weighted
+  - edition_trap
+  - revised
+- id: fy2019-weighted-civil-national
+  question: What were weighted civil filings per judgeship in FY2019 for all district courts?
+  expected:
+    figures:
+    - value: 332
+      edition: JFF-2023
+      ref:
+        measure: weighted_civil_filings_per_judgeship
+        court: US
+        fiscal_year: 2019
+        edition: JFF-2023
+      label: current official (latest edition)
+    - value: 381
+      edition:
+      - JB-2019
+      - JFF-2019
+      - JFF-2020
+      - JFF-2021
+      - JFF-2022
+      ref:
+        measure: weighted_civil_filings_per_judgeship
+        court: US
+        fiscal_year: 2019
+        edition: JB-2019
+      label: as first published
+    must_mention_revision: true
+  expected_tools:
+  - get_official_figure
+  tags:
+  - weighted
+  - edition_trap
+  - revised
+- id: fy2018-weighted-civil-national
+  question: What were weighted civil filings per judgeship nationally in FY2018?
+  expected:
+    figures:
+    - value: 367
+      edition:
+      - JB-2018
+      - JFF-2018
+      - JFF-2019
+      - JFF-2020
+      - JFF-2021
+      - JFF-2022
+      ref:
+        measure: weighted_civil_filings_per_judgeship
+        court: US
+        fiscal_year: 2018
+        edition: JFF-2022
+  expected_tools:
+  - get_official_figure
+  tags:
+  - weighted
+- id: fy2020-weighted-total-national
+  question: What were total weighted filings per judgeship (civil, criminal and supervised release hearings)
+    nationally in FY2020?
+  expected:
+    figures:
+    - value: 449
+      edition:
+      - JFF-2023
+      - JFF-2024
+      - JFF-2025
+      ref:
+        measure: weighted_total_filings_per_judgeship
+        court: US
+        fiscal_year: 2020
+        edition: JFF-2025
+      label: current official (latest edition)
+    - value: 681
+      edition:
+      - JB-2020
+      - JFF-2020
+      - JFF-2021
+      - JFF-2022
+      ref:
+        measure: weighted_total_filings_per_judgeship
+        court: US
+        fiscal_year: 2020
+        edition: JB-2020
+      label: as first published
+    must_mention_revision: true
+  expected_tools:
+  - get_official_figure
+  tags:
+  - weighted
+  - edition_trap
+  - fy2020
+  - revised
+- id: fy2025-weighted-total-national
+  question: What were weighted total filings per judgeship nationally in FY2025?
+  expected:
+    figures:
+    - value: 493
+      edition: JFF-2025
+      ref:
+        measure: weighted_total_filings_per_judgeship
+        court: US
+        fiscal_year: 2025
+        edition: JFF-2025
+      label: current official (latest edition)
+    - value: 534
+      edition: JB-2025
+      ref:
+        measure: weighted_total_filings_per_judgeship
+        court: US
+        fiscal_year: 2025
+        edition: JB-2025
+      label: as first published
+    must_mention_revision: true
+  expected_tools:
+  - get_official_figure
+  tags:
+  - weighted
+  - edition_trap
+  - revised
+- id: fy2020-judgeships-national
+  question: How many authorized district judgeships were used for the FY2020 per-judgeship figures?
+  expected:
+    figures:
+    - value: 674
+      edition:
+      - JFF-2023
+      - JFF-2024
+      - JFF-2025
+      ref:
+        measure: authorized_judgeships
+        court: US
+        fiscal_year: 2020
+        edition: JFF-2025
+      label: current official (latest edition)
+    - value: 673
+      edition:
+      - JB-2020
+      - JFF-2020
+      - JFF-2021
+      - JFF-2022
+      ref:
+        measure: authorized_judgeships
+        court: US
+        fiscal_year: 2020
+        edition: JB-2020
+      label: as first published
+    must_mention_revision: true
+  expected_tools:
+  - get_official_figure
+  tags:
+  - edition_trap
+  - judgeships
+  - fy2020
+  - revised
+- id: fy2020-unweighted-civil-national
+  question: What were unweighted civil filings per judgeship nationally in FY2020?
+  expected:
+    figures:
+    - value: 675
+      edition:
+      - JFF-2023
+      - JFF-2024
+      - JFF-2025
+      ref:
+        measure: civil_filings_per_judgeship
+        court: US
+        fiscal_year: 2020
+        edition: JFF-2025
+      label: current official (latest edition)
+    - value: 676
+      edition:
+      - JB-2020
+      - JFF-2020
+      - JFF-2021
+      - JFF-2022
+      ref:
+        measure: civil_filings_per_judgeship
+        court: US
+        fiscal_year: 2020
+        edition: JB-2020
+      label: as first published
+    must_mention_revision: true
+  expected_tools:
+  - get_official_figure
+  tags:
+  - edition_trap
+  - fy2020
+  - revised
+- id: fy2020-weighted-first-published
+  question: As first published, what were FY2020 weighted civil filings per judgeship nationally?
+  expected:
+    figures:
+    - value: 554
+      edition:
+      - JB-2020
+      - JFF-2020
+      - JFF-2021
+      - JFF-2022
+      ref:
+        measure: weighted_civil_filings_per_judgeship
+        court: US
+        fiscal_year: 2020
+        edition: JB-2020
+  expected_tools:
+  - get_official_figure
+  tags:
+  - edition_trap
+  - weighted
+  - fy2020
+- id: fy2020-weighted-jff2023
+  question: In the 2023 edition of Judicial Facts and Figures, what was the FY2020 national weighted civil
+    filings per judgeship?
+  expected:
+    figures:
+    - value: 322
+      edition: JFF-2023
+      ref:
+        measure: weighted_civil_filings_per_judgeship
+        court: US
+        fiscal_year: 2020
+        edition: JFF-2023
+  expected_tools:
+  - get_official_figure
+  tags:
+  - edition_trap
+  - weighted
+  - fy2020
+- id: fy2023-unweighted-civil-national
+  question: What were unweighted civil filings per judgeship nationally in FY2023?
+  expected:
+    figures:
+    - value: 486
+      edition:
+      - JB-2023
+      - JFF-2023
+      - JFF-2024
+      ref:
+        measure: civil_filings_per_judgeship
+        court: US
+        fiscal_year: 2023
+        edition: JFF-2024
+  expected_tools:
+  - get_official_figure
+  tags: []
+- id: fy2024-total-filings-per-judgeship
+  question: What were total (unweighted) filings per judgeship nationally in FY2024?
+  expected:
+    figures:
+    - value: 553
+      edition: JFF-2024
+      ref:
+        measure: total_filings_per_judgeship
+        court: US
+        fiscal_year: 2024
+        edition: JFF-2024
+      label: current official (latest edition)
+    - value: 554
+      edition: JB-2024
+      ref:
+        measure: total_filings_per_judgeship
+        court: US
+        fiscal_year: 2024
+        edition: JB-2024
+      label: as first published
+    must_mention_revision: true
+  expected_tools:
+  - get_official_figure
+  tags:
+  - revised
+- id: fy2020-civil-filed-national
+  question: How many civil cases were filed in U.S. district courts in FY2020?
+  expected:
+    figures:
+    - value: 470581
+      edition: JB-2020
+      ref:
+        measure: civil_cases_filed
+        court: US
+        fiscal_year: 2020
+        edition: JB-2020
+  expected_tools:
+  - get_official_figure
+  tags:
+  - c1
+  - fy2020
+- id: fy2024-civil-filed-national
+  question: How many civil cases were filed in the federal district courts in fiscal year 2024?
+  expected:
+    figures:
+    - value: 290896
+      edition: JB-2024
+      ref:
+        measure: civil_cases_filed
+        court: US
+        fiscal_year: 2024
+        edition: JB-2024
+  expected_tools:
+  - get_official_figure
+  tags:
+  - c1
+- id: fy2025-civil-terminated-national
+  question: How many civil cases did the district courts terminate in FY2025?
+  expected:
+    figures:
+    - value: 407539
+      edition: JB-2025
+      ref:
+        measure: civil_cases_terminated
+        court: US
+        fiscal_year: 2025
+        edition: JB-2025
+  expected_tools:
+  - get_official_figure
+  tags:
+  - c1
+- id: fy2023-civil-pending-national
+  question: How many civil cases were pending in the district courts at the end of FY2023?
+  expected:
+    figures:
+    - value: 642013
+      edition: JB-2023
+      ref:
+        measure: civil_cases_pending
+        court: US
+        fiscal_year: 2023
+        edition: JB-2023
+  expected_tools:
+  - get_official_figure
+  tags:
+  - c1
+  - pending
+- id: fy2017-civil-pending-national
+  question: How many civil cases were pending nationally on September 30, 2017?
+  expected:
+    figures:
+    - value: 366195
+      edition: JB-2018
+      ref:
+        measure: civil_cases_pending
+        court: US
+        fiscal_year: 2017
+        edition: JB-2018
+      label: current official (latest edition)
+    - value: 339131
+      edition: JB-2017
+      ref:
+        measure: civil_cases_pending
+        court: US
+        fiscal_year: 2017
+        edition: JB-2017
+      label: as first published
+    must_mention_revision: true
+  expected_tools:
+  - get_official_figure
+  tags:
+  - c1
+  - pending
+  - edition_trap
+  - revised
+- id: fy2022-us-civil-filed
+  question: How many civil cases with the United States as a party were filed in FY2022?
+  expected:
+    figures:
+    - value: 38428
+      edition: JB-2022
+      ref:
+        measure: us_civil_cases_filed
+        court: US
+        fiscal_year: 2022
+        edition: JB-2022
+  expected_tools:
+  - get_official_figure
+  tags:
+  - c1
+- id: fy2021-private-civil-filed
+  question: How many private civil cases were filed in the district courts in FY2021?
+  expected:
+    figures:
+    - value: 302085
+      edition: JB-2021
+      ref:
+        measure: private_civil_cases_filed
+        court: US
+        fiscal_year: 2021
+        edition: JB-2021
+  expected_tools:
+  - get_official_figure
+  tags:
+  - c1
+- id: fy2024-civil-median-months
+  question: What was the median time from filing to disposition for civil cases in FY2024, nationally?
+  expected:
+    figures:
+    - value: 13.7
+      edition:
+      - JB-2024
+      - JFF-2024
+      ref:
+        measure: civil_median_months_to_disposition
+        court: US
+        fiscal_year: 2024
+        edition: JFF-2024
+  expected_tools:
+  - get_official_figure
+  tags:
+  - c5
+  - time
+- id: fy2020-civil-median-months
+  question: What was the national median time to disposition for civil cases in FY2020?
+  expected:
+    figures:
+    - value: 8.9
+      edition:
+      - JB-2020
+      - JFF-2020
+      - JFF-2021
+      - JFF-2022
+      - JFF-2023
+      - JFF-2024
+      - JFF-2025
+      ref:
+        measure: civil_median_months_to_disposition
+        court: US
+        fiscal_year: 2020
+        edition: JFF-2025
+  expected_tools:
+  - get_official_figure
+  tags:
+  - c5
+  - time
+  - fy2020
+- id: fy2025-civil-median-trial
+  question: For civil cases that reached trial in FY2025, what was the median time from filing to disposition?
+  expected:
+    figures:
+    - value: 30.7
+      edition:
+      - JB-2025
+      - JFF-2025
+      ref:
+        measure: civil_median_months_court_action_trial
+        court: US
+        fiscal_year: 2025
+        edition: JFF-2025
+  expected_tools:
+  - get_official_figure
+  tags:
+  - c5
+  - time
+- id: fy2025-total-cases-filed
+  question: How many civil and criminal cases combined were filed in the district courts in FY2025?
+  expected:
+    figures:
+    - value: 370579
+      edition: JFF-2025
+      ref:
+        measure: total_cases_filed
+        court: US
+        fiscal_year: 2025
+        edition: JFF-2025
+  expected_tools:
+  - get_official_figure
+  tags:
+  - jff61
+- id: fy2024-total-cases-pending
+  question: How many civil and criminal cases were pending in the district courts at the end of FY2024?
+  expected:
+    figures:
+    - value: 622832
+      edition: JFF-2024
+      ref:
+        measure: total_cases_pending
+        court: US
+        fiscal_year: 2024
+        edition: JFF-2024
+  expected_tools:
+  - get_official_figure
+  tags:
+  - jff61
+- id: fy2023-criminal-median-months
+  question: What was the median time to disposition for criminal defendants in FY2023?
+  expected:
+    figures:
+    - value: 10.4
+      edition:
+      - JFF-2023
+      - JFF-2024
+      ref:
+        measure: criminal_median_months_to_disposition
+        court: US
+        fiscal_year: 2023
+        edition: JFF-2024
+  expected_tools:
+  - get_official_figure
+  tags:
+  - jff63
+  - time
+- id: fy2020-ndfla-weighted-civil
+  question: What were weighted civil filings per judgeship in the Northern District of Florida in FY2020?
+  expected:
+    figures:
+    - value: 35430
+      edition: JB-2020
+      ref:
+        measure: weighted_civil_filings_per_judgeship
+        court: FL-N
+        fiscal_year: 2020
+        edition: JB-2020
+  expected_tools:
+  - get_official_figure
+  tags:
+  - district
+  - weighted
+  - fy2020
+  - mdl
+- id: fy2020-ndfla-unweighted-civil
+  question: What were civil filings per judgeship (unweighted) in N.D. Fla. in FY2020?
+  expected:
+    figures:
+    - value: 51153
+      edition: JB-2020
+      ref:
+        measure: civil_filings_per_judgeship
+        court: FL-N
+        fiscal_year: 2020
+        edition: JB-2020
+  expected_tools:
+  - get_official_figure
+  tags:
+  - district
+  - fy2020
+  - mdl
+- id: fy2024-sdny-weighted-total
+  question: What were total weighted filings per judgeship in the Southern District of New York in FY2024?
+  expected:
+    figures:
+    - value: 482
+      edition: JB-2024
+      ref:
+        measure: weighted_total_filings_per_judgeship
+        court: NY-S
+        fiscal_year: 2024
+        edition: JB-2024
+  expected_tools:
+  - get_official_figure
+  tags:
+  - district
+  - weighted
+- id: fy2025-dnj-weighted-total
+  question: What were weighted total filings per judgeship in the District of New Jersey in FY2025?
+  expected:
+    figures:
+    - value: 974
+      edition: JB-2025
+      ref:
+        measure: weighted_total_filings_per_judgeship
+        court: NJ
+        fiscal_year: 2025
+        edition: JB-2025
+  expected_tools:
+  - get_official_figure
+  tags:
+  - district
+  - weighted
+- id: fy2025-wdtex-judgeships
+  question: How many authorized judgeships did the Western District of Texas have in FY2025?
+  expected:
+    figures:
+    - value: 13
+      edition: JB-2025
+      ref:
+        measure: authorized_judgeships
+        court: TX-W
+        fiscal_year: 2025
+        edition: JB-2025
+  expected_tools:
+  - get_official_figure
+  tags:
+  - district
+  - judgeships
+- id: fy2024-edky-judgeships
+  question: How many authorized judgeships are counted for the Eastern District of Kentucky in FY2024?
+  expected:
+    figures:
+    - value: 5.5
+      edition: JB-2024
+      ref:
+        measure: authorized_judgeships
+        court: KY-E
+        fiscal_year: 2024
+        edition: JB-2024
+  expected_tools:
+  - get_official_figure
+  tags:
+  - district
+  - judgeships
+  notes: E.D. Ky. shares a judgeship with W.D. Ky., so the table prints 5.5.
+- id: fy2017-sdwva-weighted-civil
+  question: What were weighted civil filings per judgeship in the Southern District of West Virginia in
+    FY2017?
+  expected:
+    figures:
+    - value: 1066
+      edition: JB-2017
+      ref:
+        measure: weighted_civil_filings_per_judgeship
+        court: WV-S
+        fiscal_year: 2017
+        edition: JB-2017
+  expected_tools:
+  - get_official_figure
+  tags:
+  - district
+  - weighted
+  - mdl
+- id: fy2020-ndfla-civil-filed
+  question: How many civil cases were filed in the Northern District of Florida in FY2020?
+  expected:
+    figures:
+    - value: 204994
+      edition: JB-2020
+      ref:
+        measure: civil_cases_filed
+        court: FL-N
+        fiscal_year: 2020
+        edition: JB-2020
+  expected_tools:
+  - get_official_figure
+  tags:
+  - district
+  - c1
+  - fy2020
+  - mdl
+- id: fy2017-sdwva-civil-pending
+  question: How many civil cases were pending in S.D. W. Va. at the end of FY2017?
+  expected:
+    figures:
+    - value: 71454
+      edition: JB-2018
+      ref:
+        measure: civil_cases_pending
+        court: WV-S
+        fiscal_year: 2017
+        edition: JB-2018
+      label: current official (latest edition)
+    - value: 44615
+      edition: JB-2017
+      ref:
+        measure: civil_cases_pending
+        court: WV-S
+        fiscal_year: 2017
+        edition: JB-2017
+      label: as first published
+    must_mention_revision: true
+  expected_tools:
+  - get_official_figure
+  tags:
+  - district
+  - c1
+  - pending
+  - edition_trap
+  - revised
+- id: fy2024-dnj-civil-filed
+  question: How many civil cases were filed in the District of New Jersey in FY2024?
+  expected:
+    figures:
+    - value: 13589
+      edition: JB-2024
+      ref:
+        measure: civil_cases_filed
+        court: NJ
+        fiscal_year: 2024
+        edition: JB-2024
+  expected_tools:
+  - get_official_figure
+  tags:
+  - district
+  - c1
+- id: fy2023-edpa-civil-terminated
+  question: How many civil cases did the Eastern District of Pennsylvania terminate in FY2023?
+  expected:
+    figures:
+    - value: 8112
+      edition: JB-2023
+      ref:
+        measure: civil_cases_terminated
+        court: PA-E
+        fiscal_year: 2023
+        edition: JB-2023
+  expected_tools:
+  - get_official_figure
+  tags:
+  - district
+  - c1
+- id: fy2025-cdcal-civil-filed
+  question: How many civil cases were filed in the Central District of California in FY2025?
+  expected:
+    figures:
+    - value: 17755
+      edition: JB-2025
+      ref:
+        measure: civil_cases_filed
+        court: CA-C
+        fiscal_year: 2025
+        edition: JB-2025
+  expected_tools:
+  - get_official_figure
+  tags:
+  - district
+  - c1
+- id: fy2024-sdny-civil-median
+  question: What was the median time to disposition for civil cases in S.D.N.Y. in FY2024?
+  expected:
+    figures:
+    - value: 6.4
+      edition: JB-2024
+      ref:
+        measure: civil_median_months_to_disposition
+        court: NY-S
+        fiscal_year: 2024
+        edition: JB-2024
+  expected_tools:
+  - get_official_figure
+  tags:
+  - district
+  - c5
+  - time
+- id: fy2025-cir11-civil-filed
+  question: How many civil cases were filed in the Eleventh Circuit's district courts in FY2025?
+  expected:
+    figures:
+    - value: 37003
+      edition: JB-2025
+      ref:
+        measure: civil_cases_filed
+        court: CIR-11
+        fiscal_year: 2025
+        edition: JB-2025
+  expected_tools:
+  - get_official_figure
+  tags:
+  - circuit
+  - c1
+- id: fy2024-top5-weighted-total
+  question: Which 5 districts had the highest weighted filings per judgeship in FY2024?
+  expected:
+    ranking:
+    - FL-N
+    - NC-E
+    - CA-E
+    - TX-E
+    - TX-W
+    ranking_ref:
+      measure: weighted_total_filings_per_judgeship
+      fiscal_year: 2024
+      edition: JB-2024
+      top_n: 5
+      order: desc
+  expected_tools:
+  - compare_courts
+  tags:
+  - ranking
+  - weighted
+- id: fy2025-top5-weighted-total
+  question: List the five district courts with the most weighted total filings per judgeship in FY2025,
+    highest first.
+  expected:
+    ranking:
+    - SC
+    - NC-E
+    - NJ
+    - TX-E
+    - CA-E
+    ranking_ref:
+      measure: weighted_total_filings_per_judgeship
+      fiscal_year: 2025
+      edition: JB-2025
+      top_n: 5
+      order: desc
+  expected_tools:
+  - compare_courts
+  tags:
+  - ranking
+  - weighted
+- id: fy2020-top3-weighted-civil
+  question: Which three districts had the highest weighted civil filings per judgeship in FY2020?
+  expected:
+    ranking:
+    - FL-N
+    - DE
+    - NJ
+    ranking_ref:
+      measure: weighted_civil_filings_per_judgeship
+      fiscal_year: 2020
+      edition: JB-2020
+      top_n: 3
+      order: desc
+  expected_tools:
+  - compare_courts
+  tags:
+  - ranking
+  - weighted
+  - fy2020
+- id: fy2024-top5-civil-filed
+  question: Which five districts had the most civil filings in FY2024?
+  expected:
+    ranking:
+    - FL-N
+    - CA-C
+    - NJ
+    - IL-N
+    - NY-S
+    ranking_ref:
+      measure: civil_cases_filed
+      fiscal_year: 2024
+      edition: JB-2024
+      top_n: 5
+      order: desc
+  expected_tools:
+  - compare_courts
+  tags:
+  - ranking
+  - c1
+- id: fy2025-bottom3-weighted-total
+  question: Which three districts had the lowest weighted total filings per judgeship in FY2025?
+  expected:
+    ranking:
+    - WY
+    - WV-S
+    - HI
+    ranking_ref:
+      measure: weighted_total_filings_per_judgeship
+      fiscal_year: 2025
+      edition: JB-2025
+      top_n: 3
+      order: asc
+  expected_tools:
+  - compare_courts
+  tags:
+  - ranking
+  - weighted
+- id: fy2019-2020-civil-filed-change
+  question: What were national civil filings in FY2019 and FY2020?
+  expected:
+    figures:
+    - value: 297877
+      edition: JB-2019
+      ref:
+        measure: civil_cases_filed
+        court: US
+        fiscal_year: 2019
+        edition: JB-2019
+    - value: 470581
+      edition: JB-2020
+      ref:
+        measure: civil_cases_filed
+        court: US
+        fiscal_year: 2020
+        edition: JB-2020
+  expected_tools:
+  - get_official_figure
+  tags:
+  - c1
+  - fy2020
+  - change
+- id: fy2020-ndfla-direct-mdl-count
+  question: How many civil cases were filed directly into an MDL proceeding in the Northern District of
+    Florida in FY2020?
+  expected:
+    figures:
+    - value: 202463
+      tolerance_pct: 1.0
+      label: IDB-derived
+  expected_tools:
+  - find_cases
+  tags:
+  - idb
+  - mdl
+  - fy2020
+  - cohort
+  notes: IDB civil release of 2026-08-26 (origin code 13, AO filing date in FY2020). Phase 2 evidence.
+- id: fy2019-ddel-patent-median-days
+  question: For patent cases (nature of suit 830) filed in the District of Delaware in FY2019, what was
+    the median time to disposition in days?
+  expected:
+    figures:
+    - value: 166
+      tolerance_pct: 3.0
+      label: IDB-derived
+  expected_tools:
+  - find_cases
+  - analyze_cohort
+  tags:
+  - idb
+  - cohort
+  - time
+  notes: 'IDB civil release of 2026-08-26: 845 cases, all terminated, median 166 days (FILEDATE to TERMDATE).'
