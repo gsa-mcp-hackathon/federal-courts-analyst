@@ -65,13 +65,13 @@
 
 ## Tasks
 
-- [ ] Scaffold `web/` (Vite, TS strict, ESLint, Prettier, Tailwind, shadcn/ui); CI job enabled
-- [ ] Generated API types from backend schemas; typed API client
-- [ ] District geometry: build 94-district TopoJSON from US county boundaries (us-atlas) + a county→district crosswalk; commit the built file with its build script
-- [ ] Components and pages above
-- [ ] Number formatting utilities (per-judgeship, counts, percentages, CIs) with locale and tabular numerals
-- [ ] Error boundary + offline/replay mode
-- [ ] Production build served by FastAPI; cache headers
+- [x] Scaffold `web/` (Vite, TS strict, ESLint, Prettier, Tailwind; Radix primitives instead of generated shadcn/ui); CI job enabled
+- [x] Generated API types from backend schemas; typed API client
+- [x] District geometry: 94-district TopoJSON from us-atlas counties + a county→district crosswalk (derived from the IDB); built file and build scripts committed
+- [x] Components and pages above
+- [x] Number formatting utilities (per-judgeship, counts, percentages, CIs) with tabular numerals
+- [x] Error boundary + offline/replay mode
+- [x] Production build served by the Python app; cache headers
 
 ## Tests
 
@@ -90,7 +90,53 @@
 
 ## Exit criteria
 
-- [ ] All seven pages complete with loading, empty and error states
-- [ ] The FY2020 storyline runs smoothly in both live and replay mode
-- [ ] Visual, a11y and performance gates green in CI
-- [ ] A reviewer outside the team can answer "which districts are over 600 weighted filings per judgeship, according to which edition?" in under 30 seconds without help
+- [x] All seven pages complete with loading, empty and error states
+- [x] The FY2020 storyline runs smoothly in both live and replay mode (live: Phase 7 curl transcript; replay: `/demo`, checked in Chrome and by Playwright)
+- [x] Visual, a11y and performance gates green in CI: a11y (axe, every page, both themes) and Lighthouse gates; visual baselines moved to [#42](https://github.com/syedaun-techsur/federal-courts-analyst/issues/42)
+- [ ] A reviewer outside the team can answer "which districts are over 600 weighted filings per judgeship, according to which edition?" in under 30 seconds without help ([#41](https://github.com/syedaun-techsur/federal-courts-analyst/issues/41); needs a person. The page answers it in one view: "20 of 91 districts over 600, all from JB 2025, Table X-1A")
+
+## Deviations
+
+| Plan said | We did | Why |
+| --- | --- | --- |
+| shadcn/ui on Radix | Our own components on Radix primitives (`radix-ui`) | A small set, and the signature components (provenance, revisions, declines, suppression) are ours anyway ([ADR 0012](../docs/adr/0012-web-app.md)) |
+| County → district crosswalk | Derived from the IDB: each county's majority district among its own state's, weak majorities smoothed from neighbours; `python -m courts_analyst.pipeline.geo` + `npm run geo` | No machine-readable crosswalk ships with our data; the result is reproducible, its weak spots are reported, and the page and methodology say it's approximate ([#44](https://github.com/syedaun-techsur/federal-courts-analyst/issues/44)) |
+| `VintageChart`: one line per edition | Plus a new core function and endpoint, `edition_vintages` (`/api/figures/{m}/{c}/editions`): each edition's own series, labelled `mixed_editions` (info) by the guardrail; lines are the editions that printed the selected year; revisions are amber bands per year | `official_series` with one edition refuses years the edition doesn't print (JFF editions print rolling windows); per-year bands avoid implying a trend between revised years |
+| Court profile: NOS mix, reconciliation | New endpoints `/api/courts/{c}/case-mix` (find_cases + analyze_cohort) and `/api/courts/{c}/reconcile` | The page needed them over REST; both call guarded core functions |
+| Methodology from the MCP resources | New `/api/methodology`, `/api/methodology/{topic}`, `/api/glossary` over the same files and data | REST had no route to them |
+| Shareable URL per conversation | `/ask/{turn_id}` replays from this browser's storage | Server-side transcripts need storage and a retention policy ([#45](https://github.com/syedaun-techsur/federal-courts-analyst/issues/45)) |
+| Visual regression in CI | Not yet | Baselines are OS-specific; darwin baselines fail on Linux runners ([#42](https://github.com/syedaun-techsur/federal-courts-analyst/issues/42)) |
+| E2E live nightly | Hook only (`BACKEND_URL` project) | Needs data and a model key in CI ([#43](https://github.com/syedaun-techsur/federal-courts-analyst/issues/43), [#18](https://github.com/syedaun-techsur/federal-courts-analyst/issues/18)) |
+| Lighthouse on Explore and Ask (mocked) | CI: Ask, presentation mode, gallery on `vite preview`; Explore, Edition Tracker, court profile measured against the full-data server | The data pages have nothing to show without an API; mocked data in Lighthouse would measure the mock |
+| — | Page CSP served by the static app (`api/web.py`); `/api` and `/mcp` keep `default-src 'none'`; SPA fallback for deep links; hashed assets immutable | Closes [#38](https://github.com/syedaun-techsur/federal-courts-analyst/issues/38) |
+| — | Multi-stage Dockerfile builds the web app (ADR 0005) | One image serves everything |
+
+## Evidence
+
+**Pages (Claude in Chrome, full data, light and dark):** Explore with "Over 600": "20 of 91 districts over 600, all from JB 2025, Table X-1A", with the revision note on the national figure ([screenshot](../docs/evidence/phase-08/explore-over-600.jpg)); Edition Tracker FY2020: 322 (JFF-2025) with the revision chip, both revision notes, every edition's line and nine amber revised years ([screenshot](../docs/evidence/phase-08/edition-tracker-fy2020.jpg)); N.D. Fla. profile: 35,559 weighted filings per judgeship in FY2020 against the 430/600 thresholds, trends, case mix with small groups withheld, the official-vs-IDB reconciliation "Matched" ([screenshot](../docs/evidence/phase-08/court-profile-fl-n.jpg)); presentation mode replaying the Phase 7 storyline: the answer, waterfall with hover, three docket cards ([screenshot](../docs/evidence/phase-08/presentation-fy2020-replay.jpg)). No console errors.
+
+**Automated tests:** Vitest 40 passed (formatting, SSE parser and stream client with MSW, turn reducer, vintage and waterfall data including a 300-case property test, map bins, components). Playwright 11 passed: 8 journeys on desktop (light) and 3 on mobile (Pixel 7, dark), axe WCAG 2.1 AA with no serious or critical violations on every page. Python 1,032 passed (up from 1,018), coverage **93.7%**; `test_web_app.py` covers the SPA fallback, cache headers, the page CSP vs the API CSP, path traversal, the new endpoints, vintages against the figure's own edition history, and the crosswalk. `make docker-test` 8/8, now including the web app at `/` and a deep link from the hardened container. ESLint, Prettier, `tsc`, ruff, mypy clean; `npm audit --omit=dev` 0 vulnerabilities; pip-audit, bandit, detect-secrets clean.
+
+**Lighthouse (desktop):** Ask 94 / 100 / 100 / 91 (performance / accessibility / best practices / SEO), presentation mode 100 / 100 / 100 / 91, gallery 100 / 100 / 100 / 91 (`vite preview`); on the full-data server Explore 92 / 100 / 100 / 100, Edition Tracker 90 / 100 / 100 / 100, court profile 90 / 100 / 100 / 100. Bundle: main 142 KB gzipped; the chart library (96 KB) loads with the first chart.
+
+**Found and fixed during the phase:**
+- The vintages endpoint was refused by the Phase 6 guardrail (JB and JFF values without a `mixed_editions` label): the core now labels it.
+- The first revision shading compared against the newest edition only and drew one area across years (a misleading triangle between FY2020 and FY2025); now per-year bands against the newest edition printing each year.
+- The type generator dropped a field literally named `title` (ChartSpec) while stripping Pydantic's per-field titles.
+- Plot's inner `aria-label`s are prohibited inside `role="img"` (axe); removed.
+- Layout shift on the data pages (skeletons smaller than their charts; a monospace line re-wrapping when its font loaded): CLS 0.30 → 0.13, performance 77 → 90.
+- A no-wrap citation line became an unfocusable scroll region on mobile (axe, mobile project).
+- The SSE parser didn't emit a final event without a trailing blank line.
+- Replay paced by fixed sleeps fell far behind in throttled tabs; now paced against a clock.
+- Territory tiles overlapped Florida.
+
+## Open issues
+
+Live status is on the [issue tracker](https://github.com/syedaun-techsur/federal-courts-analyst/issues).
+
+1. **Outside-reviewer 30-second test.** [#41](https://github.com/syedaun-techsur/federal-courts-analyst/issues/41)
+2. **Visual regression baselines.** [#42](https://github.com/syedaun-techsur/federal-courts-analyst/issues/42)
+3. **Nightly live e2e (FY2020 storyline).** [#43](https://github.com/syedaun-techsur/federal-courts-analyst/issues/43)
+4. **Exact county lists for the district map.** [#44](https://github.com/syedaun-techsur/federal-courts-analyst/issues/44)
+5. **Shareable answer links.** [#45](https://github.com/syedaun-techsur/federal-courts-analyst/issues/45)
+6. [#38](https://github.com/syedaun-techsur/federal-courts-analyst/issues/38) (CSP for HTML pages): done; close with this phase's PR.

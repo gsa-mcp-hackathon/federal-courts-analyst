@@ -251,6 +251,15 @@ async def test_container_reads_built_catalog(catalog, idb, tmp_path) -> None:  #
         assert '"code":"model_not_configured"' in no_key.text
         assert no_key.text.rstrip().splitlines()[-1].startswith("data: ")
         assert "event: turn_end" in no_key.text
+        # Phase 8: the web app is served at / with its own CSP, deep links too.
+        page = httpx.get(
+            f"{base}/editions/weighted-civil-filings-per-judgeship/national/2020",
+            timeout=10,
+        )
+        assert page.status_code == 200 and '<div id="root">' in page.text
+        assert "script-src 'self'" in page.headers["content-security-policy"]
+        geo = httpx.get(f"{base}/geo/districts.topo.json", timeout=10)
+        assert geo.status_code == 200 and geo.json()["type"] == "Topology"
         runs = httpx.get(f"{base}/api/eval/runs", timeout=10).json()["runs"]
         assert any(r["run_id"] == "phase3-gold-all" for r in runs)
         # The analytics core runs in the image against the mounted data.

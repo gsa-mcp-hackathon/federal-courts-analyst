@@ -18,7 +18,12 @@ from courts_analyst.core.dockets import DocketSample
 from courts_analyst.core.explain import ChangeExplanation
 from courts_analyst.core.glossary import TermLookup
 from courts_analyst.core.judgeships import JudgeshipContext
-from courts_analyst.core.official import CourtComparison, OfficialFigure
+from courts_analyst.core.official import (
+    CourtComparison,
+    EditionVintages,
+    OfficialFigure,
+    OfficialSeries,
+)
 from courts_analyst.core.reconcile import Reconciliation
 from courts_analyst.core.results import Result
 
@@ -27,6 +32,8 @@ OUT = ROOT / "web" / "src" / "api" / "schemas"
 
 MODELS: dict[str, type[BaseModel]] = {
     "official-figure": Result[OfficialFigure],
+    "official-series": Result[OfficialSeries],
+    "edition-vintages": Result[EditionVintages],
     "court-comparison": Result[CourtComparison],
     "change-explanation": Result[ChangeExplanation],
     "cohort-spec": CohortSpec,

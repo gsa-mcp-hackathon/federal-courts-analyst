@@ -28,7 +28,9 @@ with 2025-11-25 clients) and [uv](https://docs.astral.sh/uv/).
 > process serves a REST API (same envelopes as the tools) and an agent that
 > streams answers as typed server-sent events (`POST /api/ask`), with
 > CourtListener docket lookups ([ADR 0011](docs/adr/0011-agent-and-api.md)).
-> The web app (P8) follows.
+> A web app at `/` shows every figure with its edition and table, the
+> editions side by side, a district map, court profiles and the agent
+> ([ADR 0012](docs/adr/0012-web-app.md), [web/README.md](web/README.md)).
 
 ## Tools
 
@@ -128,7 +130,7 @@ src/courts_analyst/
 tests/                # unit, golden, MCP protocol, transport, container tests
 ├── fixtures/tables/  # real uscourts.gov files (≈2 MB) so CI builds the catalog
 └── golden/           # hand-verified official figures
-web/                  # React frontend (P8)
+web/                  # React web app served at / (ADR 0012)
 eval/                 # benchmark and eval kits (P3, P10)
 data/                 # committed manifest; gitignored downloads and DuckDB build
 docs/adr/             # architecture decision records

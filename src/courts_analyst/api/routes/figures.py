@@ -11,8 +11,10 @@ from courts_analyst.api.common import cached_json, envelope, error_response
 from courts_analyst.core import catalog
 from courts_analyst.core.errors import CoreError
 from courts_analyst.core.official import (
+    EditionVintages,
     OfficialFigure,
     compare_courts,
+    edition_vintages,
     get_official_figure,
     official_series,
 )
@@ -68,6 +70,15 @@ def series(
     return official_series(
         get_db(), measure, court, fy_from, fy_to, edition, allow_mixed
     )
+
+
+@router.get(
+    "/figures/{measure}/{court}/editions",
+    summary="Every edition's own series for a measure (one line per edition)",
+)
+@envelope
+def vintages(request: Request, measure: str, court: str) -> Result[EditionVintages]:
+    return edition_vintages(get_db(), measure, court)
 
 
 @router.get("/compare", summary="Rank courts on one measure (same as compare_courts)")

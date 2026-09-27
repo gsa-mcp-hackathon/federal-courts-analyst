@@ -2,7 +2,7 @@
 .DEFAULT_GOAL := help
 .PHONY: help setup lint format typecheck test test-full cov data data-tables \
         data-discover data-idb data-idb-sample data-pii-index serve serve-http security \
-        variance-report schemas inspector docker-build docker-run docker-test web eval eval-validate eval-claude eval-api eval-agent-smoke ask clean
+        variance-report schemas inspector docker-build docker-run docker-test web eval eval-validate eval-claude eval-api eval-agent-smoke ask web-build web-test web-types web-geo clean
 
 IMAGE ?= federal-courts-analyst:dev
 PORT  ?= 8000
@@ -91,8 +91,21 @@ ask: ## Stream one question from a running `make serve-http` (Q="...")
 	curl -sN -X POST http://127.0.0.1:$(PORT)/api/ask -H 'content-type: application/json' \
 	  -d "$$(python3 -c 'import json,sys; print(json.dumps({"question": sys.argv[1]}))' "$(Q)")"
 
-web: ## Frontend dev server (P8)
-	@echo "make web: the frontend arrives in Phase 8."
+web: ## Frontend dev server on :5173, proxying /api to `make serve-http` (P8)
+	cd web && npm run dev
+
+web-build: ## Production build of the web app into web/dist (served at /)
+	cd web && npm ci --no-fund && npx vite build
+
+web-test: ## Frontend lint, types, unit tests and Playwright journeys (mocked API)
+	cd web && npm run lint && npm run typecheck && npm run types:check && npm test && npx vite build && npx playwright test
+
+web-types: schemas ## Regenerate the frontend's API types from the backend schemas
+	cd web && npm run types
+
+web-geo: ## Rebuild the county→district crosswalk (needs the IDB) and the district map
+	uv run python -m courts_analyst.pipeline.geo
+	cd web && npm run geo
 
 eval-validate: ## Validate the question bank (schema, ids, splits)
 	uv run courts-eval validate

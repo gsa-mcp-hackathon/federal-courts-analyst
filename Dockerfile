@@ -6,8 +6,8 @@
 #   - cloud.gov (docker image path) and any other container host
 #   - local integration tests (make docker-test)
 #
-# The server serves MCP over streamable-HTTP at :8080/mcp with a health check
-# at :8080/health. app.py auto-selects HTTP because PORT is set below.
+# The server serves MCP over streamable-HTTP at :8080/mcp, the REST and agent
+# API at :8080/api, the web app at :8080/, and a health check at :8080/health. app.py auto-selects HTTP because PORT is set below.
 #
 # Run it hardened (Phase 6; what `make docker-run` and the docker tests do):
 #   docker run --read-only --tmpfs /tmp:rw,noexec,nosuid,size=64m \
@@ -16,6 +16,14 @@
 # The app writes nothing outside /tmp (DuckDB spills there). data/private
 # (IDB party names) is never mounted; data/build holds only the hashed
 # party-name index the output scanner reads.
+
+# ── Web build (Phase 8; ADR 0005): the SPA as static files ──────────────────
+FROM node:22-slim AS web
+WORKDIR /web
+COPY web/package.json web/package-lock.json ./
+RUN npm ci --no-audit --no-fund
+COPY web/ ./
+RUN npx vite build
 
 FROM python:3.12-slim
 
@@ -44,6 +52,8 @@ COPY src ./src
 RUN uv sync --frozen --no-dev --no-editable
 # Committed eval runs, for GET /api/eval/runs (Phase 7).
 COPY eval/results ./eval/results
+# The web app, served at / (Phase 8).
+COPY --from=web /web/dist ./web/dist
 
 # Run as an unprivileged user.
 RUN useradd --system --uid 10001 app && mkdir -p /app/data && chown -R app /app/data

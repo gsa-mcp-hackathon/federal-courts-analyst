@@ -17,3 +17,4 @@ consequences. Status is one of Proposed, Accepted, Superseded.
 | [0009](0009-mcp-tool-surface.md) | MCP tool surface: flat typed arguments, one envelope, elicitation as a convenience | Accepted |
 | [0010](0010-guardrail-policy-layer.md) | Guardrails as one policy layer in the core, failing closed | Accepted |
 | [0011](0011-agent-and-api.md) | One HTTP app; an agent over our own MCP server; narrow CourtListener wrappers | Accepted |
+| [0012](0012-web-app.md) | Web app: typed from the backend schemas, charts from validated tokens, a derived district map | Accepted |
