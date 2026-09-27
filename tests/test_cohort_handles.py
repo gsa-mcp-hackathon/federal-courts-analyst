@@ -119,7 +119,9 @@ def test_summary_is_a_preview_not_rows(core_db: Database, store: CohortStore) ->
 def test_empty_cohort_warns(core_db: Database, store: CohortStore) -> None:
     r = find_cases(core_db, store, spec(courts=["VT"], nos_codes=["410"]))
     assert r.data is not None and r.data.n == 0
-    assert {w.code for w in r.warnings} >= {"suppressed", "out_of_scope"}
+    # Nothing is withheld from an empty cohort (Phase 6): it just has no cases.
+    codes = {w.code for w in r.warnings}
+    assert "out_of_scope" in codes and "suppressed" not in codes
 
 
 def test_find_cases_needs_idb(tables_only_db: Database, store: CohortStore) -> None:

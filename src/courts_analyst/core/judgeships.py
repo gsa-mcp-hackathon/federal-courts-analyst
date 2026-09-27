@@ -19,6 +19,8 @@ from pydantic import BaseModel, Field
 from courts_analyst.core.courts import COURTS, TERRITORIAL, CourtLevel
 from courts_analyst.core.db import Database
 from courts_analyst.core.errors import NotPublishedError, OutOfScopeError
+from courts_analyst.core.guardrails import guarded
+from courts_analyst.core.guardrails.policy import config
 from courts_analyst.core.official import get_official_figure
 from courts_analyst.core.provenance import FigureRef, Provenance
 from courts_analyst.core.results import Caveat, Result, ok
@@ -85,6 +87,7 @@ def _latest_year(db: Database, court: str) -> int:
     return int(row[0])
 
 
+@guarded
 def judgeship_context(
     db: Database, court: str, fiscal_year: int | None = None
 ) -> Result[JudgeshipContext]:
@@ -215,6 +218,15 @@ def judgeship_context(
             severity="info",
             message="Judicial emergency status depends on vacancies, which this "
             "server doesn't track; see the thresholds' descriptions.",
+        )
+    )
+    warnings.append(
+        Caveat(
+            code="no_recommendation",
+            severity="info",
+            message=" ".join(config()["policies"]["advocacy"]["message"].split())
+            + " Report these facts; don't lay out a case for or against or write "
+            "persuasive pieces (op-eds, talking points).",
         )
     )
     return ok(data, prov, warnings)

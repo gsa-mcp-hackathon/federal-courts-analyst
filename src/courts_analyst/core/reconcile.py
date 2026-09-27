@@ -43,6 +43,7 @@ from courts_analyst.core.cohorts import (
 from courts_analyst.core.courts import COURTS
 from courts_analyst.core.db import Database
 from courts_analyst.core.errors import OutOfScopeError
+from courts_analyst.core.guardrails import guarded
 from courts_analyst.core.measures import PENDING_WHERE, get_measure
 from courts_analyst.core.numbers import fmt, round_half_up
 from courts_analyst.core.provenance import (
@@ -226,6 +227,7 @@ def classify(
     return "unexplained", []
 
 
+@guarded
 def reconcile_figure(
     db: Database, measure: str, court: str, fiscal_year: int
 ) -> Result[Reconciliation]:
@@ -307,6 +309,7 @@ def reconcile_figure(
     return ok(data, prov, warnings)
 
 
+@guarded
 def reconcile_cohort(
     db: Database, store: CohortStore, handle: str
 ) -> Result[Reconciliation]:

@@ -15,7 +15,8 @@
             "out_of_scope",
             "mixed_editions",
             "partial_year",
-            "truncated"
+            "truncated",
+            "no_recommendation"
           ],
           "title": "Code",
           "type": "string"
@@ -355,6 +356,52 @@
         "share_of_change"
       ],
       "title": "Contribution",
+      "type": "object"
+    },
+    "Decline": {
+      "description": "Why a guardrail policy withheld the answer, and what to ask instead.",
+      "properties": {
+        "reason": {
+          "enum": [
+            "judge_level",
+            "pii",
+            "small_cell",
+            "policy",
+            "advocacy"
+          ],
+          "title": "Reason",
+          "type": "string"
+        },
+        "message": {
+          "description": "The explanation to relay to the user.",
+          "title": "Message",
+          "type": "string"
+        },
+        "policy": {
+          "description": "The rule that applies and where it comes from.",
+          "title": "Policy",
+          "type": "string"
+        },
+        "alternative": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "A question the server can answer instead.",
+          "title": "Alternative"
+        }
+      },
+      "required": [
+        "reason",
+        "message",
+        "policy"
+      ],
+      "title": "Decline",
       "type": "object"
     },
     "Driver": {
@@ -766,7 +813,8 @@
       "default": "ok",
       "enum": [
         "ok",
-        "needs_clarification"
+        "needs_clarification",
+        "declined"
       ],
       "title": "Status",
       "type": "string"
@@ -786,6 +834,17 @@
       "anyOf": [
         {
           "$ref": "#/$defs/Clarification"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "declined": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Decline"
         },
         {
           "type": "null"

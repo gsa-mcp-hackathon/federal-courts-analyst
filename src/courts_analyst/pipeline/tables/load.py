@@ -342,7 +342,7 @@ def _insert(
 
 def obs_id(o: Observation) -> str:
     key = f"{o.file_id}|{o.measure_id}|{o.court}|{o.fiscal_year}"
-    return hashlib.sha1(key.encode()).hexdigest()[:16]
+    return hashlib.sha1(key.encode(), usedforsecurity=False).hexdigest()[:16]
 
 
 def _family_of(s: SourceFile) -> str:

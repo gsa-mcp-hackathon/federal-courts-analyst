@@ -18,6 +18,7 @@ from fastmcp import FastMCP
 
 from courts_analyst import SERVER_NAME, __version__
 from courts_analyst.config import settings
+from courts_analyst.http_security import http_middleware
 from courts_analyst.logging_config import configure_logging
 from courts_analyst.middleware import RequestLogging
 from courts_analyst.prompts import register_prompts
@@ -35,8 +36,14 @@ INSTRUCTIONS = (
     "disagree, give both and say which is current; never average or mix them. "
     "Label anything marked 'inferred' as inference. Report n and say when there "
     "are too few cases. The server has no judge-level data and no party names: "
-    "decline requests to rank or profile judges or to name parties. Call "
-    "`server_info` to check what data is loaded."
+    "decline requests to rank or profile judges or to name parties. Quote a "
+    "figure's `citation` even when asked for just a number: an edition and a "
+    "revision are part of the figure, not caveats. Don't write advocacy (op-eds, "
+    "persuasive pieces, arguments for or against judgeships): whether to act is a "
+    "policy decision for Congress, so give the neutral facts and the Judicial "
+    "Conference's own recommendation. A result with status 'declined' explains "
+    "why and suggests an alternative: relay both. Call `server_info` to check "
+    "what data is loaded."
 )
 
 # The data only changes when `make data` rebuilds it (ADR 0001: FastMCP 4 has
@@ -82,20 +89,29 @@ def main() -> None:
     json_logs = settings.log_format == "json" or (
         settings.log_format == "auto" and http
     )
-    configure_logging(settings.log_level, json_format=json_logs)
+    configure_logging(
+        settings.log_level, json_format=json_logs, secrets=settings.secrets()
+    )
     logger.info(
         "starting server",
         extra={
             "version": __version__,
             "transport": "http" if http else "stdio",
             "port": int(platform_port or settings.mcp_port) if http else None,
+            "auth": "bearer" if settings.http_bearer_token else "none",
+            "cors_origins": len(settings.http_allowed_origins),
         },
     )
 
-    if platform_port:
-        mcp.run(transport="http", host="0.0.0.0", port=int(platform_port))
-    elif http:
-        mcp.run(transport="http", host=settings.mcp_host, port=settings.mcp_port)
+    if http:
+        mcp.run(
+            transport="http",
+            # A container must listen on every interface.
+            host="0.0.0.0" if platform_port else settings.mcp_host,  # nosec B104
+            port=int(platform_port) if platform_port else settings.mcp_port,
+            middleware=http_middleware(settings),
+            allowed_origins=list(settings.http_allowed_origins) or None,
+        )
     else:
         mcp.run(transport="stdio")
 

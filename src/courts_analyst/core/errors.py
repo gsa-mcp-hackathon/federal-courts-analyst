@@ -7,6 +7,11 @@ REST caller gets something actionable rather than a stack trace.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from courts_analyst.core.results import Decline
+
 
 class CoreError(Exception):
     """Base class. ``code`` is stable; the message is for humans."""
@@ -62,12 +67,45 @@ class InvalidCohortError(CoreError):
 
 class DeclinedError(CoreError):
     """A request the server won't answer by policy (judge rankings, party
-    names). ``reason`` is one of ``judge_level``, ``pii``, ``policy``."""
+    names, tiny cohorts). ``reason`` is a
+    :data:`~courts_analyst.core.results.DeclineReason`. Guarded core functions
+    turn it into a ``declined`` result (see ``core/guardrails``)."""
 
     code = "declined"
 
     def __init__(
-        self, message: str, reason: str, suggested_next: list[str] | None = None
+        self,
+        message: str,
+        reason: str,
+        suggested_next: list[str] | None = None,
+        decline: Decline | None = None,
     ):
         super().__init__(message, suggested_next)
         self.reason = reason
+        self.decline = decline
+
+
+class MixedEditionsError(CoreError):
+    """A series would combine values from inconsistent editions (for example
+    first-published Judicial Business values with revised JFF values)."""
+
+    code = "mixed_editions"
+
+
+class PolicyViolationError(CoreError):
+    """A result broke a guardrail invariant (a bug). Raised so the result
+    never leaves the server: guardrails fail closed."""
+
+    code = "policy_violation"
+
+
+class QueryTimeoutError(CoreError):
+    """A query ran past the server's time limit."""
+
+    code = "timeout"
+
+
+class OutputTooLargeError(CoreError):
+    """A result is larger than the server's output budget."""
+
+    code = "output_too_large"

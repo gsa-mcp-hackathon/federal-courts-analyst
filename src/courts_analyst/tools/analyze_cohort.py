@@ -23,8 +23,10 @@ Not for published statistics (get_official_figure) or whole-court changes \
 
 Returns one value per group with n (cases it's computed over) and a 95% \
 confidence interval (Wilson for shares, order statistics for medians). \
-Groups under 30 cases carry a caution; under 10 the value is withheld: say \
-there are too few cases rather than guessing. Report n with every figure.
+Groups under 30 cases carry a caution; under 10 the value and n are \
+withheld (null, status 'suppressed'), as is the next smallest group where \
+needed: say there are too few cases rather than guessing. Report n with \
+every figure.
 
 Example: handle from find_cases(courts=['DE'], fy_from=2019, fy_to=2019, \
 nos_codes=['830']), metric='median_days_to_disposition' → 166 days \

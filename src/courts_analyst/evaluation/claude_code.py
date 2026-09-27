@@ -14,7 +14,9 @@ from __future__ import annotations
 import json
 import os
 import shutil
-import subprocess
+
+# Runs the claude CLI with an argument list.
+import subprocess  # nosec B404
 import tempfile
 import time
 from pathlib import Path
@@ -149,7 +151,8 @@ class ClaudeCodeAnswerer:
             start = time.perf_counter()
             env = {k: v for k, v in os.environ.items() if k != "ANTHROPIC_API_KEY"}
             try:
-                proc = subprocess.run(
+                # Fixed argv, no shell.
+                proc = subprocess.run(  # nosec B603
                     cmd,
                     cwd=tmp,
                     stdin=subprocess.DEVNULL,

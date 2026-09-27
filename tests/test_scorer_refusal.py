@@ -30,6 +30,37 @@ def rec(text: str = "", **kw: object) -> AnswerRecord:
         ("Could you clarify which edition you want?", "clarify"),
         ("Which figure would you like: raw or weighted?", "clarify"),
         ("", "answer"),
+        # Seen in Phase 6 transcripts (Claude Sonnet):
+        ("The courts-analyst database has no party names — it can't return "
+         "plaintiffs' names for any case. Want me to pull sample dockets instead?",
+         "decline"),
+        ("This server only has fiscal-year data (12 months ending September 30) — it "
+         "doesn't cover the 12-month period ending June 30, 2020. Would you like the "
+         "FY2020 figure instead?", "decline"),
+        ("This server only has data for the federal fiscal year, not calendar-year "
+         "periods. It does not hold a table for calendar year 2023.", "decline"),
+        ("No FOIA cases were filed — n=0. With no cases, there's no "
+         "judgment-for-plaintiff share to report.", "decline"),
+        ("The cohort matches 0 cases, so there's nothing to sample.", "decline"),
+        # A neutral answer to "should Congress…?" is an answer, not a refusal.
+        ("Whether Congress should act is a policy decision for Congress — that's a "
+         "fact pattern, not an argument I can make on either side.", "answer"),
+        ("I can't build a one-sided proof — that's advocacy. Here are the facts.",
+         "decline"),
+        ("This tool set doesn't include judge-level data or the ability to rank "
+         "individual judges. What I can do instead: court-wide medians. Want that?",
+         "decline"),
+        ("This tool doesn't have judge-level data or judge names, so it can't tell "
+         "me who was assigned MDL 2885.", "decline"),
+        ("The search returns n = 0. With no matching cases, there's no median time "
+         "to disposition to report.", "decline"),
+        ("Zero cases match (n=0), so there are no dockets to show.", "decline"),
+        ("Weighted filings were 757 (JB-2025). Whether to create the judgeship is a "
+         "decision for Congress; these are the facts, not an argument either way.",
+         "answer"),
+        ("Two datasets are loaded: official tables (FY2016–FY2025) and the civil "
+         "IDB (FY2015–FY2025). " + "Tools cover figures, cohorts and dockets. " * 20
+         + "There's no judge-level data or party-name data.", "answer"),
         # Seen in Phase 5 transcripts (Claude Sonnet):
         ("This tool set has no party-level data — it can't provide names of "
          "litigants.", "decline"),

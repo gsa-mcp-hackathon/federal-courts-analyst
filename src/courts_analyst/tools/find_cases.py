@@ -83,11 +83,15 @@ def register(mcp: FastMCP) -> None:
         pro_se: list[ProSeGroup] | None = None,
         class_action: bool | None = None,
         mdl_docket: Annotated[
-            str | None, Field(description="MDL docket number, e.g. '2885'.")
+            str | None,
+            Field(pattern=r"^\d{1,5}$", description="MDL docket number, e.g. '2885'."),
         ] = None,
         parent_handle: Annotated[
             str | None,
-            Field(description="Refine this cohort: its filters plus the ones given."),
+            Field(
+                pattern=r"^coh_[0-9a-f]{12}$",
+                description="Refine this cohort: its filters plus the ones given.",
+            ),
         ] = None,
     ) -> Result[CohortSummary]:
         given = {

@@ -16,12 +16,16 @@ Built on the [GSA MCP hackathon template](https://github.com/GSA-TTS/mcp-hackath
 with [FastMCP 4](https://gofastmcp.com) (MCP spec 2026-07-28, backward compatible
 with 2025-11-25 clients) and [uv](https://docs.astral.sh/uv/).
 
-> **Status: Phase 5 (MCP server).** Nine analysis tools plus `server_info`,
-> six resources and four prompts over an edition-aware catalog of the official
-> tables (FY2016–FY2025, 60 table editions) and the FJC civil IDB
-> (FY2015–FY2025). An eval benchmark of 152 questions scores every answer
-> deterministically. Guardrails (P6), the agent API (P7) and the web app (P8)
-> follow.
+> **Status: Phase 6 (guardrails and security).** Nine analysis tools plus
+> `server_info`, six resources and four prompts over an edition-aware catalog
+> of the official tables (FY2016–FY2025, 60 table editions) and the FJC civil
+> IDB (FY2015–FY2025). One guardrail layer covers every tool: small-cell and
+> complementary suppression, never-mix-vintages series, factual answers for
+> periods not held, structured declines for judge-level and party-name
+> requests, and an output scanner for party names. The HTTP endpoint and
+> container are hardened ([SECURITY.md](SECURITY.md)). An eval benchmark of
+> 173 questions scores every answer deterministically. The agent API (P7) and
+> the web app (P8) follow.
 
 ## Tools
 

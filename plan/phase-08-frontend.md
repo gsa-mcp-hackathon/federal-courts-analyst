@@ -32,7 +32,9 @@
 | Component | What it does |
 | --- | --- |
 | `ProvenanceBadge` | Small pill beside every number ("JFF 2023 · Table 6.2"). Hover/focus opens a card with series, edition, period, definition, cell reference, source link, and "copy citation" |
-| `RevisionChip` | Amber chip: "Revised · first published as 554 (JB 2020)". Click opens the Edition Tracker for that figure |
+| `RevisionChip` | Amber chip: "Revised · first published as 554 (JB 2020)" (the result's `citation`). Click opens the Edition Tracker for that figure |
+| `DeclineCard` | For `status: "declined"`: the message, the policy with its source, and the alternative as a one-click follow-up |
+| `SuppressedCell` | "fewer than 10" for `n: null` / `suppressed: true`, with a tooltip explaining small-cell rules |
 | `ReconciliationBadge` | Matched / explained variance / unexplained, with the variance explanation on hover |
 | `WarningCallout` | Guardrail warnings (small cell, data break, period mismatch, inferred) in consistent, non-alarming styles |
 | `VintageChart` | **The hero visual.** X = fiscal year, one line per edition. Where editions disagree, the gap is shaded amber and annotated. The 554 → 322 story in one picture |
@@ -47,7 +49,7 @@
 
 1. **Ask** (home): a single question box with example questions. Streaming answer in serif, citations inline, charts and docket cards in the evidence rail, `ToolTrace` below. Shareable URL per conversation (replayed from stored events).
 2. **Explore:** district map + sortable ranking table, fiscal year slider, edition selector ("current" vs "as first published"), measure toggle (raw vs weighted).
-3. **Edition Tracker:** pick a measure and court; see the vintage chart and a revision table. Deep-linkable (`/editions/weighted-filings-per-judgeship/national/2020`).
+3. **Edition Tracker:** pick a measure and court; see the vintage chart and a revision table. The chart plots one consistent series per line (`official_series`, Phase 6); when the server refuses a mixed series, show why instead of splicing. Deep-linkable (`/editions/weighted-filings-per-judgeship/national/2020`).
 4. **Court profile:** a district's caseload profile: trends, NOS mix, median time to disposition, judgeship context against thresholds, recent revisions, reconciliation status.
 5. **Evaluation:** results dashboard from P10: accuracy by suite, lift over web search and Genie, per-model comparison, error taxonomy, latency. Numbers link to the individual scored items.
 6. **Methodology:** glossary, data sources, editions explained, guardrail policies, limitations. Rendered from the same Markdown the MCP resources serve.

@@ -1,5 +1,5 @@
 """Small, dependency-free statistics: Wilson intervals for rates, a
-distribution-free interval for medians, and the small-cell rule.
+distribution-free interval for medians.
 
 The median interval uses order statistics (the binomial method), not a
 bootstrap: it is exact in coverage for continuous data, needs no random
@@ -11,24 +11,24 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from typing import Final, Literal
+from typing import Final
+
+from courts_analyst.core.guardrails.policy import SMALL_CELL_SUPPRESS, SMALL_CELL_WARN
+from courts_analyst.core.guardrails.small_cells import CellStatus, cell_status
 
 Z95: Final = 1.959963984540054
 
-SMALL_CELL_WARN: Final = 30
-"""Below this many cases a result is reported with a caution (plan decision 3)."""
-SMALL_CELL_SUPPRESS: Final = 10
-"""Below this many cases a value is withheld (plan decision 3; Phase 6 reviews)."""
-
-CellStatus = Literal["ok", "small", "suppressed"]
-
-
-def cell_status(n: int) -> CellStatus:
-    if n < SMALL_CELL_SUPPRESS:
-        return "suppressed"
-    if n < SMALL_CELL_WARN:
-        return "small"
-    return "ok"
+# The small-cell rule lives with the other guardrails (core/guardrails/); it is
+# re-exported here for the metric code that applies it.
+__all__ = [
+    "SMALL_CELL_SUPPRESS",
+    "SMALL_CELL_WARN",
+    "CellStatus",
+    "Interval",
+    "cell_status",
+    "median_ci_ranks",
+    "wilson",
+]
 
 
 @dataclass(frozen=True, slots=True)

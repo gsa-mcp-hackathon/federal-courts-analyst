@@ -20,6 +20,11 @@ The filings effect is then split by district from Table X-1A (district value
 Business series has district rows, so the decomposition uses it and says so;
 later JFF revisions of the national figure are reported as a driver.
 
+Both years' official values come from one consistent vintage (the
+never-mix-vintages rule, ``core/guardrails/vintage``), and IDB breakdown rows
+with fewer than 10 cases in both years fold into "All other" (with enough
+others that none can be recovered), so the breakdowns still add up exactly.
+
 **Drivers** are then detected and labelled by what backs them:
 ``official`` (read from a table), ``idb_derived`` (counted from IDB records),
 ``inferred`` (our reasoning, not an official statement) or ``context``.
@@ -39,6 +44,9 @@ from courts_analyst.core.cohorts import expand_courts, idb_provenance
 from courts_analyst.core.courts import COURTS, CourtLevel
 from courts_analyst.core.db import Database
 from courts_analyst.core.errors import InvalidCohortError, OutOfScopeError
+from courts_analyst.core.guardrails import guarded
+from courts_analyst.core.guardrails.small_cells import protect_pairs
+from courts_analyst.core.guardrails.vintage import choose_vintage
 from courts_analyst.core.measures import PENDING_WHERE, Measure, get_measure
 from courts_analyst.core.numbers import fmt, round_half_up
 from courts_analyst.core.provenance import FigureRef, Period, Provenance, series_title
@@ -147,18 +155,25 @@ def contributions(
     labels: dict[str, str] | None = None,
     limit: int = MAX_ROWS,
     other_label: str = "All other",
+    small_cells: bool = False,
 ) -> list[Contribution]:
     """Per-key changes, largest first, that sum exactly to the total change.
 
-    Keys beyond ``limit`` fold into one "All other" row. The first rows are
-    marked ``key_contributor`` until their cumulative change reaches 80% of
-    the total (in its direction).
+    Keys beyond ``limit`` fold into one "All other" row; with ``small_cells``
+    (case counts from the IDB) so do rows under 10 cases in both years, plus
+    enough others that none of them can be recovered from the "All other"
+    row. The first rows are marked ``key_contributor`` until their cumulative
+    change reaches 80% of the total (in its direction).
     """
     keys = set(before) | set(after)
     total = sum(after.values()) - sum(before.values())
     rows = [(k, before.get(k, 0.0), after.get(k, 0.0)) for k in keys]
     rows.sort(key=lambda r: (-abs(r[2] - r[1]), r[0]))
-    head, tail = rows[:limit], rows[limit:]
+    hidden = set(range(limit, len(rows)))
+    if small_cells:
+        hidden = protect_pairs([(a, b) for _, a, b in rows], hidden)
+    head = [r for i, r in enumerate(rows) if i not in hidden]
+    tail = [r for i, r in enumerate(rows) if i in hidden]
     out: list[Contribution] = []
     for k, a, b in head:
         out.append(
@@ -301,7 +316,8 @@ def _data_breaks(db: Database, a: int, b: int, groups: Iterable[str]) -> list[Dr
         "SELECT id, field, codes, summary, detail FROM idb.data_breaks "
         "WHERE date > CAST(? AS DATE) AND date <= CAST(? AS DATE) "
         "AND id NOT IN ('release-snapshot', 'pandemic-2020')",
-        [f"{a}-09-30", f"{b}-09-30"],
+        # From the start of FY a: a break during FY a already splits that year.
+        [f"{a - 1}-09-30", f"{b}-09-30"],
     )
     from courts_analyst.core.enums import nos_entry
 
@@ -370,6 +386,7 @@ def _mdl_driver(
         {f"{k[0]}|{k[1]}": v for k, v in before.items()},
         {f"{k[0]}|{k[1]}": v for k, v in after.items()},
         limit=3,
+        small_cells=True,
     )
     top = [
         f"{_name(k[0])} MDL {k[1]} {c.change:+,.0f}"
@@ -407,12 +424,13 @@ def _pair_contributions(before: Cells, after: Cells) -> list[Contribution]:
     b2 = {f"{k[0]}|{k[1]}": v for k, v in before.items()}
     a2 = {f"{k[0]}|{k[1]}": v for k, v in after.items()}
     labels = {k: f"{_name(_split(k)[0])} · {_split(k)[1]}" for k in set(b2) | set(a2)}
-    return contributions(b2, a2, labels)
+    return contributions(b2, a2, labels, small_cells=True)
 
 
 # ── entry point ──────────────────────────────────────────────────────────────
 
 
+@guarded
 def explain_change(
     db: Database,
     measure: str,
@@ -450,10 +468,14 @@ def _headline(m: Measure, court: str, a: int, b: int, change: float, lead: str) 
 def _explain_count(
     db: Database, m: Measure, court: str, a: int, b: int
 ) -> Result[ChangeExplanation]:
-    first = _need_chain(db, m, court, a)[-1]
-    second = _need_chain(db, m, court, b)[-1]
+    vintage = choose_vintage(
+        {a: _need_chain(db, m, court, a), b: _need_chain(db, m, court, b)},
+        "latest",
+        measure=m.id,
+    )
+    first, second = vintage.points[a], vintage.points[b]
     official_change = second.shown - first.shown
-    warnings: list[Caveat] = []
+    warnings: list[Caveat] = list(vintage.warnings)
     provenance: list[Provenance] = [
         Provenance(
             source="official_table",
@@ -476,12 +498,15 @@ def _explain_count(
         before, after = _idb_cells(db, m.idb, districts, a, b)
         idb_a, idb_b = int(sum(before.values())), int(sum(after.values()))
         idb_change = idb_b - idb_a
-        by_type = contributions(_collapse(before, 1), _collapse(after, 1))
+        by_type = contributions(
+            _collapse(before, 1), _collapse(after, 1), small_cells=True
+        )
         by_district = (
             contributions(
                 _collapse(before, 0),
                 _collapse(after, 0),
                 {d: _name(d) for d in districts},
+                small_cells=True,
             )
             if len(districts) > 1
             else []
@@ -545,7 +570,16 @@ def _explain_count(
     drivers += rev
     warnings += rev_warn
     groups = [c.key for c in data.get("by_case_type", []) if c.key_contributor]
-    drivers += _data_breaks(db, a, b, groups)
+    breaks = _data_breaks(db, a, b, groups)
+    drivers += breaks
+    warnings += [
+        Caveat(
+            code="data_break",
+            message=f"The window crosses a data break: {d.title} "
+            f"({d.evidence.rsplit('(', 1)[-1]}",
+        )
+        for d in breaks
+    ]
     court_obj = COURTS[court]
     result = ChangeExplanation(
         measure=m.id,
@@ -583,8 +617,12 @@ def _explain_per_judgeship(
 ) -> Result[ChangeExplanation]:
     ca = _need_chain(db, m, court, a)
     cb = _need_chain(db, m, court, b)
-    # The first-published Judicial Business series is the one with districts.
-    fa, fb = ca[0], cb[0]
+    # The first-published Judicial Business series is the one with districts;
+    # when a year predates it (1990 is JFF-only), one JFF edition printing
+    # both years keeps the pair in one series.
+    vintage = choose_vintage({a: ca, b: cb}, "first_published", measure=m.id)
+    fa, fb = vintage.points[a], vintage.points[b]
+    with_districts = fa.edition.startswith("JB") and fb.edition.startswith("JB")
     ja = _need_chain(db, get_measure("authorized_judgeships"), court, a)
     jb = _need_chain(db, get_measure("authorized_judgeships"), court, b)
     j1 = next((r.value for r in ja if r.edition == fa.edition), ja[0].value)
@@ -592,10 +630,10 @@ def _explain_per_judgeship(
     f1, f2 = fa.value * j1, fb.value * j2
     filings_eff, judge_eff = shift_share(f1, j1, f2, j2)
     change = fb.value - fa.value
-    warnings: list[Caveat] = []
+    warnings: list[Caveat] = list(vintage.warnings)
     drivers: list[Driver] = []
     by_district: list[Contribution] = []
-    if COURTS[court].level is not CourtLevel.DISTRICT:
+    if COURTS[court].level is not CourtLevel.DISTRICT and with_districts:
         districts = expand_courts([court])
         scale = (1 / j1 + 1 / j2) / 2
         w: dict[str, dict[str, float]] = {"a": {}, "b": {}}
@@ -654,9 +692,15 @@ def _explain_per_judgeship(
             Caveat(
                 code="revised_figure",
                 message=(
-                    f"The breakdown uses the first-published values ({fa.edition}: "
-                    f"{fmt(fa.shown)}; {fb.edition}: {fmt(fb.shown)}), the only "
-                    f"series with district rows. The current official figures are "
+                    f"The breakdown uses {fa.edition}: {fmt(fa.shown)} and "
+                    f"{fb.edition}: {fmt(fb.shown)}"
+                    + (
+                        ", the first-published series (the only one with district "
+                        "rows). "
+                        if with_districts
+                        else ", one series for both years. "
+                    )
+                    + "The current official figures are "
                     f"{ca[-1].shown:g} ({ca[-1].edition}) and {cb[-1].shown:g} "
                     f"({cb[-1].edition})."
                 ),
@@ -690,6 +734,9 @@ def _explain_per_judgeship(
         decomposition_series=(
             f"First-published Table X-1A ({fa.edition}, {fb.edition}): district "
             "value × district judgeships; exact shift-share split."
+            if with_districts
+            else f"{fa.edition} national values for both years (no district rows "
+            "in that series); exact shift-share split."
         ),
         by_district=by_district,
         drivers=drivers,

@@ -4,6 +4,7 @@
 - ``build``    normalize and load it into DATA_DIR/build/idb.duckdb (offline)
 - ``profile``  regenerate docs/data-profile.md from the built database
 - ``sample``   write the committed CI fixture (tests/fixtures/idb/)
+- ``pii-index`` rebuild only the output scanner's hashed party-name index
 - ``all``      fetch, build, profile (what ``make data-idb`` runs)
 """
 
@@ -16,8 +17,9 @@ import time
 from pathlib import Path
 
 from courts_analyst.config import settings
+from courts_analyst.core.db import PII_INDEX_NAME
 from courts_analyst.pipeline.idb.fetch import Downloader, Pin, ReleaseChangedError
-from courts_analyst.pipeline.idb.load import build_idb, write_report
+from courts_analyst.pipeline.idb.load import build_idb, build_pii_index, write_report
 from courts_analyst.pipeline.idb.manifest import dump_manifest, load_manifest
 from courts_analyst.pipeline.idb.normalize import normalize_zip
 from courts_analyst.pipeline.idb.profile import write_profile
@@ -32,7 +34,9 @@ SAMPLE_ZIP = ROOT / "tests" / "fixtures" / "idb" / "cv_sample.zip"
 
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="courts_analyst.pipeline.idb", description=__doc__)
-    p.add_argument("command", choices=["fetch", "build", "profile", "sample", "all"])
+    p.add_argument(
+        "command", choices=["fetch", "build", "profile", "sample", "pii-index", "all"]
+    )
     p.add_argument("--manifest", type=Path, default=MANIFEST)
     p.add_argument(
         "--zip", type=Path, default=None, help="build from this zip, not the download"
@@ -57,6 +61,12 @@ def main(argv: list[str] | None = None) -> int:
     db_path = settings.resolved_idb_path
     fy_from = args.fy_from or manifest.fy_from
     fy_to = args.fy_to or manifest.fy_to
+
+    if args.command == "pii-index":
+        out = db_path.with_name(PII_INDEX_NAME)
+        n = build_pii_index(settings.idb_parties_path, out)
+        print(f"pii index: {n:,} hashed names -> {out}")
+        return 0
 
     if args.command in ("fetch", "all"):
         try:

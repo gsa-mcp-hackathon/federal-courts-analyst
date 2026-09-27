@@ -3,7 +3,12 @@ cross-court comparisons that never mix editions.
 
 Default edition policy (ADR 0004): return the **latest** edition's value and
 always attach the first-published value and every revision in between, so
-the 554 → 322 story is visible without anyone having to ask for it.
+the 554 → 322 story is visible without anyone having to ask for it. Every
+figure also carries a one-line ``citation`` that names the edition and the
+revision, so even a "just one number" answer can't drop them.
+
+Multi-year series (:func:`official_series`) follow the never-mix-vintages
+rule in ``core/guardrails/vintage``.
 """
 
 from __future__ import annotations
@@ -23,11 +28,19 @@ from courts_analyst.core.courts import COURTS, TERRITORIAL, CourtLevel
 from courts_analyst.core.db import Database
 from courts_analyst.core.enums import EDITIONS
 from courts_analyst.core.errors import (
+    InvalidCohortError,
     NotPublishedError,
     OutOfScopeError,
     UnknownCourtError,
     UnknownEditionError,
 )
+from courts_analyst.core.guardrails import guarded
+from courts_analyst.core.guardrails.periods import (
+    PeriodEnding,
+    check_period,
+    period_caveats,
+)
+from courts_analyst.core.guardrails.vintage import choose_vintage
 from courts_analyst.core.measures import Measure, get_measure
 from courts_analyst.core.numbers import fmt, round_half_up
 from courts_analyst.core.provenance import (
@@ -73,6 +86,10 @@ class OfficialFigure(BaseModel):
     court_name: str
     fiscal_year: int
     value: float = Field(description="The value as printed in `edition`.")
+    citation: str = Field(
+        description="One line to quote with the number: value, edition, table and, "
+        "when editions disagree, the revision."
+    )
     edition: str
     table_code: str
     period: Period
@@ -178,19 +195,48 @@ def _select(chain: list[Row], edition: str | None) -> Row:
     )
 
 
+def citation(row: Row, chain: list[Row], period: Period) -> str:
+    """ "322 (JFF-2025, Table 1.4); revised: first published as 554 (JB-2020)"."""
+    first, latest = chain[0], chain[-1]
+    text = f"{fmt(row.shown)} ({row.edition}, Table {row.table_code})"
+    if len({r.shown for r in chain}) > 1:
+        if row.shown != first.shown:
+            text += (
+                f"; revised: first published as {fmt(first.shown)} ({first.edition})"
+            )
+        if row.shown != latest.shown:
+            text += f"; later revised to {fmt(latest.shown)} ({latest.edition})"
+    if period.period_type == "statistical_year":
+        text += f"; statistical year ending June 30, {period.fiscal_year}"
+    return text
+
+
+@guarded
 def get_official_figure(
     db: Database,
     measure: str,
     court: str,
     fiscal_year: int,
     edition: str | None = None,
+    period_ending: PeriodEnding = "september_30",
 ) -> Result[OfficialFigure]:
-    """A published figure with its edition, definition and revision history."""
+    """A published figure with its edition, definition and revision history.
+
+    ``period_ending`` other than September 30 is answered only where the
+    catalog holds that period (the 1990 statistical-year rows); otherwise the
+    error says what the server holds and the nearest fiscal year."""
     m = get_measure(measure)
     _check_court(court)
     chain = load_chain(db, measure, court, fiscal_year)
     if not chain:
+        if period_ending != "september_30":
+            check_period(period_ending, fiscal_year, [])
         raise _missing(db, m, court, fiscal_year)
+    check_period(
+        period_ending,
+        fiscal_year,
+        [Period.for_end(fiscal_year, r.period_end) for r in chain],
+    )
     row = _select(chain, edition)
     status = revision_status(chain)
     first, latest = chain[0], chain[-1]
@@ -209,6 +255,7 @@ def get_official_figure(
         court_name=court_obj.citation or court_obj.name,
         fiscal_year=fiscal_year,
         value=row.shown,
+        citation=citation(row, chain, period),
         edition=row.edition,
         table_code=row.table_code,
         period=period,
@@ -278,6 +325,7 @@ def _expand(courts: list[str] | None) -> list[str]:
     return out
 
 
+@guarded
 def compare_courts(
     db: Database,
     measure: str,
@@ -381,3 +429,129 @@ def compare_courts(
         total_courts=len([r for r in rows if r[0] != "US"]),
     )
     return ok(data, [prov], warnings)
+
+
+# ── Series (never mix vintages) ──────────────────────────────────────────────
+
+MAX_SERIES_YEARS = 40
+
+
+class SeriesPoint(BaseModel):
+    fiscal_year: int
+    value: float
+    edition: str
+    table_code: str
+    period: Period
+    revision_status: RevisionStatus
+    first_published: FigureRef
+    cell_ref: str | None = None
+
+
+class OfficialSeries(BaseModel):
+    """One measure over several years, every point from one consistent series
+    unless mixing was explicitly requested (then each point names its edition)."""
+
+    measure: str
+    measure_label: str
+    unit: str
+    court: str
+    court_name: str
+    vintage: str = Field(description="How the points were chosen.")
+    consistent: bool = Field(
+        description="False only when allow_mixed was set and the points come "
+        "from editions that don't form one series."
+    )
+    points: list[SeriesPoint]
+    years_not_published: list[int] = Field(default_factory=list)
+
+
+@guarded
+def official_series(
+    db: Database,
+    measure: str,
+    court: str,
+    fy_from: int,
+    fy_to: int,
+    edition: str | None = None,
+    allow_mixed: bool = False,
+) -> Result[OfficialSeries]:
+    """A measure for each published year in ``fy_from``–``fy_to``.
+
+    Years the catalog doesn't print are listed in ``years_not_published``.
+    Raises ``mixed_editions`` when the years don't come from one consistent
+    series (see ``core/guardrails/vintage``), unless ``allow_mixed``.
+    """
+    m = get_measure(measure)
+    _check_court(court)
+    if fy_from > fy_to or fy_to - fy_from >= MAX_SERIES_YEARS:
+        raise InvalidCohortError(
+            f"fy_from must be <= fy_to and the range at most {MAX_SERIES_YEARS} years."
+        )
+    chains = {}
+    missing = []
+    for fy in range(fy_from, fy_to + 1):
+        chain = load_chain(db, measure, court, fy)
+        if chain:
+            chains[fy] = chain
+        else:
+            missing.append(fy)
+    if not chains:
+        raise _missing(db, m, court, fy_from)
+    v = choose_vintage(chains, edition, allow_mixed, measure=m.id)
+    points = []
+    provenance = []
+    for fy, row in sorted(v.points.items()):
+        chain = chains[fy]
+        period = Period.for_end(fy, row.period_end)
+        status = revision_status(chain)
+        points.append(
+            SeriesPoint(
+                fiscal_year=fy,
+                value=row.shown,
+                edition=row.edition,
+                table_code=row.table_code,
+                period=period,
+                revision_status=status,
+                first_published=chain[0].ref(),
+                cell_ref=row.cell_ref,
+            )
+        )
+        provenance.append(
+            Provenance(
+                source="official_table",
+                table_code=row.table_code,
+                series=series_title(row.edition),
+                edition=row.edition,
+                period=period,
+                definition=m.definition,
+                url=row.url,
+                cell_ref=row.cell_ref,
+                revision_status=status,
+                first_published=chain[0].ref(),
+                later_revisions=later_revisions(chain),
+            )
+        )
+    court_obj = COURTS[court]
+    data = OfficialSeries(
+        measure=m.id,
+        measure_label=m.label,
+        unit=m.unit,
+        court=court,
+        court_name=court_obj.citation or court_obj.name,
+        vintage=v.label,
+        consistent=v.consistent,
+        points=points,
+        years_not_published=missing,
+    )
+    warnings = list(v.warnings) + period_caveats(p.period for p in points)
+    if missing:
+        warnings.append(
+            Caveat(
+                code="out_of_scope",
+                severity="info",
+                message="Not published for "
+                + ", ".join(f"FY{fy}" for fy in missing)
+                + ".",
+            )
+        )
+    return ok(data, provenance, warnings)

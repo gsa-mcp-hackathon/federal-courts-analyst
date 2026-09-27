@@ -9,7 +9,7 @@ from pydantic import Field
 
 from courts_analyst.core.glossary import TermLookup, explain_term
 from courts_analyst.core.results import Result
-from courts_analyst.tools._common import READ_ONLY, core_errors
+from courts_analyst.tools._common import READ_ONLY, core_errors, get_db
 
 DESCRIPTION = """\
 Use this when the user asks what a term, code or statistic means: "weighted \
@@ -38,4 +38,4 @@ def register(mcp: FastMCP) -> None:
     async def explain_term_tool(
         term: Annotated[str, Field(min_length=1, max_length=120)],
     ) -> Result[TermLookup]:
-        return explain_term(term)
+        return explain_term(term, get_db())
