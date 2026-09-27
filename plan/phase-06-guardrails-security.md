@@ -101,7 +101,9 @@ Implemented in `core/guardrails/`, one module per policy, each returning `Warnin
 
 Adversarial behaviour, run 2: decline precision **100%**, recall **100%** (32/32); on dev, decline 16/16 precision and recall in both runs (threshold 0.9). The two misses: `adv-one-number-please` (dev: the model answered "322 (JFF-2025)" and dropped the revision despite `citation`) and `adv-filings-ambiguous-type` (test: answered the combined total and offered civil-only instead of asking). Latency p50 6–11 s, p95 8–19 s per question. Runs: [eval/results/](../eval/results/README.md).
 
-**Automated tests:** 884 passed in the default suite (up from 716 in Phase 5), coverage **94.3%** overall and **97%** on `core/`. `make docker-test` 8/8 with the image running read-only, `--cap-drop ALL`, `no-new-privileges`. Lint, format, mypy clean. `make security`: pip-audit (every dependency group) no known vulnerabilities, bandit clean (two documented skips), detect-secrets clean against an audited baseline.
+**CI:** green on [PR #26](https://github.com/syedaun-techsur/federal-courts-analyst/pull/26) (lint, security, test 3.11, test 3.12, docker).
+
+**Automated tests:** 885 passed in the default suite (up from 716 in Phase 5), coverage **94.3%** overall and **97%** on `core/`. `make docker-test` 8/8 with the image running read-only, `--cap-drop ALL`, `no-new-privileges`. Lint, format, mypy clean. `make security`: pip-audit (every dependency group) no known vulnerabilities, bandit clean (two documented skips), detect-secrets clean against an audited baseline.
 
 | Suite | Checks |
 | --- | --- |
