@@ -45,12 +45,10 @@ _STRONG = re.compile(
     r"|hasn't\s+happened"
     r"|no\s+(?:[\w-]+\s+){0,3}(?:figure|data|median|value|share|rate|statistic)\s+to\s+"
     r"report|nothing\s+to\s+(?:sample|report|show|list)"
-    # Advocacy declined ("… not an argument I can make on either side").
-    r"|not\s+(?:an\s+argument|something|a\s+case)\s+I\s+(?:can|will|'ll)\s+(?:make|argue)"
+    r"|no\s+(?:[\w-]+\s+){0,5}to\s+(?:report|show|list|sample)\b"
     r"|(?:there's|there\s+is)\s+no\s+(?:published|official)|no\s+published\s+"
     r"(?:\w+\s+)?(?:figure|value|data|table)"
     r"|(?:result|figure|count|value)\s+(?:is|was)\s+(?:suppressed|withheld)"
-    r"|no\s+party[\s-]level\s+data|no\s+judge[\s-]level"
     r")",
     re.I,
 )
@@ -71,6 +69,10 @@ _WEAK = re.compile(
     r"|too\s+few\b|fewer\s+than\s+\d+\b|(?:sample|cohort)\s+is\s+too\s+small"
     r"|no\s+reportable|can(?:no|')t\s+be\s+(?:calculated|computed)|nothing\s+to\s+compute"
     r"|no\s+denominator|(?:result|rate)\s+is\s+undefined"
+    # "no judge-level data" opens a refusal but closes many answers as a caveat.
+    r"|no\s+(?:party|judge)[\s-]level"
+    r"|(?:doesn't|does\s+not|don't|do\s+not)\s+(?:have|include)\s+(?:any\s+)?"
+    r"(?:judge|party)[\s-]level"
     r")",
     re.I,
 )

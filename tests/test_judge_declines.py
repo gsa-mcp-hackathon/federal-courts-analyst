@@ -138,7 +138,7 @@ def _enum_values(obj: Any) -> list[str]:
 
 async def test_no_tool_input_can_name_a_judge(client: Client) -> None:
     for tool in await client.list_tools():
-        schema = tool.inputSchema
+        schema = tool.input_schema
         assert not [p for p in _properties(schema) if JUDGEISH.search(p)], tool.name
         assert not [v for v in _enum_values(schema) if JUDGEISH.search(v)], tool.name
 

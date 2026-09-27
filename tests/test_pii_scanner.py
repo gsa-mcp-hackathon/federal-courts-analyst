@@ -79,6 +79,10 @@ def test_vocabulary_and_boundaries(tmp_path: Path) -> None:
     assert scanner.hits({"x": "the United States courts"}) == []  # our own vocabulary
     assert scanner.hits({"x": "Filings for W.D. La. rose by 41"}) == []  # boundary
     assert scanner.hits({"x": "La Rose v. Smith"}) == ["LA ROSE"]
+    pii.build_index(["THRESHOLDS THE", "C R BARD INC"], path)
+    scanner = pii.Scanner(pii.PiiIndex(path))
+    assert scanner.hits({"x": "above the 600 thresholds. The Conference"}) == []
+    assert scanner.hits({"x": "sued C. R. BARD, INC. in 2020"}) == ["C R BARD INC"]
 
 
 def test_missing_index_fails_closed_for_idb_results(

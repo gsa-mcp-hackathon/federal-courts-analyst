@@ -40,7 +40,10 @@ MAX_WORDS: Final = 8
 """Longest name indexed, in words (IDB name fields hold 30 characters)."""
 _KEY: Final = b"federal-courts-analyst/pii/v1"
 _NON_WORD = re.compile(r"[^A-Z0-9&]+")
-_SEPARATORS = re.compile(r"[|·;\n]+")
+# Field separators, and a sentence break in the server's own prose (a period
+# after a lower-case word, then a capital). IDB names are upper case, so
+# "C. R. BARD" is never split.
+_SEPARATORS = re.compile(r"[|·;\n]+|(?<=[a-z]{2})[.!?]\s+(?=[A-Z])")
 _DROP_TAIL: Final = ("ET AL", "ETC", "ET AL ETC")
 
 
@@ -137,8 +140,9 @@ class PiiIndex:
     def matches(self, text: str) -> Iterator[str]:
         """Every indexed name that appears as a run of words in ``text``.
 
-        A run never crosses a separator ("|", "·", ";", a line break): keys
-        like "LA-E|Insurance" join two fields, not the words of one name."""
+        A run never crosses a separator ("|", "·", ";", a line break) or a
+        sentence break in prose: keys like "LA-E|Insurance" join two fields,
+        and two sentences don't form one name."""
         for segment in _SEPARATORS.split(text):
             yield from self._matches(normalize(segment))
 
