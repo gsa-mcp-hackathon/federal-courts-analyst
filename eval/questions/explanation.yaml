@@ -18,7 +18,7 @@
       kind: mentions
       any: [3M, earplug, Combat Arms]
   expected_tools: [explain_change]
-  tags: [demo, fy2020, mdl, change]
+  tags: [smoke, demo, fy2020, mdl, change]
   notes: >-
     IDB: FY2019→FY2020 filings +173,239; N.D. Fla. +199,881, of which 200,570 more
     direct-filed MDL cases (MDL 2885, 3M Combat Arms earplugs).
@@ -93,7 +93,7 @@
       kind: mentions
       any: [Northern District of Florida, N.D. Fla, FL-N]
   expected_tools: [explain_change]
-  tags: [change, mdl, terminations]
+  tags: [smoke, change, mdl, terminations]
   notes: C-1 terminations 293,677 (FY2023) → 396,635 (FY2024); IDB N.D. Fla. +104,167.
 - id: why-fy2017-sdwva-terminations
   question: Which district drove the increase in civil terminations from FY2016 to FY2017?
@@ -146,7 +146,7 @@
       any: [revised, restated, updated, later edition, prior-year, prior year]
   expected_tools: [get_official_figure]
   acceptable_tools: [reconcile]
-  tags: [edition_trap, pending]
+  tags: [smoke, edition_trap, pending]
   notes: >-
     JB-2018 Table C-1 prints the FY2017 closing pending count as 366,195 (vs 339,131 in
     JB-2017). The IDB reconstruction lands near the restated figure (issue #11).
@@ -258,7 +258,7 @@
       kind: mentions
       any: [civil rights]
   expected_tools: [explain_term]
-  tags: [definition, nos]
+  tags: [smoke, definition, nos]
 - id: explain-judgeship-thresholds
   question: What weighted-filings thresholds does the Judicial Conference use when it considers new judgeships?
   claims:

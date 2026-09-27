@@ -1,6 +1,7 @@
 # Nightly evaluation. Today: validate the question bank and self-check the
 # harness (gold must score 100%, null 0%) with no model calls. Phase 10 adds
-# the model runs (needs API key secrets) on a small budget.
+# a model run of the 20-question smoke set (`--tag smoke`) once API key
+# secrets exist (#18); the full bank is run by hand at phase ends.
 name: Eval (nightly)
 
 on:

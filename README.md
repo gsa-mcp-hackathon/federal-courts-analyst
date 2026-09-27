@@ -94,7 +94,7 @@ More in [QUICKSTART.md](QUICKSTART.md).
 | `data-discover` | Re-crawl uscourts.gov and rewrite the table manifest (review the diff) |
 | `data` | Both datasets (`data-tables` + `data-idb`) |
 | `eval-validate` / `eval` | Validate the question bank / harness self-check (gold 100%, null 0%) |
-| `eval-claude` | Tool-selection and e2e dev split with Claude (headless Claude Code + this server) |
+| `eval-claude` | The 20-question smoke set with Claude (headless Claude Code + this server) |
 | `variance-report` | Reconcile every court-year into `docs/variance-report.md` |
 | `schemas` | Export result JSON Schemas for the frontend |
 | `web` | Placeholder until Phase 8 |

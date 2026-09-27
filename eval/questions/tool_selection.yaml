@@ -33,7 +33,7 @@
 - id: ts-explain-change-district
   question: Why did civil filings in the District of New Jersey change from FY2023 to FY2024?
   expected_tools: [explain_change]
-  tags: [explain, district]
+  tags: [smoke, explain, district]
 - id: ts-explain-change-terminations
   question: Break down the change in civil terminations from FY2023 to FY2024 by district and case type.
   expected_tools: [explain_change]
@@ -49,7 +49,7 @@
 - id: ts-cohort-outcome-rates
   question: For civil rights cases filed by pro se plaintiffs in FY2023, what share ended in a dismissal?
   expected_tools: [find_cases, analyze_cohort]
-  tags: [cohort]
+  tags: [smoke, cohort]
 - id: ts-cohort-trend
   question: Show the trend in patent case filings in the Western District of Texas from FY2016 to FY2025.
   expected_tools: [find_cases]
@@ -63,11 +63,11 @@
 - id: ts-reconcile-pending
   question: How close is the IDB reconstruction of civil cases pending in the Southern District of West Virginia on September 30, 2017 to the published figure?
   expected_tools: [reconcile]
-  tags: [reconcile]
+  tags: [smoke, reconcile]
 - id: ts-judgeship-context
   question: How does the Eastern District of Texas's weighted caseload compare with the Judicial Conference's thresholds for new judgeships?
   expected_tools: [judgeship_context]
-  tags: [judgeships]
+  tags: [smoke, judgeships]
 - id: ts-judgeship-context-national
   question: Give me the judgeship context for the Eastern District of North Carolina in FY2025.
   expected_tools: [judgeship_context]
@@ -87,7 +87,7 @@
 - id: ts-sample-dockets
   question: Give me three example dockets of directly filed MDL cases from N.D. Fla. in FY2020 that I can look up on CourtListener.
   expected_tools: [find_cases, sample_dockets]
-  tags: [dockets]
+  tags: [smoke, dockets]
 - id: ts-sample-dockets-patent
   question: Find a few example patent case dockets from the District of Delaware filed in FY2021.
   expected_tools: [find_cases, sample_dockets]

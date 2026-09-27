@@ -30,6 +30,7 @@
   expected_tools:
   - get_official_figure
   tags:
+  - smoke
   - edition_trap
   - weighted
   - fy2020
@@ -463,6 +464,7 @@
   expected_tools:
   - get_official_figure
   tags:
+  - smoke
   - c1
   - fy2020
 - id: fy2024-civil-filed-national
@@ -509,6 +511,7 @@
   expected_tools:
   - get_official_figure
   tags:
+  - smoke
   - c1
   - pending
 - id: fy2017-civil-pending-national
@@ -726,6 +729,7 @@
   expected_tools:
   - get_official_figure
   tags:
+  - smoke
   - district
   - weighted
 - id: fy2025-dnj-weighted-total
@@ -941,6 +945,7 @@
   expected_tools:
   - compare_courts
   tags:
+  - smoke
   - ranking
   - weighted
 - id: fy2025-top5-weighted-total
@@ -1073,6 +1078,7 @@
   - find_cases
   - analyze_cohort
   tags:
+  - smoke
   - idb
   - cohort
   - time

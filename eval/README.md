@@ -19,6 +19,7 @@ make eval                               # harness self-check: gold 100%, null 0%
 uv run courts-eval stats                # counts by suite, split and tag
 uv run courts-eval run --answerer gold --suite e2e --split dev
 uv run courts-eval show eval/results/<run_id>.summary.json
+make eval-claude                        # the 20-question smoke set with Claude
 uv run courts-eval run --answerer claude-code --suite e2e --split dev --workers 4
 uv run courts-eval rescore eval/results/<run_id>.jsonl   # re-score saved answers
 ```
@@ -46,6 +47,17 @@ carry a relative tolerance and note the release they came from.
 Questions were drafted by Claude from the catalog and the IDB, following the
 plan's list of edition traps and the demo storyline. **They still need the
 domain expert's review** (issue [#17](https://github.com/syedaun-techsur/federal-courts-analyst/issues/17)).
+
+### Smoke set
+
+Model runs cost money, so the default is a fixed **smoke set** of 20
+questions tagged `smoke` (`--tag smoke`, `make eval-claude`): 6 factual, 4
+explanation, 5 tool-selection and 5 adversarial, all from the `dev` split,
+together calling every tool and covering the main traps (554 vs 322, the
+FY2017 pending restatement, judge rankings, party names, prompt injection,
+policy framing, small cells). `tests/test_question_schema.py` keeps it small,
+dev-only and covering every tool. Run the full bank only at the end of a
+phase and for the final evaluation.
 
 ### Item format
 
