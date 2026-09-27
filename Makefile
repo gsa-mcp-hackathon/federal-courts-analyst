@@ -79,9 +79,8 @@ web: ## Frontend dev server (P8)
 eval-validate: ## Validate the question bank (schema, ids, splits)
 	uv run courts-eval validate
 
-eval-claude: ## Dev-split tool-selection + e2e run with Claude (needs a logged-in `claude` CLI)
-	uv run courts-eval run --answerer claude-code --suite tool_selection --split dev --workers 4
-	uv run courts-eval run --answerer claude-code --suite e2e --split dev --workers 4
+eval-claude: ## 20-question smoke run with Claude (needs a logged-in `claude` CLI)
+	uv run courts-eval run --answerer claude-code --tag smoke --workers 4
 
 eval: ## Harness self-check: gold must score 100%, null 0%
 	uv run courts-eval run --answerer gold --quiet --expect-accuracy 1

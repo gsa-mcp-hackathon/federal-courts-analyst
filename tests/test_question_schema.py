@@ -244,3 +244,14 @@ def test_suite_rules(suite: str, extra: dict[str, object], message: str) -> None
 def test_default_bank_path() -> None:
     assert DEFAULT_BANK.is_dir()
     assert {p.stem for p in DEFAULT_BANK.glob("*.yaml")} == set(SUITES)
+
+
+def test_smoke_subset() -> None:
+    """The `smoke` tag is the cheap default for model runs: small, dev-only
+    (never held-out items), every model-facing suite and every tool."""
+    smoke = select(ITEMS, tags=["smoke"])
+    assert 15 <= len(smoke) <= 25
+    assert {i.resolved_split for i in smoke} == {"dev"}
+    assert {i.suite for i in smoke} == set(SUITES) - {"engine"}
+    tools = {t for i in smoke for t in i.expected_tools}
+    assert tools == TOOLS - {"server_info"}
