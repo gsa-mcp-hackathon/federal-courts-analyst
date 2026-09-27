@@ -106,3 +106,36 @@ tags: [edition_trap, weighted, fy2020]
 - The weighted civil series in JFF-2018 carries a note ("Due to a change in methodology, numbers for years prior to 2015 may not match numbers previously published"), but nothing explains the 2023 revision.
 - FY2024 is revised within the same year: JB-2024 prints 384 weighted civil filings per judgeship, JFF-2024 prints 335.
 - JFF's FY2000 row has odd values in every edition (median time for civil cases with no court action 0.03 months, criminal bench trial 0.03). They're faithful to the workbooks; no question uses them.
+
+## Evidence
+
+**Bank (2026-09-26):** 152 questions: engine 30, e2e 51, explanation 20, tool_selection 25, adversarial 26. Held out: 49 (32%), present in every suite. Behaviours: 133 answer, 2 clarify, 17 decline. 83 expected figures, 63 claims, 5 rankings, 16 items that must flag a revision.
+
+| Check | Result |
+| --- | --- |
+| Gold answerer, all 152 | **152/152 (100%)**, every behaviour class at precision and recall 100% ([run](../eval/results/phase3-gold-all.md)) |
+| Null answerer, all 152 | **0/152 (0%)**: every item has a check silence fails ([run](../eval/results/phase3-null-all.md)) |
+| Expected official figures vs catalog | every `ref` value and every acceptable edition match the fixture catalog; all 5 rankings recompute exactly |
+
+**CI:** green on [PR #19](https://github.com/syedaun-techsur/federal-courts-analyst/pull/19) (lint, test 3.11, test 3.12, docker).
+
+**Automated tests:** 494 passed in the default suite (166 new), **95% total coverage**; `evaluation/` modules 94–98% except `answerers.py`. `make docker-test` 6/6 (the image now installs `duckdb` and `pyyaml`). Lint, format, mypy clean.
+
+| Suite | Checks |
+| --- | --- |
+| `test_question_schema.py` | bank size and balance, unique ids, real tool names, canonical courts, every figure and edition against the catalog, rankings recomputed, loader and validator errors |
+| `test_scorer_numeric.py` | printed precision (322 vs 322.2/321.6/321.4), absolute and relative tolerance (hypothesis), per-judgeship vs totals, number and edition extraction from prose |
+| `test_scorer_edition.py` | 322 + JB-2020 wrong; 322 + JFF-2023 right; any JFF edition that prints 322 right; both editions right when ambiguous; swapped or missing editions wrong; revision flag required |
+| `test_scorer_refusal.py` | behaviour from text and structured `status`; confusion matrix, precision and recall; Markdown summary |
+| `test_gold_answerer.py` | gold 100%, null 0%, runner outputs, answerer failures recorded, error taxonomy, claims, court mentions in order, CLI |
+| `test_split_stability.py` | pinned assignments, same split in a fresh interpreter with another hash seed, ~30% over 5,000 ids |
+
+**Claude in Chrome:** opened `eval/README.md` and the committed null-run summary on the PR branch on GitHub. Headings, tables and code blocks render, and the held-out policy reads correctly ([screenshot](../docs/evidence/phase-03/null-run-summary.jpg)).
+
+## Open issues
+
+Live status is on the [issue tracker](https://github.com/syedaun-techsur/federal-courts-analyst/issues).
+
+1. **Domain expert review** of the question bank. [#17](https://github.com/syedaun-techsur/federal-courts-analyst/issues/17)
+2. **Model API keys** for local and nightly model runs. [#18](https://github.com/syedaun-techsur/federal-courts-analyst/issues/18)
+3. The FY2017 pending restatement (JB-2017 339,131 → JB-2018 366,195) goes to Phase 4 reconciliation. [#11](https://github.com/syedaun-techsur/federal-courts-analyst/issues/11) (comment added)
