@@ -19,3 +19,10 @@ def round_half_up(value: float, decimals: int = 0) -> float:
     """
     quantum = Decimal(1).scaleb(-decimals)
     return float(Decimal(repr(value)).quantize(quantum, rounding=ROUND_HALF_UP))
+
+
+def fmt(value: float) -> str:
+    """A published value for text: thousands separators, no trailing ``.0``."""
+    if float(value).is_integer():
+        return f"{int(value):,}"
+    return f"{value:,}"

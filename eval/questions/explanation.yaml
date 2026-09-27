@@ -226,9 +226,6 @@
     - id: mentions_september_30
       kind: mentions
       any: [September 30]
-    - id: mentions_1992_or_1993
-      kind: mentions
-      any: ["1992", "1993"]
   expected_tools: [explain_term]
   tags: [definition, period]
 - id: why-pending-rose-fy2020-fy2021

@@ -30,7 +30,7 @@ the first publication of that year's figures) and Judicial Facts and Figures
 repeats or revises them.
 
 Measure definitions are in
-[`measures.yaml`](../src/courts_analyst/pipeline/tables/measures.yaml) and
+[`measures.yaml`](../src/courts_analyst/core/data/measures.yaml) and
 come from the tables' own notes.
 
 ## How files are found

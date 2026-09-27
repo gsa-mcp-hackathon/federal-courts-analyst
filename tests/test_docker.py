@@ -100,6 +100,17 @@ def test_logs_are_json(container_name: str) -> None:
         assert json.loads(line)["level"]
 
 
+CORE_SMOKE = """
+from courts_analyst.config import settings
+from courts_analyst.core.db import Database
+from courts_analyst.core.official import get_official_figure
+from courts_analyst.core.reconcile import classify
+db = Database(settings.resolved_duckdb_path, settings.resolved_idb_path)
+f = get_official_figure(db, "weighted_civil_filings_per_judgeship", "US", 2020).data
+print(f.value, f.edition, f.first_published.value, classify("civil_cases_filed", 1, 1, [])[0])
+"""
+
+
 def _run_with_catalog(db_dir: str) -> tuple[str, str]:
     """Start the image with a built catalog mounted read-only at DATA_DIR/build."""
     name = f"fca-data-{uuid.uuid4().hex[:8]}"
@@ -164,5 +175,15 @@ async def test_container_reads_built_catalog(catalog, idb, tmp_path) -> None:  #
             check=True,
         )
         assert "private" not in ls.stdout.split()
+        # The analytics core runs in the image against the mounted data.
+        core = subprocess.run(
+            ["docker", "exec", name, "python", "-c", CORE_SMOKE],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        assert core.stdout.split() == ["322.0", "JFF-2025", "554.0", "matched"], (
+            core.stderr
+        )
     finally:
         subprocess.run(["docker", "stop", name], capture_output=True)

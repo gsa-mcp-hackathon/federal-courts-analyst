@@ -16,6 +16,21 @@ from enum import StrEnum
 from functools import cache
 from typing import Final
 
+from courts_analyst.core.errors import UnknownCourtError
+
+__all__ = [
+    "CIRCUITS",
+    "COURTS",
+    "DISTRICTS",
+    "TERRITORIAL",
+    "Court",
+    "CourtLevel",
+    "UnknownCourtError",
+    "court_aliases",
+    "normalize_court_text",
+    "resolve_court",
+]
+
 
 class CourtLevel(StrEnum):
     """What kind of unit a court code refers to."""
@@ -42,10 +57,6 @@ class Court:
     """Two-letter postal code for districts."""
     division: str | None = None
     """``N``/``E``/``S``/``W``/``M``/``C`` for multi-district states."""
-
-
-class UnknownCourtError(ValueError):
-    """Raised when a court name can't be matched to exactly one court."""
 
 
 # (postal, full state name, Bluebook abbreviation)

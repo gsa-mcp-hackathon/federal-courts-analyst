@@ -2,7 +2,7 @@
 .DEFAULT_GOAL := help
 .PHONY: help setup lint format typecheck test test-full cov data data-tables \
         data-discover data-idb data-idb-sample serve serve-http \
-        inspector docker-build docker-run docker-test web eval eval-validate clean
+        variance-report schemas inspector docker-build docker-run docker-test web eval eval-validate clean
 
 IMAGE ?= federal-courts-analyst:dev
 PORT  ?= 8000
@@ -45,6 +45,12 @@ data-idb: ## Fetch the pinned civil IDB release (~330 MB) and build idb.duckdb (
 
 data-idb-sample: ## Rebuild the committed IDB test fixture from the downloaded release
 	uv run python -m courts_analyst.pipeline.idb sample
+
+variance-report: ## Reconcile every court-year (IDB vs Table C-1) into docs/variance-report.md
+	uv run python -m courts_analyst.pipeline.reports variance
+
+schemas: ## Export result JSON Schemas for the frontend (web/src/api/schemas/)
+	uv run python -m courts_analyst.schemas
 
 data-discover: ## Re-crawl uscourts.gov and rewrite data/manifest/tables.yaml
 	uv run python -m courts_analyst.pipeline.tables discover

@@ -32,7 +32,7 @@ from courts_analyst.pipeline.tables.records import (
     SourceFile,
 )
 
-MEASURES_YAML = Path(__file__).with_name("measures.yaml")
+MEASURES_YAML = Path(__file__).parents[2] / "core" / "data" / "measures.yaml"
 
 # JB is the first publication of a fiscal year's figures; JFF repeats and
 # revises them. Same-date editions are ordered by this rank.

@@ -104,15 +104,15 @@ Metrics: count, trend by FY, median days to disposition (bootstrap CI), disposit
 
 ## Tasks
 
-- [ ] Enums and shared models in `models.py`/`core/`; JSON schema export for the frontend (`make schemas` → `web/src/api/schemas/`)
-- [ ] Measures registry (YAML + loader), including which source is authoritative per measure
-- [ ] `official.py` with default-edition policy (latest, with first-published attached)
-- [ ] Cohort spec/store/handles + `analyze_cohort`
-- [ ] `explain.py` with decomposition and four driver detectors
-- [ ] `reconcile.py` + variance report generator
-- [ ] `judgeships.py` (thresholds as data, not constants in code; each tagged with its CRS/Judicial Conference source)
-- [ ] `glossary.py` from a reviewed YAML glossary (NOS codes, weighted filings, directly filed MDL, fiscal vs statistical year…)
-- [ ] All SQL parameterized; DuckDB opened read-only by the core
+- [x] Enums and shared models in `core/` (`enums.py`, `provenance.py`, `results.py`); JSON schema export for the frontend (`make schemas` → `web/src/api/schemas/`, checked current by a test)
+- [x] Measures registry (YAML + loader), including which source is authoritative per measure (`core/data/measures.yaml`: official tables for every measure; `idb` rule for the three C-1 counts)
+- [x] `official.py` with default-edition policy (latest, with first-published attached)
+- [x] Cohort spec/store/handles + `analyze_cohort`
+- [x] `explain.py` with decomposition and four driver detectors (plus `mdl_cases` for terminations/pending and `judgeship_change`)
+- [x] `reconcile.py` + variance report generator (`make variance-report`)
+- [x] `judgeships.py` (thresholds as data, not constants in code; each tagged with its CRS/Judicial Conference source; plus the Conference's 2025 recommendations)
+- [x] `glossary.py` from a YAML glossary (NOS codes, weighted filings, directly filed MDL, fiscal vs statistical year…); domain expert review is [#5](https://github.com/syedaun-techsur/federal-courts-analyst/issues/5)
+- [x] All SQL parameterized; DuckDB opened read-only by the core (and external file access disabled)
 
 ## Tests
 
@@ -133,7 +133,28 @@ Metrics: count, trend by FY, median days to disposition (bootstrap CI), disposit
 
 ## Exit criteria
 
-- [ ] All eval **engine** questions from P3 pass at the defined tolerance, or have a documented explained variance
-- [ ] `explain_change` produces the FY2020 storyline on full data
-- [ ] Variance report generated
-- [ ] mypy strict clean on `core/`
+- [x] All eval **engine** questions from P3 pass at the defined tolerance, or have a documented explained variance (30/30 pass)
+- [x] `explain_change` produces the FY2020 storyline on full data
+- [x] Variance report generated ([docs/variance-report.md](../docs/variance-report.md))
+- [x] mypy strict clean on `core/`
+
+## Deviations
+
+| Plan said | We did | Why |
+| --- | --- | --- |
+| `models.py` holds the shared models; `enums.py` re-exports courts | Models in `core/provenance.py` and `core/results.py`; `enums.py` builds closed vocabularies (courts, measures, editions, codebook groups) as `str` + JSON Schema `enum` | The core owns its contract (ADR 0002); an `enum` schema lets MCP clients list every allowed value without Python enums for 107 courts |
+| `Warning` model | `Caveat` class, published under the schema title `Warning` | `Warning` shadows a Python builtin |
+| `ToolResult[T]` with data, provenance, warnings, suggested_next | `Result[T]` adds `status` (`ok` / `needs_clarification`) and `clarification` | Phase 5's elicitation fallback returns the same envelope instead of a second type |
+| Measures registry as a new YAML | Moved `pipeline/tables/measures.yaml` to `core/data/measures.yaml` and added `tables` and `idb`; the pipeline reads it from there | One file defines each measure for both the catalog and the server |
+| Pending rule "move into `measures.py`" | `PENDING_WHERE` in `core/measures.py`, parameterized; `pipeline/idb/profile.py` uses it | Same rule everywhere, no formatted SQL |
+| Bootstrap CI for medians | Distribution-free order-statistic interval (exact binomial ranks n ≤ 200) with a coverage simulation test | Exact, reproducible, and two quantile lookups instead of thousands of resamples |
+| Decompose "by district × NOS group" | Three breakdowns (district, case type, and the pair), each summing exactly to the IDB change, plus the change excluding directly filed MDL cases | The single cross-product is hard to read; separate lists answer "where" and "what kind" directly |
+| Per-judgeship decomposition | Shift-share on the **first-published** X-1A series with district rows; revised national values reported separately with a `revised_figure` warning | Only Judicial Business prints district rows; mixing its districts with a revised JFF national figure would mix series |
+| `methodology_revision` detector | Two drivers: the official revision (`official`) and, when the evidence supports it, the district inference (`inferred`, gated: ≥ 50% of the revision and a majority-MDL district) | The first version also "explained" FY2019 by C.D. Cal. (25 of 49 points); the gate keeps inference to cases the data supports |
+| — | `judgeship_change` and `mdl_cases` (terminations, pending) drivers | Needed for the FY2024 terminations and pending stories |
+| `reconcile`: dedup timing, snapshot date, transfers, reopened cases, MDL counting | Four quantified causes: restated edition, repeat records, undated reopenings, snapshot drift; tolerances fixed before the report ran | Only causes we can measure count as "explained"; the rest are reported as unexplained |
+| — | Compare pending counts with the **latest** edition | The AO restates the prior year's closing pending count; this resolves [#11](https://github.com/syedaun-techsur/federal-courts-analyst/issues/11) |
+| `judgeship_context`: thresholds, emergencies, recommendations | Thresholds (430, 600) and the Conference's **2025** recommendations (69 district judgeships, 25 districts; PDF sha256-pinned). No emergency status | Emergencies depend on current vacancies, which we don't hold; claiming one would be wrong |
+| Inputs from P1: add C-2/C-3 and FCMS as table families | Not added; the IDB's nature-of-suit hierarchy (checked against C-2 in Phase 2) serves the case-type breakdowns | The core didn't need them for any P4 exit criterion; they stay open in [#9](https://github.com/syedaun-techsur/federal-courts-analyst/issues/9) |
+| — | `EngineAnswerer` (`courts-eval run --answerer engine`) | Makes the engine exit criterion a repeatable eval run |
+| — | Glossary claim "tables use fiscal years from 1992" dropped, with the matching eval claim | Not verified against a source |

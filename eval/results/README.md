@@ -7,3 +7,4 @@ phase baselines are committed deliberately with `git add -f` and listed below.
 | Run | Phase | What |
 | --- | --- | --- |
 | `phase3-gold-all` / `phase3-null-all` | 3 | Harness self-check over all 152 items: gold 100%, null 0% |
+| `phase4-engine` | 4 | Engine suite (30 IDB rebuilds vs Table C-1) answered by the analytics core on the full data: 30/30 |
