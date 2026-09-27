@@ -308,3 +308,20 @@ def resolve_court(name: str) -> Court:
     if not code:
         raise UnknownCourtError(f"Unknown or ambiguous court name: {name!r}")
     return COURTS[code]
+
+
+def court_aliases(code: str) -> frozenset[str]:
+    """Every spelling of the court ``code`` that :func:`resolve_court` accepts,
+    normalised (upper case, punctuation collapsed to single spaces).
+
+    Spellings two courts share are left out, as in :func:`resolve_court`.
+    """
+    index = _alias_index()
+    return frozenset(
+        key for alias in _aliases(COURTS[code]) if index.get(key := _norm(alias))
+    )
+
+
+def normalize_court_text(text: str) -> str:
+    """Normalise free text the way court aliases are, for substring search."""
+    return _norm(text)

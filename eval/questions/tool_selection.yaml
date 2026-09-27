@@ -1,0 +1,104 @@
+# tool_selection suite — does the model pick the right tool(s) from the
+# descriptions alone? Correct = every expected tool was called. Scored on the
+# first model turn's calls when the answerer supports it, otherwise on the
+# whole transcript.
+- id: ts-single-official-figure
+  question: What were weighted civil filings per judgeship in the District of Delaware in FY2020?
+  expected_tools: [get_official_figure]
+  tags: [official]
+- id: ts-official-figure-edition
+  question: What did the 2021 edition of Judicial Facts and Figures report for FY2019 weighted civil filings per judgeship?
+  expected_tools: [get_official_figure]
+  tags: [official, edition_trap]
+- id: ts-revisions-of-figure
+  question: Has the FY2022 national weighted civil filings per judgeship figure ever been revised?
+  expected_tools: [get_official_figure]
+  tags: [official, revised]
+- id: ts-compare-top-districts
+  question: Rank the ten busiest district courts by weighted filings per judgeship in FY2025.
+  expected_tools: [compare_courts]
+  tags: [compare]
+- id: ts-compare-named-districts
+  question: Compare civil filings per judgeship in S.D.N.Y., E.D.N.Y. and D.N.J. for FY2024.
+  expected_tools: [compare_courts]
+  tags: [compare]
+- id: ts-compare-circuits-districts
+  question: Which Fifth Circuit districts had the highest weighted civil filings per judgeship in FY2023?
+  expected_tools: [compare_courts]
+  tags: [compare]
+- id: ts-explain-change-national
+  question: What drove the change in civil filings between FY2022 and FY2023?
+  expected_tools: [explain_change]
+  tags: [explain]
+- id: ts-explain-change-district
+  question: Why did civil filings in the District of New Jersey change from FY2023 to FY2024?
+  expected_tools: [explain_change]
+  tags: [explain, district]
+- id: ts-explain-change-terminations
+  question: Break down the change in civil terminations from FY2023 to FY2024 by district and case type.
+  expected_tools: [explain_change]
+  tags: [explain]
+- id: ts-cohort-count
+  question: How many employment discrimination cases were filed in the Northern District of Illinois in FY2024?
+  expected_tools: [find_cases]
+  tags: [cohort]
+- id: ts-cohort-median-time
+  question: What was the median time to disposition for Social Security appeals filed in FY2022 in the Ninth Circuit's districts?
+  expected_tools: [find_cases, analyze_cohort]
+  tags: [cohort]
+- id: ts-cohort-outcome-rates
+  question: For civil rights cases filed by pro se plaintiffs in FY2023, what share ended in a dismissal?
+  expected_tools: [find_cases, analyze_cohort]
+  tags: [cohort]
+- id: ts-cohort-trend
+  question: Show the trend in patent case filings in the Western District of Texas from FY2016 to FY2025.
+  expected_tools: [find_cases, analyze_cohort]
+  tags: [cohort]
+- id: ts-reconcile-figure
+  question: Does the IDB reproduce the official count of civil cases filed nationally in FY2023?
+  expected_tools: [reconcile]
+  tags: [reconcile]
+- id: ts-reconcile-pending
+  question: How close is the IDB reconstruction of civil cases pending in the Southern District of West Virginia on September 30, 2017 to the published figure?
+  expected_tools: [reconcile]
+  tags: [reconcile]
+- id: ts-judgeship-context
+  question: How does the Eastern District of Texas's weighted caseload compare with the Judicial Conference's thresholds for new judgeships?
+  expected_tools: [judgeship_context]
+  tags: [judgeships]
+- id: ts-judgeship-context-national
+  question: Give me the judgeship context for the Eastern District of North Carolina in FY2025.
+  expected_tools: [judgeship_context]
+  tags: [judgeships]
+- id: ts-explain-term-weighted
+  question: What does "weighted filings" mean?
+  expected_tools: [explain_term]
+  tags: [glossary]
+- id: ts-explain-term-nos
+  question: What is nature of suit code 830?
+  expected_tools: [explain_term]
+  tags: [glossary]
+- id: ts-explain-term-jff
+  question: What is Judicial Facts and Figures, and how does it differ from Judicial Business?
+  expected_tools: [explain_term]
+  tags: [glossary]
+- id: ts-sample-dockets
+  question: Give me three example dockets of directly filed MDL cases from N.D. Fla. in FY2020 that I can look up on CourtListener.
+  expected_tools: [find_cases, sample_dockets]
+  tags: [dockets]
+- id: ts-sample-dockets-patent
+  question: Find a few example patent case dockets from the District of Delaware filed in FY2021.
+  expected_tools: [find_cases, sample_dockets]
+  tags: [dockets]
+- id: ts-server-info
+  question: What data does this server have loaded, and what years does it cover?
+  expected_tools: [server_info]
+  tags: [meta]
+- id: ts-official-pending
+  question: How many civil cases were pending in the Central District of California at the end of FY2022?
+  expected_tools: [get_official_figure]
+  tags: [official]
+- id: ts-official-median-time
+  question: What was the national median time from filing to disposition for civil cases in FY2021?
+  expected_tools: [get_official_figure]
+  tags: [official]

@@ -1,0 +1,123 @@
+"""``courts-eval``: validate the bank, run a suite, show a past summary.
+
+Examples::
+
+    courts-eval validate
+    courts-eval run --answerer gold
+    courts-eval run --suite e2e --split dev --answerer null
+    courts-eval stats
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import sys
+from collections import Counter
+from pathlib import Path
+
+from courts_analyst.evaluation.answerers import ANSWERERS
+from courts_analyst.evaluation.bank import DEFAULT_BANK, BankError, load_bank, select
+from courts_analyst.evaluation.runner import DEFAULT_RESULTS, run
+from courts_analyst.evaluation.schema import HELD_OUT_PERCENT, SUITES
+from courts_analyst.evaluation.scoring.summary import summary_markdown
+
+
+def _parser() -> argparse.ArgumentParser:
+    p = argparse.ArgumentParser(prog="courts-eval", description=__doc__)
+    p.add_argument("--bank", type=Path, default=DEFAULT_BANK)
+    sub = p.add_subparsers(dest="cmd", required=True)
+    sub.add_parser("validate", help="Load and validate every question file")
+    sub.add_parser("stats", help="Counts by suite, split and tag")
+    r = sub.add_parser("run", help="Answer and score a slice of the bank")
+    r.add_argument("--answerer", required=True, help=f"one of {sorted(ANSWERERS)}")
+    r.add_argument("--suite", choices=SUITES)
+    r.add_argument("--split", choices=["dev", "test"])
+    r.add_argument("--tag", action="append", dest="tags")
+    r.add_argument("--id", action="append", dest="ids")
+    r.add_argument("--limit", type=int)
+    r.add_argument("--results-dir", type=Path, default=DEFAULT_RESULTS)
+    r.add_argument("--run-id")
+    r.add_argument("--quiet", action="store_true")
+    r.add_argument(
+        "--expect-accuracy",
+        type=float,
+        help="exit 1 unless accuracy equals this (harness self-checks: 1 or 0)",
+    )
+    s = sub.add_parser("show", help="Print a past run's summary as Markdown")
+    s.add_argument("summary", type=Path, help="<run_id>.summary.json")
+    return p
+
+
+def main(argv: list[str] | None = None) -> int:
+    args = _parser().parse_args(argv)
+    if args.cmd == "show":
+        from courts_analyst.evaluation.scoring.summary import RunSummary
+
+        data = json.loads(args.summary.read_text())
+        summary = RunSummary.model_validate(data["summary"])
+        print(summary_markdown(summary, f"{data['answerer']} · {data['label']}"))
+        return 0
+    try:
+        items = load_bank(args.bank)
+    except BankError as exc:
+        print(f"invalid question bank: {exc}", file=sys.stderr)
+        return 1
+    if args.cmd == "validate":
+        held = sum(i.resolved_split == "test" for i in items)
+        print(
+            f"{len(items)} questions valid; {held} held out "
+            f"({100 * held / len(items):.0f}%, target {HELD_OUT_PERCENT}%)"
+        )
+        return 0
+    if args.cmd == "stats":
+        by = Counter((i.suite, i.resolved_split) for i in items)
+        print("| Suite | dev | test | total |\n| --- | ---: | ---: | ---: |")
+        for suite in SUITES:
+            d, t = by[(suite, "dev")], by[(suite, "test")]
+            print(f"| {suite} | {d} | {t} | {d + t} |")
+        tags = Counter(t for i in items for t in i.tags)
+        print("\nTags: " + ", ".join(f"{t} ({n})" for t, n in tags.most_common()))
+        return 0
+
+    if args.answerer not in ANSWERERS:
+        print(f"unknown answerer {args.answerer!r}; pick from {sorted(ANSWERERS)}")
+        return 2
+    chosen = select(items, args.suite, args.split, args.tags, args.ids)
+    if args.limit:
+        chosen = chosen[: args.limit]
+    if not chosen:
+        print("no questions match those filters", file=sys.stderr)
+        return 1
+    label = "-".join(x for x in [args.suite or "all", args.split or "both"] if x)
+
+    def progress(item, score):  # type: ignore[no-untyped-def]
+        if not args.quiet:
+            mark = "✓" if score.correct else "✗"
+            extra = "" if score.correct else f"  [{score.error_category}]"
+            print(f"{mark} {item.id}{extra}", flush=True)
+
+    result = run(
+        ANSWERERS[args.answerer](),
+        chosen,
+        label=label,
+        results_dir=args.results_dir,
+        run_id=args.run_id,
+        progress=progress,
+    )
+    print()
+    print(result.paths["markdown"].read_text())
+    print(f"results: {result.paths['jsonl']}")
+    if args.expect_accuracy is not None and result.summary.accuracy != (
+        args.expect_accuracy
+    ):
+        print(
+            f"expected accuracy {args.expect_accuracy}, got {result.summary.accuracy}",
+            file=sys.stderr,
+        )
+        return 1
+    return 0
+
+
+if __name__ == "__main__":  # pragma: no cover
+    raise SystemExit(main())

@@ -1,0 +1,276 @@
+# explanation suite — "why" questions scored by rule-based claims, never by an
+# LLM judge. Claims name the facts a correct explanation must contain; the
+# contributions behind them were computed from the IDB (release 2026-08-26)
+# and the official tables (see notes). Phrase lists accept the usual spellings.
+- id: why-fy2020-civil-filings-jump
+  question: Why did federal civil filings jump in FY2020?
+  claims:
+    - id: names_ndfla
+      kind: mentions
+      any: [Northern District of Florida, N.D. Fla, FL-N, "Florida, Northern"]
+    - id: names_mdl
+      kind: mentions
+      any: [MDL, multidistrict]
+    - id: notes_direct_filing
+      kind: mentions
+      any: [directly filed, direct filing, filed directly, direct-filed, direct filed]
+    - id: names_earplug_or_3m
+      kind: mentions
+      any: [3M, earplug, Combat Arms]
+  expected_tools: [explain_change]
+  tags: [demo, fy2020, mdl, change]
+  notes: >-
+    IDB: FY2019→FY2020 filings +173,239; N.D. Fla. +199,881, of which 200,570 more
+    direct-filed MDL cases (MDL 2885, 3M Combat Arms earplugs).
+- id: why-fy2020-weighted-revised
+  question: Why are there two official figures, 554 and 322, for FY2020 weighted civil filings per judgeship?
+  claims:
+    - id: names_both_editions
+      kind: mentions
+      all: [JB-2020]
+      any: [JFF-2023, JFF-2024, JFF-2025, Judicial Facts and Figures]
+    - id: says_revised
+      kind: mentions
+      any: [revised, revision, restated]
+    - id: labels_inference
+      kind: mentions
+      any: [inferred, inference, not official, unconfirmed, not confirmed, no published note, not explained]
+    - id: names_ndfla
+      kind: mentions
+      any: [Northern District of Florida, N.D. Fla, FL-N]
+  expected_tools: [get_official_figure]
+  acceptable_tools: [explain_change]
+  tags: [demo, fy2020, edition_trap, weighted]
+  notes: >-
+    Nothing published explains the JFF-2023 revision; the MDL explanation must be
+    labelled as inference (concept document; issue #8).
+- id: why-fy2021-civil-filings-fell
+  question: Why did civil filings fall so much between FY2020 and FY2021?
+  claims:
+    - id: names_ndfla
+      kind: mentions
+      any: [Northern District of Florida, N.D. Fla, FL-N]
+    - id: names_mdl
+      kind: mentions
+      any: [MDL, multidistrict]
+  expected_tools: [explain_change]
+  tags: [change, mdl]
+  notes: IDB FY2020→FY2021 filings −125,942; N.D. Fla. −119,631 (direct-filed MDL −119,244).
+- id: why-fy2022-civil-filings-fell
+  question: What drove the drop in national civil filings from FY2021 to FY2022?
+  claims:
+    - id: names_ndfla
+      kind: mentions
+      any: [Northern District of Florida, N.D. Fla, FL-N]
+    - id: names_new_jersey
+      kind: mentions
+      any: [New Jersey, D.N.J]
+    - id: names_mdl
+      kind: mentions
+      any: [MDL, multidistrict]
+  expected_tools: [explain_change]
+  tags: [change, mdl]
+  notes: IDB FY2021→FY2022 −69,685; N.D. Fla. −49,125, D.N.J. −16,201, both mostly direct-filed MDL.
+- id: why-fy2023-civil-filings-rose
+  question: Why did civil filings rise in FY2023?
+  claims:
+    - id: names_mdl
+      kind: mentions
+      any: [MDL, multidistrict]
+    - id: names_a_top_contributor
+      kind: mentions
+      any: [New Jersey, D.N.J, Northern District of Florida, N.D. Fla, Southern District of Florida, S.D. Fla]
+    - id: names_product_liability
+      kind: mentions
+      any: [product liability, personal injury]
+  expected_tools: [explain_change]
+  tags: [change, mdl]
+  notes: IDB FY2022→FY2023 +65,260; D.N.J. +13,756, N.D. Fla. +13,319, S.D. Fla. +13,001; personal injury/product liability +44,256.
+- id: why-fy2024-terminations-jump
+  question: Why did civil terminations jump in FY2024?
+  claims:
+    - id: names_ndfla
+      kind: mentions
+      any: [Northern District of Florida, N.D. Fla, FL-N]
+  expected_tools: [explain_change]
+  tags: [change, mdl, terminations]
+  notes: C-1 terminations 293,677 (FY2023) → 396,635 (FY2024); IDB N.D. Fla. +104,167.
+- id: why-fy2017-sdwva-terminations
+  question: Which district drove the increase in civil terminations from FY2016 to FY2017?
+  claims:
+    - id: names_sdwva
+      kind: mentions
+      any: [Southern District of West Virginia, S.D. W. Va, WV-S, "West Virginia, Southern"]
+  expected_tools: [explain_change]
+  tags: [change, terminations, mdl]
+  notes: IDB FY2016→FY2017 terminations +18,252; S.D. W. Va. +14,774.
+- id: why-weighted-differs-from-raw
+  question: Why do weighted filings per judgeship differ from raw filings per judgeship?
+  claims:
+    - id: mentions_case_weights
+      kind: mentions
+      any: [case weight, case-weight, weights]
+    - id: mentions_judge_time
+      kind: mentions
+      any: [judge time, judicial time, time judges, work, burden, effort]
+    - id: mentions_fjc
+      kind: mentions
+      any: [Federal Judicial Center, FJC]
+  expected_tools: [explain_term]
+  tags: [definition, weighted]
+- id: why-judgeships-673-vs-674
+  question: Why is FY2020 reported with 673 authorized judgeships in one table and 674 in another?
+  claims:
+    - id: names_x1a_or_jb
+      kind: mentions
+      any: [X-1A, JB-2020, Judicial Business]
+    - id: names_jff
+      kind: mentions
+      any: ["6.2", JFF-2023, JFF-2024, JFF-2025, Judicial Facts and Figures]
+    - id: says_edition_difference
+      kind: mentions
+      any: [edition, revised, later, restated]
+  expected_tools: [get_official_figure]
+  tags: [edition_trap, judgeships, fy2020]
+- id: why-fy2017-pending-restated
+  question: The FY2017 national civil pending count is 339,131 in one table and 366,195 in another. Why?
+  claims:
+    - id: names_jb2017
+      kind: mentions
+      any: [JB-2017, Judicial Business 2017]
+    - id: names_jb2018
+      kind: mentions
+      any: [JB-2018, Judicial Business 2018]
+    - id: says_restated
+      kind: mentions
+      any: [revised, restated, updated, later edition, prior-year, prior year]
+  expected_tools: [get_official_figure]
+  acceptable_tools: [reconcile]
+  tags: [edition_trap, pending]
+  notes: >-
+    JB-2018 Table C-1 prints the FY2017 closing pending count as 366,195 (vs 339,131 in
+    JB-2017). The IDB reconstruction lands near the restated figure (issue #11).
+- id: why-ndfla-weighted-fy2020-extreme
+  question: Why was the Northern District of Florida's weighted civil filings per judgeship so extreme in FY2020?
+  claims:
+    - id: names_mdl
+      kind: mentions
+      any: [MDL, multidistrict]
+    - id: names_earplug_or_3m
+      kind: mentions
+      any: [3M, earplug, Combat Arms, "2885"]
+  expected_tools: [explain_change]
+  acceptable_tools: [get_official_figure, find_cases]
+  tags: [fy2020, mdl, district]
+- id: what-changed-weighted-2023-edition
+  question: What changed in the weighted civil filings series starting with the 2023 Judicial Facts and Figures?
+  claims:
+    - id: says_revised_down
+      kind: mentions
+      any: [revised down, lower, downward, decreased, reduced]
+    - id: names_recent_years
+      kind: mentions
+      any: ["2020", "2021", "2022"]
+    - id: labels_inference
+      kind: mentions
+      any: [inferred, inference, not official, unconfirmed, not confirmed, no published note, not explained, doesn't explain, does not explain]
+  expected_tools: [get_official_figure]
+  acceptable_tools: [explain_change]
+  tags: [edition_trap, weighted]
+- id: why-fy2024-weighted-two-figures-same-year
+  question: For FY2024, why do Judicial Business and Judicial Facts and Figures give different weighted civil filings per judgeship?
+  claims:
+    - id: names_jb2024
+      kind: mentions
+      any: [JB-2024, Judicial Business 2024, "384"]
+    - id: names_jff2024
+      kind: mentions
+      any: [JFF-2024, "335"]
+    - id: says_series_differs
+      kind: mentions
+      any: [revised, series, methodology, different]
+  expected_tools: [get_official_figure]
+  tags: [edition_trap, weighted]
+- id: why-fy2025-filings-changed
+  question: What explains the change in civil filings between FY2024 and FY2025?
+  claims:
+    - id: names_ndfla_decline
+      kind: mentions
+      any: [Northern District of Florida, N.D. Fla, FL-N]
+    - id: names_south_carolina
+      kind: mentions
+      any: [South Carolina, D.S.C]
+  expected_tools: [explain_change]
+  tags: [change]
+  notes: IDB FY2024→FY2025 +12,863; N.D. Fla. −22,003, D.S.C. +7,460.
+- id: explain-direct-filed-mdl
+  question: What does "directly filed MDL case" mean, and why does it matter for filing counts?
+  claims:
+    - id: mentions_origin_13
+      kind: mentions
+      any: [origin 13, origin code 13, "13"]
+    - id: mentions_mdl_court
+      kind: mentions
+      any: [MDL court, transferee court, transferee district, multidistrict litigation court]
+    - id: mentions_2016
+      kind: mentions
+      any: ["2016"]
+  expected_tools: [explain_term]
+  tags: [definition, mdl]
+- id: explain-statistical-vs-fiscal-year
+  question: What's the difference between a statistical year and a fiscal year in these tables?
+  claims:
+    - id: mentions_june_30
+      kind: mentions
+      any: [June 30]
+    - id: mentions_september_30
+      kind: mentions
+      any: [September 30]
+    - id: mentions_1992_or_1993
+      kind: mentions
+      any: ["1992", "1993"]
+  expected_tools: [explain_term]
+  tags: [definition, period]
+- id: why-pending-rose-fy2020-fy2021
+  question: Why did the number of pending civil cases climb in FY2020 and FY2021?
+  claims:
+    - id: names_mdl
+      kind: mentions
+      any: [MDL, multidistrict]
+    - id: names_ndfla
+      kind: mentions
+      any: [Northern District of Florida, N.D. Fla, FL-N]
+  expected_tools: [explain_change]
+  tags: [change, pending, mdl]
+- id: why-weighted-ndfla-drop-fy2025
+  question: Why did N.D. Fla. civil filings drop so sharply by FY2025?
+  claims:
+    - id: names_mdl
+      kind: mentions
+      any: [MDL, multidistrict, "2885", earplug, 3M]
+  expected_tools: [explain_change]
+  tags: [change, mdl, district]
+  notes: C-1 N.D. Fla. filings 25,234 (FY2024) → 3,248 (FY2025).
+- id: explain-nos-442
+  question: What is nature of suit 442?
+  claims:
+    - id: mentions_employment
+      kind: mentions
+      any: [employment]
+    - id: mentions_civil_rights
+      kind: mentions
+      any: [civil rights]
+  expected_tools: [explain_term]
+  tags: [definition, nos]
+- id: explain-judgeship-thresholds
+  question: What weighted-filings thresholds does the Judicial Conference use when it considers new judgeships?
+  claims:
+    - id: mentions_430
+      kind: mentions
+      any: ["430"]
+    - id: mentions_600
+      kind: mentions
+      any: ["600"]
+  expected_tools: [judgeship_context]
+  acceptable_tools: [explain_term]
+  tags: [judgeships, definition]
