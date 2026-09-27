@@ -1,0 +1,137 @@
+# NOS — nature of suit (3-digit statistical code).
+# Source: FJC IDB Civil Codebook 1988 Forward (2023-10-25), pp. 3–4.
+#
+# category / group / line place each code in the hierarchy of the official
+# Table C-2 ("Civil Cases Commenced, by Basis of Jurisdiction and Nature of
+# Suit"), transcribed from JB-2024 C-2 (jb_c2_0930.2024.xlsx):
+#   category  C-2's top-level totals (Contract, Real Property, Tort, Statutes)
+#   group     the next level (a C-2 "Total" row, or the row itself)
+#   line      the finest C-2 row the code is counted in
+# Checked against JB-2024 C-2: FY2024 IDB filings by category and group agree
+# within 0.4% for every group (see docs/methodology/idb.md). Codes marked
+# `unverified` are too few to confirm their row that way.
+#
+# Codes marked `discontinued` are not in the 2023 codebook but still occur in
+# older records; their labels come from the C-2 row names and the JS 44 civil
+# cover sheet.
+field: nos
+column: NOS
+title: Nature of suit
+description: Statistical code for the nature of the action filed.
+missing: ["-8"]
+codes:
+  # ── Contract Actions ──────────────────────────────────────────────────────
+  - {code: "110", label: Insurance, category: Contract Actions, group: Insurance, line: Insurance}
+  - {code: "120", label: Marine contract actions, category: Contract Actions, group: Marine, line: Marine}
+  - {code: "130", label: Miller Act, category: Contract Actions, group: Miller Act, line: Miller Act}
+  - {code: "140", label: Negotiable instruments, category: Contract Actions, group: Negotiable Instruments, line: Negotiable Instruments}
+  - {code: "150", label: Overpayments and enforcement of judgments, category: Contract Actions, group: Recovery of Overpayments and Enforcement of Judgments, line: Other}
+  - {code: "151", label: Overpayments under the Medicare Act, category: Contract Actions, group: Recovery of Overpayments and Enforcement of Judgments, line: Other, unverified: true}
+  - {code: "152", label: Recovery of defaulted student loans, category: Contract Actions, group: Recovery of Overpayments and Enforcement of Judgments, line: Defaulted Student Loans}
+  - {code: "153", label: Recovery of overpayments of veterans' benefits, category: Contract Actions, group: Recovery of Overpayments and Enforcement of Judgments, line: Veterans' Overpayment}
+  - {code: "160", label: Stockholders' suits, category: Contract Actions, group: Other Contract Actions, line: Other Contract Actions, unverified: true}
+  - {code: "190", label: Other contract actions, category: Contract Actions, group: Other Contract Actions, line: Other Contract Actions}
+  - {code: "195", label: Contract product liability, category: Contract Actions, group: Other Contract Actions, line: Other Contract Actions, unverified: true}
+  - {code: "196", label: Franchise, category: Contract Actions, group: Franchise, line: Franchise}
+  # ── Real Property Actions ─────────────────────────────────────────────────
+  - {code: "210", label: Land condemnation, category: Real Property Actions, group: Condemnation of Land, line: Condemnation of Land}
+  - {code: "220", label: Foreclosure, category: Real Property Actions, group: Foreclosure, line: Foreclosure}
+  - {code: "230", label: "Rent, lease and ejectment", category: Real Property Actions, group: "Rent, Lease, and Ejectment", line: "Rent, Lease, and Ejectment"}
+  - {code: "240", label: Torts to land, category: Real Property Actions, group: "Torts to Land, Including Product Liability", line: "Torts to Land, Including Product Liability"}
+  - {code: "245", label: Real property product liability, category: Real Property Actions, group: "Torts to Land, Including Product Liability", line: "Torts to Land, Including Product Liability"}
+  - {code: "290", label: Other real property actions, category: Real Property Actions, group: Other Real Property Actions, line: Other Real Property Actions}
+  # ── Tort Actions: Personal Injury ─────────────────────────────────────────
+  - {code: "310", label: Airplane personal injury, category: Tort Actions, group: Other Personal Injury, line: Airplane}
+  - {code: "315", label: Airplane product liability, category: Tort Actions, group: Personal Injury/Product Liability, line: Airplane}
+  - {code: "320", label: "Assault, libel and slander", category: Tort Actions, group: Other Personal Injury, line: "Assault, Libel, and Slander"}
+  - {code: "330", label: Federal Employers' Liability Act, category: Tort Actions, group: Other Personal Injury, line: Federal Employers Liability Act}
+  - {code: "340", label: Marine personal injury, category: Tort Actions, group: Other Personal Injury, line: Marine}
+  - {code: "345", label: Marine product liability, category: Tort Actions, group: Personal Injury/Product Liability, line: Marine}
+  - {code: "350", label: Motor vehicle personal injury, category: Tort Actions, group: Other Personal Injury, line: Motor Vehicle}
+  - {code: "355", label: Motor vehicle product liability, category: Tort Actions, group: Personal Injury/Product Liability, line: Motor Vehicle}
+  - {code: "360", label: Other personal injury, category: Tort Actions, group: Other Personal Injury, line: Other}
+  - {code: "362", label: Medical malpractice, category: Tort Actions, group: Other Personal Injury, line: Medical Malpractice}
+  - {code: "365", label: Personal injury product liability, category: Tort Actions, group: Personal Injury/Product Liability, line: Other}
+  - {code: "367", label: Health care / pharmaceutical personal injury product liability, category: Tort Actions, group: Personal Injury/Product Liability, line: Health Care/Pharma}
+  - {code: "368", label: Asbestos personal injury product liability, category: Tort Actions, group: Personal Injury/Product Liability, line: Asbestos}
+  # ── Tort Actions: Personal Property Damage ────────────────────────────────
+  - {code: "370", label: Other fraud, category: Tort Actions, group: Personal Property Damage, line: "Fraud, Including Truth in Lending"}
+  - {code: "371", label: Truth in lending, category: Tort Actions, group: Personal Property Damage, line: "Fraud, Including Truth in Lending"}
+  - {code: "380", label: Other personal property damage, category: Tort Actions, group: Personal Property Damage, line: Other Personal Property Damage}
+  - {code: "385", label: Property damage product liability, category: Tort Actions, group: Personal Property Damage, line: Other Personal Property Damage}
+  # ── Actions Under Statutes ────────────────────────────────────────────────
+  - {code: "375", label: False Claims Act, category: Actions Under Statutes, group: Other Statutory Actions, line: Other Statutory Actions, unverified: true}
+  - {code: "376", label: Qui tam (False Claims Act), category: Actions Under Statutes, group: Other Statutory Actions, line: Other Statutory Actions, unverified: true}
+  - {code: "400", label: State reapportionment, category: Actions Under Statutes, group: State Reapportionment Suits, line: State Reapportionment Suits}
+  - {code: "410", label: Antitrust, category: Actions Under Statutes, group: Antitrust, line: Antitrust}
+  - {code: "422", label: Bankruptcy appeals (28 U.S.C. 158), category: Actions Under Statutes, group: Bankruptcy, line: Appeal (28 U.S.C. 158)}
+  - {code: "423", label: Bankruptcy withdrawal (28 U.S.C. 157), category: Actions Under Statutes, group: Bankruptcy, line: Withdrawal (28 U.S.C. 157)}
+  - {code: "430", label: Banks and banking, category: Actions Under Statutes, group: Banks and Banking, line: Banks and Banking}
+  - {code: "440", label: Other civil rights, category: Actions Under Statutes, group: Civil Rights, line: Other Civil Rights}
+  - {code: "441", label: Civil rights – voting, category: Actions Under Statutes, group: Civil Rights, line: Voting}
+  - {code: "442", label: Civil rights – employment, category: Actions Under Statutes, group: Civil Rights, line: Employment}
+  - {code: "443", label: Civil rights – housing and accommodations, category: Actions Under Statutes, group: Civil Rights, line: Housing and Accommodations}
+  - {code: "444", label: Civil rights – welfare, category: Actions Under Statutes, group: Civil Rights, line: Welfare, discontinued: true}
+  - {code: "445", label: Americans with Disabilities Act – employment, category: Actions Under Statutes, group: Civil Rights, line: ADA--Employment}
+  - {code: "446", label: Americans with Disabilities Act – other, category: Actions Under Statutes, group: Civil Rights, line: ADA--Other}
+  - {code: "448", label: Education, category: Actions Under Statutes, group: Civil Rights, line: Education}
+  - {code: "450", label: Interstate commerce, category: Actions Under Statutes, group: Other Statutory Actions, line: Other Statutory Actions, unverified: true}
+  - {code: "460", label: Deportation, category: Actions Under Statutes, group: Deportation, line: Deportation}
+  - {code: "462", label: Naturalization application, category: Actions Under Statutes, group: Immigration, line: Naturalization Applications}
+  - {code: "463", label: Habeas corpus – alien detainee, category: Actions Under Statutes, group: Prisoner Petitions, line: Habeas Corpus--Alien Detainees}
+  - {code: "465", label: Other immigration actions, category: Actions Under Statutes, group: Immigration, line: Other Immigration Actions}
+  - {code: "470", label: Racketeer Influenced and Corrupt Organizations Act, category: Actions Under Statutes, group: Racketeer Influenced and Corrupt Organization Act, line: Racketeer Influenced and Corrupt Organization Act}
+  - {code: "480", label: Consumer credit, category: Actions Under Statutes, group: Consumer Credit, line: Consumer Credit}
+  - code: "485"
+    label: Telephone Consumer Protection Act
+    category: Actions Under Statutes
+    group: Other Statutory Actions
+    line: Other Statutory Actions
+    note: >-
+      C-2 has no TCPA row. Counting 485 under Consumer Credit overstates that
+      row by about 1,350 FY2024 filings and understates Other Statutory
+      Actions by the same amount, so C-2 counts it as another statute.
+  - {code: "490", label: Cable / satellite TV, category: Actions Under Statutes, group: Cable/Sat. TV, line: Cable/Sat. TV}
+  - {code: "510", label: Prisoner petitions – motions to vacate sentence, category: Actions Under Statutes, group: Prisoner Petitions, line: Motions to Vacate Sentence}
+  - {code: "530", label: Prisoner petitions – habeas corpus, category: Actions Under Statutes, group: Prisoner Petitions, line: Habeas Corpus--General}
+  - {code: "535", label: Habeas corpus – death penalty, category: Actions Under Statutes, group: Prisoner Petitions, line: Habeas Corpus--Death Penalty}
+  - {code: "540", label: Prisoner petitions – mandamus and other, category: Actions Under Statutes, group: Prisoner Petitions, line: Mandamus and Other}
+  - {code: "550", label: Prisoner civil rights, category: Actions Under Statutes, group: Prisoner Petitions, line: Civil Rights}
+  - {code: "555", label: Prison condition, category: Actions Under Statutes, group: Prisoner Petitions, line: Prison Condition}
+  - {code: "560", label: Civil detainee – conditions of confinement, category: Actions Under Statutes, group: Prisoner Petitions, line: Civil Detainee--Conditions of Confinement}
+  - {code: "610", label: Agricultural acts (forfeiture and penalty), category: Actions Under Statutes, group: Forfeiture and Penalty, line: Agricultural Acts, discontinued: true}
+  - {code: "620", label: Food and drug act, category: Actions Under Statutes, group: Forfeiture and Penalty, line: Food and Drug Act, discontinued: true}
+  - {code: "625", label: Drug-related seizure of property, category: Actions Under Statutes, group: Forfeiture and Penalty, line: Drug-Related Seizure of Property}
+  - {code: "630", label: Liquor laws, category: Actions Under Statutes, group: Forfeiture and Penalty, line: Other Forfeiture and Penalty Suits, discontinued: true, unverified: true}
+  - {code: "640", label: Railroad and truck, category: Actions Under Statutes, group: Forfeiture and Penalty, line: Other Forfeiture and Penalty Suits, discontinued: true, unverified: true}
+  - {code: "650", label: Airline regulations, category: Actions Under Statutes, group: Forfeiture and Penalty, line: Air Traffic Regulations, discontinued: true}
+  - {code: "660", label: Occupational safety and health, category: Actions Under Statutes, group: Forfeiture and Penalty, line: Occupational Safety and Health Act, discontinued: true}
+  - {code: "690", label: Other forfeiture and penalty suits, category: Actions Under Statutes, group: Forfeiture and Penalty, line: Other Forfeiture and Penalty Suits}
+  - {code: "710", label: Fair Labor Standards Act, category: Actions Under Statutes, group: Labor Laws, line: Fair Labor Standards Act}
+  - {code: "720", label: Labor Management Relations Act, category: Actions Under Statutes, group: Labor Laws, line: Labor Management Relations Act}
+  - {code: "730", label: Labor Management Reporting and Disclosure Act, category: Actions Under Statutes, group: Labor Laws, line: Labor Management Reporting and Disclosure Act, discontinued: true}
+  - {code: "740", label: Railway Labor Act, category: Actions Under Statutes, group: Labor Laws, line: Railway Labor Act}
+  - {code: "751", label: Family and Medical Leave Act, category: Actions Under Statutes, group: Labor Laws, line: Family and Medical Leave Act}
+  - {code: "790", label: Other labor litigation, category: Actions Under Statutes, group: Labor Laws, line: Other Labor Litigation}
+  - {code: "791", label: Employee Retirement Income Security Act, category: Actions Under Statutes, group: Labor Laws, line: Employee Retirement Income Security Act}
+  - {code: "820", label: Copyright, category: Actions Under Statutes, group: Intellectual Property Rights, line: Copyright}
+  - {code: "830", label: Patent, category: Actions Under Statutes, group: Intellectual Property Rights, line: Patent}
+  - {code: "835", label: Patent – abbreviated new drug application, category: Actions Under Statutes, group: Intellectual Property Rights, line: Patent--Abbreviated New Drug Application}
+  - {code: "840", label: Trademark, category: Actions Under Statutes, group: Intellectual Property Rights, line: Trademark}
+  - {code: "850", label: "Securities, commodities and exchange", category: Actions Under Statutes, group: "Securities, Commodities, and Exchanges", line: "Securities, Commodities, and Exchanges"}
+  - {code: "861", label: Social Security – health insurance (1395ff), category: Actions Under Statutes, group: Social Security Laws, line: Other}
+  - {code: "862", label: Social Security – black lung (923), category: Actions Under Statutes, group: Social Security Laws, line: Other}
+  - {code: "863", label: "Social Security – disability insurance (DIWC/DIWW, 405(g))", category: Actions Under Statutes, group: Social Security Laws, line: Disability Insurance}
+  - {code: "864", label: Social Security – supplemental security income (Title XVI), category: Actions Under Statutes, group: Social Security Laws, line: Supplemental Security Income}
+  - {code: "865", label: Social Security – retirement and survivors (405(g)), category: Actions Under Statutes, group: Social Security Laws, line: Retirement and Survivors Benefits}
+  - {code: "870", label: Tax suits, category: Actions Under Statutes, group: Tax Suits, line: Tax Suits}
+  - {code: "871", label: IRS third-party suits (26 U.S.C. 7609), category: Actions Under Statutes, group: Tax Suits, line: Tax Suits, unverified: true}
+  - {code: "875", label: Customer challenge (12 U.S.C. 3410), category: Actions Under Statutes, group: Customer Challenge, line: Customer Challenge, discontinued: true}
+  - {code: "880", label: Defend Trade Secrets Act, category: Actions Under Statutes, group: Intellectual Property Rights, line: Defend Trade Secrets Act}
+  - {code: "890", label: Other statutory actions, category: Actions Under Statutes, group: Other Statutory Actions, line: Other Statutory Actions}
+  - {code: "891", label: Agricultural acts, category: Actions Under Statutes, group: Other Statutory Actions, line: Other Statutory Actions, unverified: true}
+  - {code: "893", label: Environmental matters, category: Actions Under Statutes, group: Environmental Matters, line: Environmental Matters}
+  - {code: "895", label: Freedom of Information Act, category: Actions Under Statutes, group: Freedom of Information Act, line: Freedom of Information Act}
+  - {code: "896", label: Arbitration, category: Actions Under Statutes, group: Other Statutory Actions, line: Other Statutory Actions, unverified: true}
+  - {code: "899", label: Administrative Procedure Act review or appeal, category: Actions Under Statutes, group: Other Statutory Actions, line: Other Statutory Actions, unverified: true}
+  - {code: "950", label: Constitutionality of state statutes, category: Actions Under Statutes, group: Constitutionality of State Statutes, line: Constitutionality of State Statutes}

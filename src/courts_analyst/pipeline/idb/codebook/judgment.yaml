@@ -1,0 +1,13 @@
+# JUDGMENT — party the final judgment favored.
+# Source: FJC IDB Civil Codebook 1988 Forward (2023-10-25), p. 13.
+# The codebook lists both 0 and -8 as missing.
+field: judgment
+column: JUDGMENT
+title: Judgment for
+description: The party in whose favor a final judgment was entered.
+missing: ["-8", "0"]
+codes:
+  - {code: "1", label: Plaintiff}
+  - {code: "2", label: Defendant}
+  - {code: "3", label: Both}
+  - {code: "4", label: Unknown}

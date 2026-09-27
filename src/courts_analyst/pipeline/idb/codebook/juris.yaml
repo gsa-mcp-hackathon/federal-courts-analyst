@@ -1,0 +1,13 @@
+# JURIS — basis of U.S. district court jurisdiction.
+# Source: FJC IDB Civil Codebook 1988 Forward (2023-10-25), p. 3.
+field: juris
+column: JURIS
+title: Jurisdiction
+description: Basis of the district court's jurisdiction, used with the nature-of-suit code.
+missing: ["-8"]
+codes:
+  - {code: "1", label: U.S. government plaintiff, group: us}
+  - {code: "2", label: U.S. government defendant, group: us}
+  - {code: "3", label: Federal question, group: private}
+  - {code: "4", label: Diversity of citizenship, group: private}
+  - {code: "5", label: Local question, group: private}

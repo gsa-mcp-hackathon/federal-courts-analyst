@@ -47,6 +47,7 @@ coverage.xml
 # Data: downloads and build outputs are never committed (see data/README.md)
 data/raw/*
 data/build/*
+data/private/
 !data/raw/.gitkeep
 !data/build/.gitkeep
 *.duckdb

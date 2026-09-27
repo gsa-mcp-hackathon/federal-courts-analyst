@@ -1,0 +1,22 @@
+# PROCPROG — how far the case had progressed when it was disposed of.
+# Source: FJC IDB Civil Codebook 1988 Forward (2023-10-25), p. 11 and
+# Appendix A. `group` is the codebook's two stages.
+field: procprog
+column: PROCPROG
+title: Procedural progress
+description: The point to which the case had progressed when it was disposed of.
+missing: ["-8"]
+codes:
+  - {code: "1", label: No court action (before issue joined), group: before_issue_joined}
+  - {code: "2", label: Order entered (before issue joined), group: before_issue_joined}
+  - {code: "11", label: Hearing held (before issue joined), group: before_issue_joined}
+  - {code: "12", label: Order decided (before issue joined), group: before_issue_joined}
+  - {code: "3", label: No court action (after issue joined), group: after_issue_joined}
+  - {code: "4", label: Judgment on motion, group: after_issue_joined}
+  - {code: "5", label: Pretrial conference held, group: after_issue_joined}
+  - {code: "6", label: During court trial, group: after_issue_joined}
+  - {code: "7", label: During jury trial, group: after_issue_joined}
+  - {code: "8", label: After court trial, group: after_issue_joined}
+  - {code: "9", label: After jury trial, group: after_issue_joined}
+  - {code: "10", label: Other, group: after_issue_joined}
+  - {code: "13", label: Request for trial de novo after arbitration, group: after_issue_joined}

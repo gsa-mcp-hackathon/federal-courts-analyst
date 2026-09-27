@@ -85,3 +85,21 @@ async def test_data_status_reflects_duckdb_file(
     db.write_bytes(b"")
     result = await client.call_tool("server_info", {})
     assert result.structured_content["data_status"] == "ready"
+
+
+async def test_datasets_report_each_database(
+    client: Client, tmp_path, monkeypatch
+) -> None:
+    from courts_analyst.config import settings
+
+    monkeypatch.setattr(settings, "duckdb_path", tmp_path / "courts.duckdb")
+    monkeypatch.setattr(settings, "idb_duckdb_path", tmp_path / "idb.duckdb")
+    result = await client.call_tool("server_info", {})
+    assert result.structured_content["datasets"] == {
+        "official_tables": "not_built",
+        "idb_civil": "not_built",
+    }
+    (tmp_path / "idb.duckdb").write_bytes(b"")
+    result = await client.call_tool("server_info", {})
+    assert result.structured_content["datasets"]["idb_civil"] == "ready"
+    assert result.structured_content["data_status"] == "not_built"

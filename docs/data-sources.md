@@ -1,7 +1,9 @@
 # Data sources and methodology: official tables catalog
 
 This covers Phase 1: how the server gets the judiciary's published caseload
-tables, turns them into an edition-aware catalog, and checks the result.
+tables, turns them into an edition-aware catalog, and checks the result. The
+FJC civil Integrated Database (Phase 2) is covered in
+[methodology/idb.md](methodology/idb.md).
 The generated [revision log](revision-log.md) lists every figure that changed
 between editions.
 

@@ -1,0 +1,10 @@
+# STATUSCD — record type. Captured since October 2000.
+# Source: FJC IDB Civil Codebook 1988 Forward (2023-10-25), p. 14.
+field: statuscd
+column: STATUSCD
+title: Record status
+description: Whether the record is a pending case or a terminated case.
+missing: []
+codes:
+  - {code: "S", label: Pending, group: pending}
+  - {code: "L", label: Terminated, group: terminated}

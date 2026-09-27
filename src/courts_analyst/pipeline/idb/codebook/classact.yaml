@@ -1,0 +1,9 @@
+# CLASSACT — the complaint alleges a Rule 23 class action.
+# Source: FJC IDB Civil Codebook 1988 Forward (2023-10-25), p. 5.
+field: classact
+column: CLASSACT
+title: Class action alleged
+description: The plaintiff alleges the complaint meets the prerequisites of a class action (Fed. R. Civ. P. 23).
+missing: ["-8"]
+codes:
+  - {code: "1", label: Class action alleged}

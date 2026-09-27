@@ -1,0 +1,15 @@
+# NOJ — nature of judgment, for cases disposed of by a final judgment.
+# Source: FJC IDB Civil Codebook 1988 Forward (2023-10-25), p. 12.
+field: noj
+column: NOJ
+title: Nature of judgment
+description: The relief in a final judgment.
+missing: ["-8"]
+codes:
+  - {code: "0", label: No monetary award}
+  - {code: "1", label: Monetary award only}
+  - {code: "2", label: Monetary award and other}
+  - {code: "3", label: Injunction}
+  - {code: "4", label: "Forfeiture, foreclosure or condemnation"}
+  - {code: "5", label: Costs only}
+  - {code: "6", label: Costs and attorney fees}

@@ -38,9 +38,11 @@ class Settings(BaseSettings):
 
     # ── Data ──────────────────────────────────────────────────────────────────
     # DATA_DIR holds raw downloads (data/raw) and build outputs (data/build).
-    # DUCKDB_PATH defaults to <DATA_DIR>/build/courts.duckdb.
+    # DUCKDB_PATH defaults to <DATA_DIR>/build/courts.duckdb (official tables);
+    # IDB_DUCKDB_PATH to <DATA_DIR>/build/idb.duckdb (FJC civil IDB).
     data_dir: Path = Path("data")
     duckdb_path: Path | None = None
+    idb_duckdb_path: Path | None = None
 
     # ── External services (all optional) ──────────────────────────────────────
     anthropic_api_key: SecretStr | None = None
@@ -72,6 +74,17 @@ class Settings(BaseSettings):
     def resolved_duckdb_path(self) -> Path:
         """Where the analytical DuckDB file lives."""
         return self.duckdb_path or self.data_dir / "build" / "courts.duckdb"
+
+    @property
+    def resolved_idb_path(self) -> Path:
+        """Where the civil IDB DuckDB file lives (no party names in it)."""
+        return self.idb_duckdb_path or self.data_dir / "build" / "idb.duckdb"
+
+    @property
+    def idb_parties_path(self) -> Path:
+        """IDB party names (PII). Kept outside data/build, which is what gets
+        mounted into the server; the server never reads this file."""
+        return self.data_dir / "private" / "idb_parties.parquet"
 
 
 settings = Settings()

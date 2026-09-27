@@ -1,7 +1,7 @@
 # Federal Courts Analyst — developer entry points. Run `make help`.
 .DEFAULT_GOAL := help
 .PHONY: help setup lint format typecheck test test-full cov data data-tables \
-        data-discover serve serve-http \
+        data-discover data-idb data-idb-sample serve serve-http \
         inspector docker-build docker-run docker-test web eval clean
 
 IMAGE ?= federal-courts-analyst:dev
@@ -9,7 +9,7 @@ PORT  ?= 8000
 
 help: ## List targets
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | \
-	  awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-13s\033[0m %s\n", $$1, $$2}'
+	  awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-16s\033[0m %s\n", $$1, $$2}'
 
 setup: ## Install dev deps and git hooks
 	uv sync --group dev --group pipeline
@@ -33,11 +33,18 @@ test: ## Fast test suite with coverage (no full-data tests)
 test-full: ## Everything, including @fulldata tests (needs `make data`)
 	uv run pytest -m "" --cov --cov-report=term-missing
 
-data: data-tables ## Download and build every dataset (IDB joins in P2)
+data: data-tables data-idb ## Download and build every dataset
 
 data-tables: ## Fetch the official tables in the manifest and build courts.duckdb
 	uv sync --group dev --group pipeline
 	uv run python -m courts_analyst.pipeline.tables all
+
+data-idb: ## Fetch the pinned civil IDB release (~330 MB) and build idb.duckdb (~1.5 min)
+	uv sync --group dev --group pipeline
+	uv run python -m courts_analyst.pipeline.idb all
+
+data-idb-sample: ## Rebuild the committed IDB test fixture from the downloaded release
+	uv run python -m courts_analyst.pipeline.idb sample
 
 data-discover: ## Re-crawl uscourts.gov and rewrite data/manifest/tables.yaml
 	uv run python -m courts_analyst.pipeline.tables discover
@@ -69,3 +76,4 @@ eval: ## Run the evaluation benchmark (P3)
 clean: ## Remove caches and build outputs (keeps downloads in data/raw)
 	rm -rf .pytest_cache .mypy_cache .ruff_cache htmlcov .coverage coverage.xml
 	find data/build -mindepth 1 ! -name .gitkeep -delete
+	rm -rf data/private
