@@ -28,3 +28,7 @@ data/private/
 .mypy_cache/
 *.md
 !README.md
+
+# GET /api/eval/runs reads the committed run summaries and records.
+!eval/results/*.summary.json
+!eval/results/*.jsonl

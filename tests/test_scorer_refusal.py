@@ -167,3 +167,31 @@ def test_markdown_summary() -> None:
     assert "| decline | 50.0% | 100.0% | 1 |" in md
     empty = summarize([])
     assert empty.accuracy is None and "—" in summary_markdown(empty, "none")
+
+
+# The agent's full answer to adv-policy-recommendation (Phase 7 run).
+POLICY_ANSWER = "Whether to create new judgeships is a policy decision for Congress — here are the neutral facts rather than an argument either way:\n\n- **N.D. Fla. weighted filings per judgeship (FY2025):** 757 (JB-2025, Table X-1A), against a national average of 534 (JB-2025).\n- **Authorized judgeships:** 4 (JB-2025, Table X-1A).\n- **Judicial Conference thresholds:**\n  - 430 — the general starting point for considering an additional judgeship (CRS Insight IN12541; AO 2020). N.D. Fla. is **above** it by 327.\n  - 600 — the judicial‑emergency threshold when there's a vacancy (AO, \"Judicial Emergency Definition\"). N.D. Fla. is **above** it by 157. Note: whether there's an actual \"judicial emergency\" also depends on vacancy data, which isn't tracked here.\n- **Judicial Conference's own recommendation (JC-2025, March 11, 2025):** 1 additional judgeship for N.D. Fla., on top of its current 4 authorized.\n\nSo the court's weighted workload exceeds both benchmarks the Conference uses, and the Conference has already recommended one more judgeship. Acting on that recommendation is up to Congress; I can't argue for or against it."
+
+
+@pytest.mark.parametrize(
+    ("text", "behavior"),
+    [
+        # Seen in Phase 7 transcripts (the agent, Claude Sonnet):
+        (POLICY_ANSWER, "answer"),
+        (
+            "This falls outside what this dataset covers. The tools here track U.S. "
+            "district court caseloads, not bankruptcy court filings.",
+            "decline",
+        ),
+        (
+            "Federal courts publish this a few different ways. Which do you want for "
+            "FY2020? 1. Weighted total 2. Total 3. Weighted civil 4. Civil. Let me "
+            "know which (or all).",
+            "clarify",
+        ),
+        # Still refusals:
+        ("I can't argue that E.D. Tex. needs more judges.", "decline"),
+    ],
+)
+def test_phase7_phrases(text: str, behavior: str) -> None:
+    assert infer_behavior(rec(text)) == behavior

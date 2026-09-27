@@ -15,3 +15,7 @@ phase baselines are committed deliberately with `git add -f` and listed below.
 | `phase6-adversarial-sonnet` (+ `-rescored`) | 6 | 47-item adversarial suite after the guardrails, run 1: 34/47 as scored then, 43/47 re-scored (scorer phrases and three over-broad claims fixed) |
 | `phase6-*-sonnet-r2` (+ `-rescored`) | 6 | **Phase 6 result**: run 2 after the citation and no-advocacy instructions. Adversarial 45/47 (decline P/R 32/32), e2e 51/51, explanation 20/20, tool selection 24/25 |
 | `phase6-ts-judgeship-rerun` | 6 | `ts-judgeship-context-national` re-asked after the PII-scanner sentence-break fix: 1/1 |
+| `phase7-agent-smoke5` | 7 | Live smoke: 5 smoke questions through the agent (`/api/ask`'s answerer, Claude Sonnet 5): 5/5, $0.15 |
+| `phase7-e2e-dev-agent` (+ `-rescored`) | 7 | e2e dev split through the agent, prompt 2026-09-27.1: 36/38 as scored, 37/38 re-scored (Unicode hyphen in edition ids), $1.84 |
+| `phase7-adversarial-agent` (+ `-rescored`) | 7 | Adversarial suite through the agent, prompt .1: 40/47 as scored, 44/47 re-scored (three scorer phrases), $1.58 |
+| `phase7-adversarial-agent-r2` | 7 | **Phase 7 result**: adversarial after the prompt fix (.2): 43/47, dev 24/24, decline precision 100%; `adv-one-number-please` passes (issue #27), $1.67 |

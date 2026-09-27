@@ -24,7 +24,8 @@ _SERIES_TITLES = {
 }
 
 _EDITION_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
-    ("id", re.compile(r"\b(JB|JFF|FCMS|STFJ|FJCS)[-\s](\d{4})\b", re.I)),
+    # Models also write the id with Unicode hyphens (JB‑2024 with U+2011).
+    ("id", re.compile(r"\b(JB|JFF|FCMS|STFJ|FJCS)[-\u2010-\u2013\s](\d{4})\b", re.I)),
     *[
         (
             code,
