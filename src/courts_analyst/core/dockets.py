@@ -19,6 +19,8 @@ from pydantic import BaseModel, Field
 from courts_analyst.core.cohorts import CohortStore, _from_where, idb_provenance
 from courts_analyst.core.courts import COURTS
 from courts_analyst.core.db import Database
+from courts_analyst.core.guardrails import guarded
+from courts_analyst.core.guardrails.policy import SMALL_CELL_SUPPRESS, declined_error
 from courts_analyst.core.results import Caveat, Result, ok
 
 MAX_SAMPLE: Final = 10
@@ -65,19 +67,25 @@ class DocketRef(BaseModel):
 
 class DocketSample(BaseModel):
     handle: str
-    cohort_size: int
+    cohort_size: int = Field(description="Cases in the cohort (at least 10).")
     dockets: list[DocketRef]
 
 
 SAMPLE_TAIL = " ORDER BY hash(case_key || ?), case_key LIMIT ?"
 
 
+@guarded
 def sample_dockets(
     db: Database, store: CohortStore, handle: str, n: int = 3
 ) -> Result[DocketSample]:
-    """Up to ``n`` (≤ 10) docket references from the cohort, deterministically."""
+    """Up to ``n`` (≤ 10) docket references from the cohort, deterministically.
+
+    Declined for cohorts of fewer than 10 cases: a sample would list most of
+    the cohort, and its size would give away the suppressed count."""
     db.require_idb()
     rec = store.get(handle)
+    if rec.n < SMALL_CELL_SUPPRESS:
+        raise declined_error("small_cell")
     n = max(1, min(n, MAX_SAMPLE))
     frm, params = _from_where(rec.spec)
     rows = db.rows(

@@ -27,7 +27,9 @@ national figure, the 430 and 600 thresholds with their sources, the \
 Conference's 2025 recommendation for the court if any, and a neutral \
 summary. The server never recommends judgeships itself and can't say \
 whether a court has a judicial emergency (that needs vacancy data): don't \
-imply either.
+imply either. Asked whether a court should get judgeships, give these facts \
+and the Conference's recommendation, say it's a decision for Congress, and \
+don't argue either side.
 
 Example: court='TX-E', fiscal_year=2025 → 894 weighted filings per judgeship \
 (JB-2025), above 430 and 600; the Conference recommended 2 more judgeships."""

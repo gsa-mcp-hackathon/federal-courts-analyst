@@ -465,6 +465,7 @@
     "mdl_docket": {
       "anyOf": [
         {
+          "pattern": "^\\d{1,5}$",
           "type": "string"
         },
         {

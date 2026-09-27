@@ -125,9 +125,10 @@ def test_group_by_and_suppression(core_db: Database, store: CohortStore) -> None
         core_db, store, few, "median_days_to_disposition", group_by="nos_group"
     )
     groups = r.data.results  # type: ignore[union-attr]
-    tiny = [g for g in groups if g.n < 10]
-    assert tiny and all(g.value is None and g.status == "suppressed" for g in tiny)
-    assert all(g.value is not None for g in groups if g.n >= 10)
+    # Small groups are withheld whole: no value and no n (Phase 6).
+    tiny = [g for g in groups if g.status == "suppressed"]
+    assert tiny and all(g.value is None and g.n is None for g in tiny)
+    assert all(g.value is not None and g.n >= 10 for g in groups if g.n is not None)
     assert any(w.code == "suppressed" for w in r.warnings)
 
 

@@ -9,6 +9,7 @@ from fastmcp import Context, FastMCP
 from pydantic import Field
 
 from courts_analyst.core.enums import CourtCode, EditionSelector
+from courts_analyst.core.guardrails.periods import PeriodEnding
 from courts_analyst.core.official import OfficialFigure, get_official_figure
 from courts_analyst.core.results import Result, clarify
 from courts_analyst.tools._common import READ_ONLY, ask, core_errors, get_db
@@ -25,12 +26,13 @@ between years (use explain_change), or for counts with filters such as case \
 type (use find_cases).
 
 Returns the value in the latest edition by default, the first-published \
-value, every edition that printed it and, when editions disagree \
-(revision_status 'revised'), revision_notes on why. Always name the edition \
-and say when a figure was revised, even if asked for one number; relay an \
-'inferred' note as inference. Warnings flag statistical years (1990 ends \
-June 30). A plain "civil filings" means civil_cases_filed; pass \
-'filings_per_judgeship' only when the user didn't say weighted or unweighted.
+value, every edition that printed it and, when editions disagree, \
+revision_notes on why. Quote `citation` with the number, even if asked for \
+one number: it names the edition and any revision. Relay an 'inferred' note \
+as inference. For a 12-month period not ending September 30 (e.g. ending \
+June 30), pass period_ending and relay what the server says. A plain "civil \
+filings" means civil_cases_filed; pass 'filings_per_judgeship' only when the \
+user didn't say weighted or unweighted.
 
 Example: measure='weighted_civil_filings_per_judgeship', court='US', \
 fiscal_year=2020 → 322 (JFF-2025), first published as 554 (JB-2020)."""
@@ -58,6 +60,13 @@ def register(mcp: FastMCP) -> None:
                 description="'latest' (default), 'first_published' or an edition id."
             ),
         ] = "latest",
+        period_ending: Annotated[
+            PeriodEnding,
+            Field(
+                description="End of the 12-month period: 'september_30' (fiscal "
+                "year, default) or another quarter end the user asked about."
+            ),
+        ] = "september_30",
         ctx: Context | None = None,
     ) -> Result[OfficialFigure] | mcp_types.InputRequiredResult:
         if measure in AMBIGUOUS:
@@ -67,4 +76,6 @@ def register(mcp: FastMCP) -> None:
             if answer is None:
                 return clarify(AMBIGUOUS[measure], OfficialFigure)
             measure = answer
-        return get_official_figure(get_db(), measure, court, fiscal_year, edition)
+        return get_official_figure(
+            get_db(), measure, court, fiscal_year, edition, period_ending
+        )

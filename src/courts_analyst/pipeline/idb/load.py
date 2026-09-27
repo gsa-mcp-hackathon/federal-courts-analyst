@@ -39,6 +39,8 @@ from typing import Any
 
 import duckdb
 
+from courts_analyst.core.db import PII_INDEX_NAME
+from courts_analyst.core.guardrails.pii import build_index
 from courts_analyst.pipeline.idb.codebook import (
     Field_,
     load_codebook,
@@ -135,6 +137,7 @@ def build_idb(
         _write_breaks(con)
         step("raw", lambda: _raw(con, cols, fy_from, fy_to))
         step("parties", lambda: _export_parties(con, parties_path))
+        step("pii index", lambda: _pii_index(con, db_path.with_name(PII_INDEX_NAME)))
         con.execute("ALTER TABLE idb_civil_raw DROP COLUMN plt")
         con.execute("ALTER TABLE idb_civil_raw DROP COLUMN def")
         step("decode", lambda: _record(con, codebook))
@@ -351,6 +354,28 @@ def _export_parties(con: duckdb.DuckDBPyConnection, parties_path: Path) -> None:
                   FROM idb_civil_raw ORDER BY record_id)
             TO {_q(str(parties_path))} (FORMAT parquet)"""
     )
+
+
+def _pii_index(con: duckdb.DuckDBPyConnection, path: Path) -> None:
+    """Hashed party names for the server's output scanner (Phase 6)."""
+    names = con.execute(
+        "SELECT plt FROM idb_civil_raw UNION SELECT def FROM idb_civil_raw"
+    ).fetchall()
+    n = build_index((r[0] for r in names), path)
+    log.info("pii index: %s hashed names -> %s", f"{n:,}", path.name)
+
+
+def build_pii_index(parties_path: Path, index_path: Path) -> int:
+    """Rebuild the scanner index from the private parties file alone."""
+    con = duckdb.connect()
+    try:
+        names = con.execute(
+            f"SELECT plaintiff FROM {_q(str(parties_path))} "
+            f"UNION SELECT defendant FROM {_q(str(parties_path))}"
+        ).fetchall()
+    finally:
+        con.close()
+    return build_index((r[0] for r in names), index_path)
 
 
 # ── Decoded records ──────────────────────────────────────────────────────────

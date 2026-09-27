@@ -42,6 +42,8 @@ from courts_analyst.core.enums import (
     nos_entry,
 )
 from courts_analyst.core.errors import InvalidCohortError, UnknownHandleError
+from courts_analyst.core.guardrails import guarded
+from courts_analyst.core.guardrails.small_cells import protect
 from courts_analyst.core.provenance import Provenance
 from courts_analyst.core.results import Caveat, Result, ok
 from courts_analyst.core.stats import (
@@ -117,7 +119,9 @@ class CohortSpec(BaseModel):
         default=None, description="True: class action alleged at filing."
     )
     mdl_docket: str | None = Field(
-        default=None, description="An MDL docket number, for example '2885'."
+        default=None,
+        pattern=r"^\d{1,5}$",
+        description="An MDL docket number, for example '2885'.",
     )
 
     @model_validator(mode="after")
@@ -289,8 +293,13 @@ class CohortStore:
 
 class Count(BaseModel):
     key: str
-    n: int
+    n: int | None = Field(description="Cases; None when suppressed (fewer than 10).")
     share: float | None = None
+    suppressed: bool = Field(
+        default=False,
+        description="Withheld: fewer than 10 cases, or withheld so a small cell "
+        "can't be worked out from the total.",
+    )
 
 
 class CohortSummary(BaseModel):
@@ -300,8 +309,9 @@ class CohortSummary(BaseModel):
     parent: str | None = None
     spec: dict[str, Any] = Field(description="The normalised filters.")
     basis: Basis
-    n: int = Field(
-        description="Cases (filed basis) or terminations (terminated basis)."
+    n: int | None = Field(
+        description="Cases (filed basis) or terminations (terminated basis); None "
+        "when fewer than 10 (suppressed)."
     )
     by_fiscal_year: list[Count]
     top_courts: list[Count]
@@ -314,7 +324,9 @@ class CohortSummary(BaseModel):
 
 class GroupValue(BaseModel):
     group: str | None = Field(default=None, description="Group key, or None for all.")
-    n: int = Field(description="Cases the value is computed over.")
+    n: int | None = Field(
+        description="Cases the value is computed over; None when suppressed."
+    )
     value: float | None = Field(description="None when withheld (fewer than 10 cases).")
     ci_low: float | None = None
     ci_high: float | None = None
@@ -346,29 +358,54 @@ def idb_provenance(
     )
 
 
-def _counts(db: Database, spec: CohortSpec, column: str, limit: int) -> list[Count]:
+def _counts(
+    db: Database, spec: CohortSpec, column: str, total: int, limit: int | None = None
+) -> list[Count]:
+    """The cohort split by ``column``, largest first, with small cells (and
+    their complements) suppressed across the *whole* split before the top
+    ``limit`` are kept."""
     frm, params = _from_where(spec)
     sql = (
         "SELECT CAST("
         + column
         + " AS VARCHAR) AS k, count(*) AS n"
         + frm
-        + " GROUP BY 1 ORDER BY n DESC, k LIMIT ?"
+        + " GROUP BY 1 ORDER BY n DESC, k"
     )
-    rows = db.rows(sql, [*params, limit])
-    total = sum(r[1] for r in rows) or 1
-    return [Count(key=str(k), n=n, share=n / total) for k, n in rows]
+    rows = db.rows(sql, params)
+    return protect_counts([(str(k), int(n)) for k, n in rows], total)[:limit]
+
+
+def protect_counts(rows: list[tuple[str, int]], total: int | None) -> list[Count]:
+    """Counts with the small-cell and complementary rules applied. ``total``
+    is the published sum of the rows (None when it isn't shown)."""
+    shown = total is not None and sum(n for _, n in rows) == total
+    guard = protect([n for _, n in rows], total_shown=shown)
+    return [
+        Count(key=k, n=None, share=None, suppressed=True)
+        if i in guard.withheld
+        else Count(key=k, n=n, share=n / total if total else None)
+        for i, (k, n) in enumerate(rows)
+    ]
 
 
 def _cell_caveats(n: int) -> list[Caveat]:
     status = cell_status(n)
+    if status == "suppressed" and n > 0:
+        return [
+            Caveat(
+                code="suppressed",
+                severity="block",
+                message=f"Fewer than {SMALL_CELL_SUPPRESS} cases: too few to report. "
+                "The count and every statistic are withheld; broaden the filters.",
+            )
+        ]
     if status == "suppressed":
         return [
             Caveat(
                 code="suppressed",
                 severity="block",
-                message=f"Only {n} cases match: too few to report (fewer than "
-                f"{SMALL_CELL_SUPPRESS}). Values are withheld; broaden the filters.",
+                message="No cases to compute this over; broaden the filters.",
             )
         ]
     if status == "small":
@@ -412,6 +449,17 @@ def _data_break_caveats(db: Database, spec: CohortSpec) -> list[Caveat]:
     return out
 
 
+def _suppressed_counts_caveat() -> Caveat:
+    return Caveat(
+        code="suppressed",
+        severity="info",
+        message=f"Groups with fewer than {SMALL_CELL_SUPPRESS} cases are shown as "
+        "suppressed (n = null), and so is the next smallest where needed, so no "
+        "small group can be worked out from the total.",
+    )
+
+
+@guarded
 def find_cases(
     db: Database, store: CohortStore, spec: CohortSpec, parent: str | None = None
 ) -> Result[CohortSummary]:
@@ -437,21 +485,29 @@ def find_cases(
         )
     )
     _, fy_col = _source(spec)
+    small = 0 < n < SMALL_CELL_SUPPRESS
+    shown = n > 0 and not small
     summary = CohortSummary(
         handle=handle,
         parent=parent,
         spec=spec.normalized(),
         basis=spec.basis,
-        n=n,
-        by_fiscal_year=sorted(_counts(db, spec, fy_col, 20), key=lambda c: c.key)
-        if n
+        n=None if small else n,
+        by_fiscal_year=sorted(_counts(db, spec, fy_col, n), key=lambda c: c.key)
+        if shown
         else [],
-        top_courts=_counts(db, spec, "court", 5) if n else [],
-        top_nos_groups=_counts(db, spec, "nos_group", 5) if n else [],
-        mdl_direct_share=float(row[1]) if row[1] is not None else None,
-        terminated_share=float(row[2]) if row[2] is not None else None,
+        top_courts=_counts(db, spec, "court", n, 5) if shown else [],
+        top_nos_groups=_counts(db, spec, "nos_group", n, 5) if shown else [],
+        mdl_direct_share=float(row[1]) if row[1] is not None and shown else None,
+        terminated_share=float(row[2]) if row[2] is not None and shown else None,
     )
-    warnings = _cell_caveats(n) + _data_break_caveats(db, spec)
+    # An empty cohort isn't a suppressed one: out_of_scope below says so.
+    warnings = (_cell_caveats(n) if n else []) + _data_break_caveats(db, spec)
+    if any(
+        c.suppressed
+        for c in (*summary.by_fiscal_year, *summary.top_courts, *summary.top_nos_groups)
+    ):
+        warnings.append(_suppressed_counts_caveat())
     if n == 0:
         warnings.append(
             Caveat(code="out_of_scope", message="No cases match these filters.")
@@ -464,11 +520,12 @@ def find_cases(
         "record for terminations).",
     )
     nxt = [f"analyze_cohort(handle='{handle}', metric=...)"]
-    if n:
+    if shown:
         nxt.append(f"sample_dockets(handle='{handle}', n=3)")
     return ok(summary, [prov], warnings, nxt)
 
 
+@guarded
 def refine(
     db: Database, store: CohortStore, handle: str, changes: dict[str, Any]
 ) -> Result[CohortSummary]:
@@ -519,7 +576,7 @@ def _groups(
     if col.endswith("_fy"):
         rows = sorted(rows, key=lambda r: str(r[0]))
     omitted = max(0, len(rows) - MAX_GROUPS)
-    return [(r[0], int(r[1])) for r in rows[:MAX_GROUPS]], omitted
+    return [(r[0], int(r[1])) for r in rows], omitted
 
 
 def _with_group(
@@ -564,7 +621,7 @@ def _rates(
         + " AS VARCHAR), count(*)"
         + frm
         + cond
-        + " GROUP BY 1 ORDER BY 2 DESC",
+        + " GROUP BY 1 ORDER BY 2 DESC, 1",
         params,
     )
     n = sum(r[1] for r in rows)
@@ -578,7 +635,7 @@ def _rates(
         value=top_k / n,
         ci_low=ci.low,
         ci_high=ci.high,
-        breakdown=[Count(key=str(key), n=k, share=k / n) for key, k in rows],
+        breakdown=protect_counts([(str(key), int(k)) for key, k in rows], n),
         status=status,
     )
 
@@ -636,6 +693,33 @@ _METHOD = {
 }
 
 
+def _protect_groups(results: list[GroupValue], total: int) -> list[GroupValue]:
+    """Withhold small groups (their n and value) and, when the groups' n add up
+    to the cohort total the summary shows, enough others that none can be
+    worked out from it."""
+    counts = [r.n or 0 for r in results]
+    guard = protect(counts, total_shown=sum(counts) == total)
+    out = []
+    for i, r in enumerate(results):
+        if i in guard.withheld or r.status == "suppressed":
+            out.append(
+                r.model_copy(
+                    update={
+                        "n": None,
+                        "value": None,
+                        "ci_low": None,
+                        "ci_high": None,
+                        "breakdown": None,
+                        "status": "suppressed",
+                    }
+                )
+            )
+        else:
+            out.append(r)
+    return out
+
+
+@guarded
 def analyze_cohort(
     db: Database,
     store: CohortStore,
@@ -652,7 +736,10 @@ def analyze_cohort(
     col = _group_col(spec, group_by)
     groups, omitted = _groups(db, spec, col)
     results: list[GroupValue] = []
-    for key, gn in groups:
+    # Metrics run on the shown groups only; small-cell protection below sees
+    # every group's count, so truncation can't expose a withheld one.
+    all_counts = [gn for _, gn in groups]
+    for key, gn in groups[:MAX_GROUPS]:
         frm, params = _with_group(spec, col, key)
         if metric in ("count", "trend"):
             gv = GroupValue(n=gn, value=float(gn), status=cell_status(gn))
@@ -675,10 +762,35 @@ def analyze_cohort(
     warnings: list[Caveat] = []
     small = [r for r in results if r.status != "ok"]
     if small and metric not in ("count", "trend"):
-        worst = min(r.n for r in small)
+        worst = min(r.n or 0 for r in small)
         warnings.extend(_cell_caveats(worst))
     elif metric in ("count", "trend") and rec.n < SMALL_CELL_WARN:
         warnings.extend(_cell_caveats(rec.n))
+    if rec.n < SMALL_CELL_SUPPRESS:
+        results = [
+            r.model_copy(
+                update={
+                    "n": None,
+                    "value": None,
+                    "ci_low": None,
+                    "ci_high": None,
+                    "breakdown": None,
+                    "status": "suppressed",
+                }
+            )
+            for r in results
+        ]
+    else:
+        # Every group's count feeds the protection, shown or not.
+        padded = results + [
+            GroupValue(n=gn, value=None, status="ok") for gn in all_counts[MAX_GROUPS:]
+        ]
+        if metric in ("count", "trend") or sum(r.n or 0 for r in padded) == rec.n:
+            results = _protect_groups(padded, rec.n)[: len(results)]
+        else:
+            results = _protect_groups(padded, -1)[: len(results)]
+        if any(r.status == "suppressed" and r.group is not None for r in results):
+            warnings.append(_suppressed_counts_caveat())
     if omitted:
         warnings.append(
             Caveat(

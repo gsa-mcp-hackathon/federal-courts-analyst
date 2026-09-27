@@ -20,6 +20,8 @@ import duckdb
 
 from courts_analyst.core.errors import DataUnavailableError
 
+PII_INDEX_NAME = "pii_index.bin"
+
 
 def _attach_sql(path: Path, alias: str) -> str:
     literal = "'" + str(path).replace("'", "''") + "'"
@@ -29,9 +31,19 @@ def _attach_sql(path: Path, alias: str) -> str:
 class Database:
     """The catalog (required) and the IDB (optional) behind one connection."""
 
-    def __init__(self, tables_path: Path, idb_path: Path | None = None) -> None:
+    def __init__(
+        self,
+        tables_path: Path,
+        idb_path: Path | None = None,
+        pii_index_path: Path | None = None,
+    ) -> None:
         self.tables_path = tables_path
         self.idb_path = idb_path
+        # The hashed party-name index the output scanner reads (Phase 6);
+        # the IDB pipeline writes it next to idb.duckdb.
+        self.pii_index_path = pii_index_path or (
+            idb_path.with_name(PII_INDEX_NAME) if idb_path is not None else None
+        )
         self._lock = threading.Lock()
         self._con: duckdb.DuckDBPyConnection | None = None
 

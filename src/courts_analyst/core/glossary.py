@@ -4,6 +4,10 @@ Looks in three places, in order: the reviewed glossary
 (``core/data/glossary.yaml``), the measures registry, and the IDB codebook's
 nature-of-suit codes ("nature of suit 442", "NOS 830", "442"). Anything else
 gets fuzzy "did you mean" suggestions rather than a guess.
+
+The term is free text, so it is screened first (``core/guardrails/intent``):
+a request to rank or name judges, or to name parties, is declined with the
+policy and an alternative rather than looked up.
 """
 
 from __future__ import annotations
@@ -17,7 +21,11 @@ from typing import Any, Literal
 import yaml
 from pydantic import BaseModel, Field
 
+from courts_analyst.core.db import Database
 from courts_analyst.core.enums import nos_entry
+from courts_analyst.core.errors import DeclinedError
+from courts_analyst.core.guardrails import guarded
+from courts_analyst.core.guardrails.intent import screen
 from courts_analyst.core.measures import registry
 from courts_analyst.core.provenance import Provenance
 from courts_analyst.core.results import Caveat, Result, ok
@@ -102,9 +110,19 @@ def _nos(code: str) -> TermDefinition | None:
     )
 
 
-def explain_term(term: str) -> Result[TermLookup]:
-    """Define a term, measure or nature-of-suit code; suggest when unsure."""
+@guarded
+def explain_term(term: str, db: Database | None = None) -> Result[TermLookup]:
+    """Define a term, measure or nature-of-suit code; suggest when unsure.
+
+    ``db`` is only used by the output scanner (the term is echoed back)."""
     q = term.strip()
+    screening = screen(q)
+    if screening.decline is not None:
+        raise DeclinedError(
+            screening.decline.message,
+            screening.decline.reason,
+            decline=screening.decline,
+        )
     key = _norm(q)
     found: TermDefinition | None = None
     if m := _NOS.match(q.strip()):

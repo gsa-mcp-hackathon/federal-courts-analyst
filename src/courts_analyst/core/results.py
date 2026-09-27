@@ -1,10 +1,12 @@
 """Result envelopes: data + provenance + warnings + next steps.
 
-Every core entry point returns a :class:`Result`. Its ``status`` is ``ok``, or
+Every core entry point returns a :class:`Result`. Its ``status`` is ``ok``;
 ``needs_clarification`` when the question is ambiguous in a way that changes
-the answer; then ``data`` is empty and ``clarification`` lists the choices.
-Adapters (MCP tools, REST) pass the envelope through unchanged, so every
-client sees the same provenance and warnings.
+the answer (``data`` is empty and ``clarification`` lists the choices); or
+``declined`` when a guardrail policy withholds the answer (``data`` is empty
+and ``declined`` says why and what to ask instead). Adapters (MCP tools, REST)
+pass the envelope through unchanged, so every client sees the same
+provenance, warnings and declines.
 """
 
 from __future__ import annotations
@@ -29,7 +31,10 @@ WarningCode = Literal[
     "mixed_editions",
     "partial_year",
     "truncated",
+    "no_recommendation",
 ]
+
+DeclineReason = Literal["judge_level", "pii", "small_cell", "policy", "advocacy"]
 
 
 class Caveat(BaseModel):
@@ -64,12 +69,24 @@ class Clarification(BaseModel):
     )
 
 
+class Decline(BaseModel):
+    """Why a guardrail policy withheld the answer, and what to ask instead."""
+
+    reason: DeclineReason
+    message: str = Field(description="The explanation to relay to the user.")
+    policy: str = Field(description="The rule that applies and where it comes from.")
+    alternative: str | None = Field(
+        default=None, description="A question the server can answer instead."
+    )
+
+
 class Result(BaseModel, Generic[T]):
     """Envelope every core entry point returns."""
 
-    status: Literal["ok", "needs_clarification"] = "ok"
+    status: Literal["ok", "needs_clarification", "declined"] = "ok"
     data: T | None = None
     clarification: Clarification | None = None
+    declined: Decline | None = None
     provenance: list[Provenance] = Field(default_factory=list)
     warnings: list[Caveat] = Field(default_factory=list)
     suggested_next: list[str] = Field(
@@ -99,3 +116,9 @@ def clarify(clarification: Clarification, data_type: type[T]) -> Result[T]:
     """A ``needs_clarification`` result for a tool whose data type is ``data_type``."""
     model: type[Result[T]] = Result[data_type]  # type: ignore[valid-type]
     return model(status="needs_clarification", clarification=clarification)
+
+
+def decline(declined: Decline, data_type: type[T]) -> Result[T]:
+    """A ``declined`` result for a tool whose data type is ``data_type``."""
+    model: type[Result[T]] = Result[data_type]  # type: ignore[valid-type]
+    return model(status="declined", declined=declined, suggested_next=[])
