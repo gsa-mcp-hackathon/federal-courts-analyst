@@ -157,4 +157,27 @@ describe("Markdown", () => {
     const links = [...container.querySelectorAll("a")].map((a) => a.getAttribute("href"));
     expect(links).toEqual(["https://www.uscourts.gov/"]);
   });
+
+  // Issue #49: a table row with no separator line under it looped forever.
+  // Mid-stream every table passes through this state.
+  it.each([
+    ["a lone table row", "| A | B |", "| A | B |"],
+    ["a header with a partial separator", "| A | B |\n|--", "| A | B | |--"],
+  ])("renders %s as text", (_, text, expected) => {
+    const { container } = render(<Markdown text={text} />);
+    expect(container.querySelector("table")).toBeNull();
+    expect(container.textContent).toBe(expected);
+  });
+
+  it("renders a row after a paragraph as its own paragraph", () => {
+    const { container } = render(<Markdown text={"Dockets:\n| A | B |"} />);
+    const paras = [...container.querySelectorAll("p")].map((p) => p.textContent);
+    expect(paras).toEqual(["Dockets:", "| A | B |"]);
+  });
+
+  it("renders a header with no body rows as a table", () => {
+    const { container } = render(<Markdown text={"| A | B |\n|---|---|"} />);
+    expect(container.querySelectorAll("th")).toHaveLength(2);
+    expect(container.querySelectorAll("tbody tr")).toHaveLength(0);
+  });
 });
