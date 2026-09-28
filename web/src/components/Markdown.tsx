@@ -128,7 +128,11 @@ export function Markdown({ text, className }: { text: string; className?: string
       );
       continue;
     }
-    const para: string[] = [];
+    // The first line is always taken: a line no branch above claimed (such
+    // as a table row with no separator yet, mid-stream) is plain text, and
+    // the loop always moves on (issue #49).
+    const para: string[] = [line.trim()];
+    i++;
     while (
       i < lines.length &&
       lines[i]!.trim() &&
