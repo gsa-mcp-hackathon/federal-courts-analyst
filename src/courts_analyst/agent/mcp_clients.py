@@ -387,9 +387,14 @@ class ToolHost:
 
         self._ours = Client(mcp, elicitation_handler=self._elicit)
         await self._stack.enter_async_context(self._ours)
+        from courts_analyst.tools import DESK_TOOLS
+
+        # The request desk is never the model's to call (ADR 0013): a person
+        # picks every desk write in the web app, and the agent stays read-only.
         self._ours_tools = [
             ToolSpec(t.name, t.description or "", dict(t.input_schema))
             for t in await self._ours.list_tools()
+            if t.name not in DESK_TOOLS
         ]
         if self._want_cl:
             self._cl = await self._open_courtlistener()

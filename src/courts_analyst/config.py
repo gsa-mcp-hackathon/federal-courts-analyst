@@ -64,6 +64,17 @@ class Settings(BaseSettings):
     # keep handles across restarts in HTTP mode.
     cohort_store_path: Path | None = None
 
+    # ── Request desk (ADR 0013) ────────────────────────────────────────────────
+    # Sandbox write workflow. Unset path → in memory (a restart empties it).
+    # Set a writable path, never inside data/build (mounted read-only).
+    desk_store_path: Path | None = None
+    # Staff routes and the staff screen need this token (X-Desk-Staff-Token).
+    # Unset → the staff side is off.
+    desk_staff_token: SecretStr | None = None
+    # Register the two staff tools (record_official_response, publish_answer)
+    # on MCP, e.g. to play the statistics office from Claude Desktop.
+    desk_staff_mode: bool = False
+
     # ── External services (all optional) ──────────────────────────────────────
     anthropic_api_key: SecretStr | None = None
     openai_api_key: SecretStr | None = None
@@ -102,6 +113,7 @@ class Settings(BaseSettings):
         "openai_api_key",
         "courtlistener_api_token",
         "http_bearer_token",
+        "desk_staff_token",
         mode="before",
     )
     @classmethod

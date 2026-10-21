@@ -211,6 +211,21 @@ def _scan(
     return None
 
 
+def party_names_in(db: Database | None, text: str) -> bool:
+    """Whether ``text`` holds a party name from the IDB index, for checks that
+    must run before something is stored (the request desk). Fails closed: with
+    the IDB loaded but its index missing, the answer is yes."""
+    try:
+        if db is None or not db.has_idb:
+            return False
+    except DataUnavailableError:
+        return False
+    try:
+        return bool(_scanner(db).hits({"text": text}))
+    except pii.PiiIndexError:
+        return True
+
+
 # ── entry point ──────────────────────────────────────────────────────────────
 
 
@@ -297,4 +312,5 @@ __all__ = [
     "apply_policies",
     "guarded",
     "is_guarded",
+    "party_names_in",
 ]

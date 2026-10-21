@@ -16,8 +16,14 @@ EXPECTED_TOOLS = {
     "judgeship_context",
     "explain_term",
     "sample_dockets",
+    "find_published_answers",
+    "open_request",
+    "save_verified_answer",
+    "file_revision_inquiry",
     "server_info",
 }
+# Request desk writes (ADR 0013): sandbox records only, never destructive.
+DESK_WRITES = {"open_request", "save_verified_answer", "file_revision_inquiry"}
 TOOL_ORDER = [
     "explain_change",
     "get_official_figure",
@@ -28,6 +34,10 @@ TOOL_ORDER = [
     "judgeship_context",
     "explain_term",
     "sample_dockets",
+    "find_published_answers",
+    "open_request",
+    "save_verified_answer",
+    "file_revision_inquiry",
     "server_info",
 ]
 EXPECTED_RESOURCES = {
@@ -75,7 +85,9 @@ async def test_every_tool_has_description_schema_and_annotations(
         assert tool.description and len(tool.description) > 40, tool.name
         assert tool.output_schema, f"{tool.name} has no outputSchema"
         assert tool.annotations is not None, tool.name
-        assert tool.annotations.read_only_hint is True, tool.name
+        assert tool.annotations.read_only_hint is (tool.name not in DESK_WRITES), (
+            tool.name
+        )
         assert tool.annotations.destructive_hint is False, tool.name
         assert tool.annotations.title, tool.name
         # Only sample_dockets points outside this server (CourtListener links).

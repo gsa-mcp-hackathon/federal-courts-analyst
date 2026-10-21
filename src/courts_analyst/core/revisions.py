@@ -7,6 +7,10 @@ cover at least half of the revision **and** most of that district's filings
 that year were directly filed MDL cases. It always carries an
 ``inferred_not_official`` warning: no published note explains these
 revisions, so it stays an inference until the AO confirms (issue #8).
+
+A response recorded on the request desk (ADR 0013) is added as a third
+basis, ``office_response``. In the sandbox it is labelled as entered by the
+simulated statistics office, and the inference keeps its warning.
 """
 
 from __future__ import annotations
@@ -18,6 +22,7 @@ from pydantic import BaseModel, Field
 from courts_analyst.core.chain import Row, history_text
 from courts_analyst.core.courts import COURTS
 from courts_analyst.core.db import Database
+from courts_analyst.core.desk.hooks import office_response_for
 from courts_analyst.core.measures import Measure
 from courts_analyst.core.numbers import fmt
 from courts_analyst.core.results import Caveat
@@ -29,7 +34,7 @@ INFERENCE_SHARE = 0.5
 class RevisionNote(BaseModel):
     """One statement about why editions differ, labelled by what backs it."""
 
-    basis: Literal["official", "inferred"]
+    basis: Literal["official", "inferred", "office_response"]
     text: str
     district: str | None = Field(
         default=None, description="The district an inference is about."
@@ -138,4 +143,16 @@ def revision_notes(
                     ),
                 )
             )
+    if (resp := office_response_for(m.id, court, fy)) is not None:
+        notes.append(
+            RevisionNote(
+                basis="office_response",
+                text=(
+                    "Response entered by the simulated statistics office (sandbox, "
+                    f"request desk), {resp.created_at[:10]}: the office {resp.outcome} "
+                    f"the figure. {resp.text}"
+                ),
+                revision=revision,
+            )
+        )
     return notes, warnings

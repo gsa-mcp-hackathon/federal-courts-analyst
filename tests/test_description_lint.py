@@ -28,6 +28,10 @@ async def _tools() -> list:  # type: ignore[type-arg]
         "judgeship_context",
         "explain_term",
         "sample_dockets",
+        "find_published_answers",
+        "open_request",
+        "save_verified_answer",
+        "file_revision_inquiry",
     ],
 )
 async def test_description_has_four_parts_in_order(name: str) -> None:

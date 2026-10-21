@@ -2,19 +2,15 @@
 
 from __future__ import annotations
 
-import re
 from collections.abc import Iterator
 from typing import Any
 
 from courts_analyst.core.courts import court_aliases, normalize_court_text
+from courts_analyst.core.figures_text import REVISION_WORDS
 from courts_analyst.evaluation.records import AnswerRecord
 from courts_analyst.evaluation.schema import Claim
 
-_REVISION = re.compile(
-    r"revis|restat|first[\s-]published|as\s+originally\s+published|later\s+edition"
-    r"|earlier\s+edition|changed\s+between\s+editions|both\s+(?:official\s+)?figures",
-    re.I,
-)
+_REVISION = REVISION_WORDS
 
 
 def _has(text: str, phrase: str) -> bool:

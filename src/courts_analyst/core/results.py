@@ -32,6 +32,7 @@ WarningCode = Literal[
     "partial_year",
     "truncated",
     "no_recommendation",
+    "sandbox",
 ]
 
 DeclineReason = Literal["judge_level", "pii", "small_cell", "policy", "advocacy"]

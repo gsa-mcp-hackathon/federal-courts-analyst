@@ -22,8 +22,9 @@ from fastmcp.exceptions import ToolError
 from courts_analyst.config import settings
 from courts_analyst.core.cohorts import CohortStore
 from courts_analyst.core.db import Database
+from courts_analyst.core.desk.store import DeskStore
 from courts_analyst.core.errors import CoreError
-from courts_analyst.core.results import Clarification
+from courts_analyst.core.results import Choice, Clarification
 
 P = ParamSpec("P")
 R = TypeVar("R")
@@ -35,9 +36,19 @@ READ_ONLY = {
     "openWorldHint": False,
 }
 
+WRITE = {
+    "readOnlyHint": False,
+    "destructiveHint": False,
+    "idempotentHint": True,  # with the same idempotency_key
+    "openWorldHint": False,
+}
+"""Request desk writes (ADR 0013): they add sandbox records, never change or
+delete official data."""
+
 _lock = threading.Lock()
 _dbs: dict[tuple[Path, Path], Database] = {}
 _stores: dict[Path | None, CohortStore] = {}
+_desks: dict[Path | None, DeskStore] = {}
 
 
 def get_db() -> Database:
@@ -55,6 +66,15 @@ def get_store() -> CohortStore:
         if key not in _stores:
             _stores[key] = CohortStore(key)
         return _stores[key]
+
+
+def get_desk() -> DeskStore:
+    """The request desk store for the current settings (opened on first use)."""
+    key = settings.desk_store_path
+    with _lock:
+        if key not in _desks:
+            _desks[key] = DeskStore(key)
+        return _desks[key]
 
 
 def tool_error(err: CoreError) -> ToolError:
@@ -147,3 +167,32 @@ async def ask(
     if result.action == "accept" and isinstance(result.data, str):
         return result.data
     return None
+
+
+# ── Confirming a write (ADR 0013: every desk write is confirmed first) ──────
+
+_CONFIRM_CHOICES = [
+    Choice(value="yes", label="Yes, write it"),
+    Choice(value="no", label="No, don't"),
+]
+
+
+async def confirmed(
+    ctx: Context | None, confirm: bool, question: str
+) -> bool | mcp_types.InputRequiredResult:
+    """Whether the user agreed to a write. ``confirm=True`` means the caller
+    already asked; otherwise ask by elicitation where the client can. A
+    client that can't be asked gets a preview and calls again with
+    ``confirm=True``."""
+    if confirm:
+        return True
+    c = Clarification(
+        parameter="confirm",
+        question=question,
+        choices=_CONFIRM_CHOICES,
+        default="no",
+    )
+    answer = await ask(ctx, c)
+    if isinstance(answer, mcp_types.InputRequiredResult):
+        return answer
+    return answer == "yes"
