@@ -33,6 +33,7 @@ The judges score four things. For each one, here's what should stand out:
 | 7 | [Agent service and API](phase-07-agent-api.md) | FastAPI streaming agent (our MCP + CourtListener MCP) plus REST for the explorer | P5 |
 | 8 | [Web frontend](phase-08-frontend.md) | Polished React app: Ask, Explore map, Edition Tracker, Court profiles, Eval dashboard | P7 (8a design system can start at P4) |
 | 9 | [MCP App and deployment](phase-09-mcp-app-deploy.md) | Inline chart MCP App, Databricks Apps deploy, watsonx/ContextForge registration | P5, P8 |
+| 9b | [Request desk](phase-09b-request-desk.md) (proposed) | Sandboxed write workflow: ask the statistics office, verified copies, notify on change, a public answer library | P5–P8; runs alongside P9, before P10's held-out run |
 | 10 | [Full evaluation](phase-10-full-evaluation.md) | Baselines (web search, Genie), multiple models, MLflow and Phoenix, results dashboard | P3, P7 |
 | 11 | [Submission and demo](phase-11-submission.md) | Deck, evaluation document, demo script and video, rehearsals | all |
 
