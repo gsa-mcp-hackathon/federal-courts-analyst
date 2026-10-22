@@ -176,6 +176,7 @@ refused) and the refusal reason.
 | Separate `save_verified_answer` and `file_revision_inquiry` calls from the web | One REST call per click (`submit_option`) that verifies first, then writes request, answer and inquiry in one transaction | A refused answer leaves nothing behind |
 | Write-safety suite inside the question bank | `evaluation/write_safety.py` (19 scripted cases) plus `tests/test_desk_write_safety.py` | The bank scores answers to questions; these cases are sequences of desk actions |
 | Requests can name court, years and measure | Taken from the answer's citations | One source of truth |
+| MCP tools as listed in the design | Added `keep_answer`, `my_requests`, `check_inquiry_eligibility`, staff `inquiry_queue`, the `desk://library` resource and the `keep_this_answer` prompt; shared demo accounts | Review: the main flow lived in REST, so an MCP client couldn't follow up or save a real answer. Any client now gets the full desk (`tests/test_desk_mcp_parity.py`) |
 
 ## Evidence
 

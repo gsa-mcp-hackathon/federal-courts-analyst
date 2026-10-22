@@ -37,8 +37,9 @@ the text must be one of:
    read-only ones in process (`get_official_figure`, `explain_change`,
    `compare_courts`, `find_cases`, `analyze_cohort`, `reconcile`,
    `judgeship_context`) and accepts numbers their outputs hold. No value is
-   ever taken from the request. MCP's `save_verified_answer` accepts cited
-   figures only.
+   ever taken from the request. MCP clients pass `tool_calls` to
+   `keep_answer` or `save_verified_answer` and get the same re-run
+   (`tools/_rerun.py`, shared with the REST routes).
 3. **A published threshold** (430, 600), or a **difference or percentage
    change** between numbers the answer already backs.
 
@@ -83,12 +84,15 @@ Anything else is `invalid_transition` (409).
 | Action | Public (demo account) | Statistics office (staff token) | The agent |
 | --- | --- | --- | --- |
 | Ask questions | yes | yes | yes |
-| Pick an option, see My requests | yes | n/a | **never** (desk tools are not offered to the model) |
+| Keep an answer, see My requests (web or any MCP client) | yes | n/a | **never** (the web app's agent is not offered desk tools) |
 | See the inquiry queue, respond, publish, audit log | no | yes | never |
 | Search the library | yes | yes | no (the web app shows matches) |
 
 Public users sign in with invented demo accounts; no real identity is
-collected. Requests are private to their asker.
+collected. Requests are private to their asker. An MCP client passes the
+account's name as `asker_name` ("Priya"), so a request kept from Claude
+Desktop is in the same My requests as one kept in the web app. (MCP callers
+aren't authenticated: in the sandbox, a name is a claim, not a login.)
 
 ## Using it
 
@@ -96,7 +100,7 @@ collected. Requests are private to their asker.
 | --- | --- |
 | Web | Options under each answer; **My requests**, **Library**; **Statistics office (simulated)** in the footer (asks for `DESK_STAFF_TOKEN`) |
 | REST | `POST /api/desk/requests` (an option), `GET /api/desk/requests[/{id}]`, `POST /api/desk/requests/{id}/read`, `GET /api/desk/library`, `GET /api/desk/eligibility`, `GET /api/desk/accounts`; staff: `GET /api/desk/staff/inquiries`, `GET /api/desk/staff/requests`, `POST /api/desk/staff/inquiries/{id}/response`, `POST /api/desk/staff/requests/{id}/publish`, `GET /api/desk/staff/audit`, `POST /api/desk/staff/check-staleness` |
-| MCP | `find_published_answers` (read), `open_request`, `save_verified_answer`, `file_revision_inquiry`; with `DESK_STAFF_MODE=true` also `record_official_response`, `publish_answer`. Writes are confirmed by elicitation, or return a preview until called with `confirm=true` |
+| MCP (any client) | `keep_answer` (one call: check, then save, plus the inquiry for *Ask the statistics office*), `my_requests`, `check_inquiry_eligibility`, `find_published_answers`; the same steps one at a time with `open_request`, `save_verified_answer`, `file_revision_inquiry`; with `DESK_STAFF_MODE=true` also `inquiry_queue`, `record_official_response`, `publish_answer`. Resource `desk://library`; prompt `keep_this_answer`. Writes are confirmed by elicitation, or return a preview until called with `confirm=true`. `keep_answer` and `save_verified_answer` take `tool_calls` and re-run them like the web app does |
 | Make | `make desk-seed` (the demo's opening state: one inquiry already waiting), `make desk-check` (flag answers citing figures a newer edition revised; also runs at HTTP startup), `make desk-reset`, `make eval-write-safety` |
 
 Settings: `DESK_STORE_PATH`, `DESK_STAFF_TOKEN`, `DESK_STAFF_MODE` (see

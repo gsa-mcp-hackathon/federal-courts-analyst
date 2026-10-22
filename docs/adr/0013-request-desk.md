@@ -88,8 +88,7 @@ The proposal page for the team:
 
    The re-run exists because the agent cites only some figures as citation
    events; the rest of a real answer (points per district, case counts)
-   comes from tool outputs. MCP's `save_verified_answer` takes citations
-   only.
+   comes from tool outputs. MCP and REST share the re-run.
 
    A refusal names each offending number and what to use instead ("554 is
    JB-2020; the other figures are JFF-2025, which prints 322"). The number
@@ -150,6 +149,15 @@ The proposal page for the team:
   today.
 
 ## As built (Phase 9b)
+
+- **The desk is complete over MCP.** Any MCP client can do what the web app
+  does: `keep_answer` (one call: check, then request, answer and inquiry),
+  `my_requests`, `check_inquiry_eligibility`, `find_published_answers`, the
+  `desk://library` resource and the `keep_this_answer` prompt, plus the
+  three step-by-step tools above and, in staff mode, `inquiry_queue`. The
+  tool re-run lives in `tools/_rerun.py`, shared by MCP and REST. Demo
+  account names resolve to the same account in every client
+  (`core/desk/accounts.py`), so one person has one inbox.
 
 - Eligibility is decided by the server for each cited figure, not by the
   citation's `revised` flag: figures cited from `explain_change` carry

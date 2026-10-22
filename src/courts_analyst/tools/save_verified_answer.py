@@ -13,15 +13,18 @@ from courts_analyst.core.desk.service import save_verified_answer
 from courts_analyst.core.results import Result
 from courts_analyst.tools._common import WRITE, confirmed, core_errors, get_db, get_desk
 from courts_analyst.tools._desk import AskerName, Confirm, IdempotencyKey, public_actor
+from courts_analyst.tools._rerun import ToolCalls, recompute
 
 DESCRIPTION = """\
 Use this after open_request, when the user wants the answer kept: it checks \
 the answer and saves it to the request only if it passes. The check: every \
-number in the text is a cited official value (or a fiscal year, a published \
-threshold such as 430, or the difference of two cited values), each citation \
-matches what its edition printed, and one measure's figures come from \
-consistent editions. An earlier edition's value may be quoted as history in \
-a sentence that says so ("first published as 554").
+number in the text is a cited official value, a number the server's read \
+tools produce (pass the calls the answer relied on in tool_calls; the server \
+re-runs them), a published threshold such as 430, or a difference or \
+percentage of backed numbers; each citation matches what its edition \
+printed; and one measure's figures come from consistent editions. An \
+earlier edition's value may be quoted as history in a sentence that says so \
+("first published as 554").
 
 Not for creating the request (use open_request) or for asking why a figure \
 changed (use file_revision_inquiry after saving).
@@ -54,6 +57,7 @@ def register(mcp: FastMCP) -> None:
                 "with the edition it was quoted from.",
             ),
         ],
+        tool_calls: ToolCalls,
         asker_name: AskerName = "MCP user",
         idempotency_key: IdempotencyKey = None,
         confirm: Confirm = False,
@@ -64,6 +68,7 @@ def register(mcp: FastMCP) -> None:
         )
         if isinstance(ok, mcp_types.InputRequiredResult):
             return ok
+        computed = await recompute(mcp, tool_calls)
         return save_verified_answer(
             get_db(),
             get_desk(),
@@ -73,4 +78,5 @@ def register(mcp: FastMCP) -> None:
             citations,
             idempotency_key,
             ok,
+            computed,
         )

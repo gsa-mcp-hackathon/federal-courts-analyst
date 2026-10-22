@@ -24,10 +24,11 @@ from fastmcp import FastMCP
 from fastmcp.exceptions import ResourceError
 
 from courts_analyst.core.catalog import overview, published_table, revisions
+from courts_analyst.core.desk.service import find_published_answers
 from courts_analyst.core.enums import EDITIONS
 from courts_analyst.core.errors import CoreError
 from courts_analyst.core.glossary import glossary
-from courts_analyst.tools._common import get_db
+from courts_analyst.tools._common import get_db, get_desk
 
 CODEBOOK_FIELDS = (
     "arbit", "circuit", "classact", "disp", "district", "ifp", "judgment",
@@ -78,6 +79,22 @@ def register_resources(mcp: FastMCP) -> None:
     @_guard
     def catalog() -> str:
         return _json(overview(get_db()).model_dump())
+
+    @mcp.resource(
+        "desk://library",
+        name="desk_library",
+        title="Request desk: approved answers",
+        description="The request desk's public library (sandbox, ADR 0013): "
+        "answers the statistics office approved, newest first, each with its "
+        "edition-stamped citations, the office's response, and whether a newer "
+        "edition has since revised a cited figure.",
+        mime_type="application/json",
+        annotations={**_BOTH, "priority": 0.5},
+    )
+    @_guard
+    def desk_library() -> str:
+        result = find_published_answers(get_db(), get_desk(), limit=50)
+        return _json(result.model_dump(mode="json"))
 
     @mcp.resource(
         "courts://revisions",

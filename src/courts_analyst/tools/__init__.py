@@ -18,6 +18,7 @@ from courts_analyst.config import settings
 from courts_analyst.core.desk import hooks
 from courts_analyst.tools import (
     analyze_cohort,
+    check_inquiry_eligibility,
     compare_courts,
     explain_change,
     explain_term,
@@ -25,7 +26,10 @@ from courts_analyst.tools import (
     find_cases,
     find_published_answers,
     get_official_figure,
+    inquiry_queue,
     judgeship_context,
+    keep_answer,
+    my_requests,
     open_request,
     publish_answer,
     reconcile,
@@ -50,6 +54,9 @@ MODULES = (
     explain_term,
     sample_dockets,
     find_published_answers,
+    check_inquiry_eligibility,
+    keep_answer,
+    my_requests,
     open_request,
     save_verified_answer,
     file_revision_inquiry,
@@ -61,6 +68,10 @@ MODULES = (
 DESK_TOOLS = frozenset(
     {
         "find_published_answers",
+        "check_inquiry_eligibility",
+        "keep_answer",
+        "my_requests",
+        "inquiry_queue",
         "open_request",
         "save_verified_answer",
         "file_revision_inquiry",
@@ -70,7 +81,7 @@ DESK_TOOLS = frozenset(
 )
 # Staff-only: registered only with DESK_STAFF_MODE, so a public client never
 # sees them.
-STAFF_MODULES = (record_official_response, publish_answer)
+STAFF_MODULES = (inquiry_queue, record_official_response, publish_answer)
 
 
 def register_tools(mcp: FastMCP, staff: bool | None = None) -> None:

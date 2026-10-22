@@ -54,11 +54,16 @@ offered them.
 
 | Tool | Does |
 | --- | --- |
+| `keep_answer` | One call for what the web app's button does: check the answer, then save it as a verified copy, a watch, or a question to the statistics office |
+| `my_requests` | The asker's inbox: status, verified answer, the office's response, updates |
+| `check_inquiry_eligibility` | Whether a figure's revision can go to the statistics office (read-only) |
 | `find_published_answers` | Search approved answers in the public library (read-only) |
-| `open_request` | Create a request: ask the statistics office, save a verified copy, or get notified |
-| `save_verified_answer` | Save an answer only if every number passes the verification gate |
-| `file_revision_inquiry` | Ask the (simulated) statistics office about one unexplained revision; one inquiry per revision |
-| `record_official_response`, `publish_answer` | Staff only, registered with `DESK_STAFF_MODE=true` |
+| `open_request`, `save_verified_answer`, `file_revision_inquiry` | The same steps one at a time |
+| `inquiry_queue`, `record_official_response`, `publish_answer` | The simulated statistics office; registered only with `DESK_STAFF_MODE=true` |
+
+Plus the `desk://library` resource and the `keep_this_answer` prompt. Any MCP
+client gets the full desk; the web app is one client of the same functions,
+and a demo account's name (`asker_name="Priya"`) is the same person in both.
 
 Resources: `courts://catalog`, `courts://revisions`, `courts://glossary`,
 `courts://editions/{edition}/{table}` (immutable), `courts://codebook/{field}`,

@@ -17,13 +17,21 @@ EXPECTED_TOOLS = {
     "explain_term",
     "sample_dockets",
     "find_published_answers",
+    "check_inquiry_eligibility",
+    "keep_answer",
+    "my_requests",
     "open_request",
     "save_verified_answer",
     "file_revision_inquiry",
     "server_info",
 }
 # Request desk writes (ADR 0013): sandbox records only, never destructive.
-DESK_WRITES = {"open_request", "save_verified_answer", "file_revision_inquiry"}
+DESK_WRITES = {
+    "keep_answer",
+    "open_request",
+    "save_verified_answer",
+    "file_revision_inquiry",
+}
 TOOL_ORDER = [
     "explain_change",
     "get_official_figure",
@@ -35,6 +43,9 @@ TOOL_ORDER = [
     "explain_term",
     "sample_dockets",
     "find_published_answers",
+    "check_inquiry_eligibility",
+    "keep_answer",
+    "my_requests",
     "open_request",
     "save_verified_answer",
     "file_revision_inquiry",
@@ -47,12 +58,14 @@ EXPECTED_RESOURCES = {
     "courts://editions/{edition}/{table}",
     "courts://codebook/{field}",
     "courts://methodology/{topic}",
+    "desk://library",
 }
 EXPECTED_PROMPTS = {
     "district_caseload_profile",
     "what_changed_and_why",
     "judgeship_briefing",
     "compare_editions",
+    "keep_this_answer",
 }
 
 

@@ -1,18 +1,20 @@
 """What the request desk tools share: who the caller is.
 
 MCP clients have no accounts, so a public caller is identified by the name
-and role it passes (demo identity, no real identity collected). The two
+it passes: a demo account's name ("Priya") maps to the same account the web
+app uses, so a request made from Claude Desktop shows in that person's My
+requests (demo identity, no real identity collected). The two
 staff tools exist only when ``desk_staff_mode`` is on, and act as the
 simulated statistics office.
 """
 
 from __future__ import annotations
 
-import re
 from typing import Annotated, Literal
 
 from pydantic import Field
 
+from courts_analyst.core.desk.accounts import resolve
 from courts_analyst.core.desk.models import Actor
 
 PublicRole = Literal["congressional_staff", "journalist", "researcher", "public"]
@@ -53,5 +55,6 @@ OFFICE = Actor(
 
 
 def public_actor(name: str, role: PublicRole = "public") -> Actor:
-    slug = re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-") or "user"
-    return Actor(account_id=f"mcp:{slug}", name=name.strip(), role=role)
+    """The demo account with this name (the same one the web app signs in
+    with), or an account of the caller's own."""
+    return resolve(name, role)

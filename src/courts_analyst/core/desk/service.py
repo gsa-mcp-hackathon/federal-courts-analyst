@@ -638,8 +638,11 @@ def save_verified_answer(
     citations: Sequence[CitationIn],
     idempotency_key: str | None = None,
     confirm: bool = True,
+    computed: Mapping[float, str] | None = None,
 ) -> Result[DeskOutcome]:
-    """Run the verification gate on an answer and save it only if it passes."""
+    """Run the verification gate on an answer and save it only if it passes.
+    ``computed``: numbers the adapter got by re-running the answer's read
+    tools on the server (never values a caller supplied)."""
     if (
         done := _replay(store, actor, "save_verified_answer", idempotency_key)
     ) is not None:
@@ -650,7 +653,7 @@ def save_verified_answer(
             f"Request #{request_id} is published; its answer can't change.",
         )
     text = _clean(text, MAX_ANSWER, "answer")
-    gate = verify(db, text, citations)
+    gate = verify(db, text, citations, computed)
     if not gate.passed:
         return _result(
             db,

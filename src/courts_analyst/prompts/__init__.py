@@ -127,5 +127,36 @@ def register_prompts(mcp: FastMCP) -> None:
             f"revision unless they do.\n\n{RULES}"
         )
 
+    @mcp.prompt(
+        name="keep_this_answer",
+        title="Keep this answer (request desk)",
+        description="Save the last answer as a verified copy, ask the statistics "
+        "office why a figure changed, or get notified if its numbers change.",
+    )
+    def keep_this_answer(
+        option: Annotated[
+            str,
+            Field(description="ask_office, verified_copy or notify."),
+        ] = "ask_office",
+    ) -> str:
+        return (
+            "The user wants to keep your last answer on the request desk "
+            f"(option '{option}'). It's a sandbox: nothing is sent to the AO or "
+            "the FJC.\n\n"
+            "1. If the option is ask_office, call check_inquiry_eligibility for "
+            "the revised figure the answer is about. If it isn't eligible, say "
+            "why and offer verified_copy instead.\n"
+            "2. Call keep_answer with the question, your answer text exactly as "
+            "you gave it, a citation (measure, court, fiscal_year, edition, value) "
+            "for each official figure it quotes, and tool_calls: the read tools "
+            "and arguments you used for the answer. Let the user confirm.\n"
+            "3. If it isn't saved, show each problem the server lists, fix the "
+            "answer (use the server's suggested figure, or label an earlier "
+            "edition's value as first published), and try again.\n"
+            "4. When it's saved, give the request number and the stamp, and say "
+            "the user can follow it with my_requests.\n\n"
+            "Never call keep_answer unless the user asked to keep the answer."
+        )
+
 
 __all__ = ["register_prompts"]
