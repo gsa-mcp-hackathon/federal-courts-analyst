@@ -166,3 +166,24 @@ def test_edition_named_in_the_text_must_match_the_citation(core_db: Any) -> None
         core_db, "It was 322 (JFF-2024) in FY2020.", [cite(2020, "JFF-2024", 322)]
     )
     assert ok.passed
+
+
+def test_links_dockets_and_dates_are_not_statistics(core_db: Any) -> None:
+    r = verify(
+        core_db,
+        "It was 322 in FY2020 (JFF-2024). See docket 3:19-md-02885, filed "
+        "2020-07-06, and the national emergency of March 13, 2020; "
+        "[search](https://example.org/?q=%2220-cv-49045%22) or `MDL 2885`.",
+        [cite(2020, "JFF-2024", 322)],
+    )
+    assert r.passed, r.problems
+
+
+def test_server_computed_values_and_derived_percentages(core_db: Any) -> None:
+    text = "From 381 (JB-2019) to 554 (JB-2020), up 45%; N.D. Fla. added 206 points."
+    cites = [cite(2019, "JB-2019", 381), cite(2020, "JB-2020", 554)]
+    refused = verify(core_db, text, cites)
+    assert codes(refused) == ["uncited_number"] and refused.problems[0].number == "206"
+    ok = verify(core_db, text, cites, computed={206.0: "explain_change"})
+    assert ok.passed, ok.problems
+    assert [(c.number, c.source) for c in ok.computed] == [("206", "explain_change")]

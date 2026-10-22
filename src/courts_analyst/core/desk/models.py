@@ -120,12 +120,23 @@ class GateProblem(BaseModel):
     fix: str | None = None
 
 
+class ComputedValue(BaseModel):
+    """A number the server's own tools produced when the gate re-ran them."""
+
+    number: str = Field(description="The number as written in the answer.")
+    source: str = Field(description="The read tool whose re-run output holds it.")
+
+
 class GateReport(BaseModel):
     """The verification gate's verdict on one answer."""
 
     passed: bool
     problems: list[GateProblem] = Field(default_factory=list)
     citations: list[CheckedCitation] = Field(default_factory=list)
+    computed: list[ComputedValue] = Field(
+        default_factory=list,
+        description="Numbers backed by re-running the turn's read tools on the server.",
+    )
     edition_basis: list[str] = Field(
         default_factory=list, description="Editions the answer's figures come from."
     )

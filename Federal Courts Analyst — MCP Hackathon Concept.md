@@ -120,7 +120,7 @@ The server should know which conclusions it shouldn't draw. That's our strongest
 - **Data-break awareness:** warn when a query spans known codebook or collection changes in the IDB, or when a published figure was revised in a later edition. The server never mixes vintages silently.
 - **No judge-level rankings:** consistent with the FJC's own policy against enabling judge-shopping. The server declines and explains why.
 - **PII-aware output:** the IDB includes party names. Aggregate outputs suppress individual names by default, following FRCP 5.2-style redaction principles.
-- **Read-only, sandboxed, public data only:** nothing from internal judiciary systems and no internal knowledge from anyone's day job.
+- **Read-only, sandboxed, public data only:** nothing from internal judiciary systems and no internal knowledge from anyone's day job. *(Amended by [ADR 0013](docs/adr/0013-request-desk.md), proposed: the official data stays read-only; a sandboxed request desk may write its own records, and nothing is sent outside.)*
 - **Prompt-injection hygiene:** CourtListener results are treated as untrusted data.
 
 ## Evaluation plan

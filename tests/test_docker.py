@@ -140,13 +140,13 @@ print(f.value, f.edition, f.first_published.value, classify("civil_cases_filed",
 """
 
 
-def _run_with_catalog(db_dir: str) -> tuple[str, str]:
+def _run_with_catalog(db_dir: str, *extra: str) -> tuple[str, str]:
     """Start the image with a built catalog mounted read-only at DATA_DIR/build."""
     name = f"fca-data-{uuid.uuid4().hex[:8]}"
     subprocess.run(
         [
             "docker", "run", "-d", "--rm", "--name", name, "-p", "127.0.0.1::8080",
-            *HARDENED, "-v", f"{db_dir}:/app/data/build:ro", IMAGE,
+            *HARDENED, *extra, "-v", f"{db_dir}:/app/data/build:ro", IMAGE,
         ],
         check=True,
         capture_output=True,
@@ -272,5 +272,72 @@ async def test_container_reads_built_catalog(catalog, idb, tmp_path) -> None:  #
         assert core.stdout.split() == ["322.0", "JFF-2025", "554.0", "matched"], (
             core.stderr
         )
+    finally:
+        subprocess.run(["docker", "stop", name], capture_output=True)
+
+
+def test_request_desk_in_the_hardened_container(catalog, idb, tmp_path) -> None:  # type: ignore[no-untyped-def]
+    """ADR 0013: with a read-only root filesystem, the desk store lives in
+    /tmp; the catalog mount stays read-only; the storyline works over HTTP."""
+    if not shutil.which("docker"):
+        pytest.skip("docker not installed")
+    build_dir = tmp_path / "build"
+    build_dir.mkdir()
+    for src, dst in (
+        (catalog.db, "courts.duckdb"),
+        (idb.db, "idb.duckdb"),
+        (idb.db.with_name("pii_index.bin"), "pii_index.bin"),
+    ):
+        shutil.copy(src, build_dir / dst)
+        (build_dir / dst).chmod(0o644)
+    build_dir.chmod(0o755)
+    name, base = _run_with_catalog(
+        str(build_dir),
+        "-e", "DESK_STORE_PATH=/tmp/desk/desk.sqlite",
+        "-e", "DESK_STAFF_TOKEN=container-token",
+    )  # fmt: skip
+    w = "weighted_civil_filings_per_judgeship"
+    try:
+        r = httpx.post(
+            f"{base}/api/desk/requests",
+            headers={"x-desk-account": "priya"},
+            json={
+                "option": "ask_office",
+                "question": "Why did FY2020 change?",
+                "answer_text": "FY2020 is 322 (JFF-2025), first published as 554 "
+                "(JB-2020).",
+                "citations": [
+                    {
+                        "measure": w,
+                        "fiscal_year": 2020,
+                        "edition": "JFF-2025",
+                        "value": 322,
+                    },
+                    {
+                        "measure": w,
+                        "fiscal_year": 2020,
+                        "edition": "JB-2020",
+                        "value": 554,
+                    },
+                ],
+                "inquiry": {"measure": w, "fiscal_year": 2020},
+            },
+            timeout=30,
+        )
+        assert r.status_code == 200, r.text
+        assert r.json()["data"]["request"]["status"] == "waiting_for_office"
+        queue = httpx.get(
+            f"{base}/api/desk/staff/inquiries",
+            headers={"x-desk-staff-token": "container-token"},
+            timeout=30,
+        ).json()["data"]["inquiries"]
+        assert queue[0]["waiting_requests"] == 1
+        probe = subprocess.run(
+            ["docker", "exec", name, "sh", "-c",
+             "ls /tmp/desk/desk.sqlite && touch /app/data/build/x 2>&1; touch /app/x 2>&1"],
+            capture_output=True, text=True,
+        )  # fmt: skip
+        assert "/tmp/desk/desk.sqlite" in probe.stdout
+        assert probe.stdout.count("Read-only file system") == 2
     finally:
         subprocess.run(["docker", "stop", name], capture_output=True)

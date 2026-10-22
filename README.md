@@ -11,6 +11,7 @@ editions differ.
 - Architecture decisions: [`docs/adr/`](docs/adr/README.md)
 - Data sources and methodology: [`docs/data-sources.md`](docs/data-sources.md)
 - Every official figure revised between editions: [`docs/revision-log.md`](docs/revision-log.md)
+- The request desk, a sandboxed write workflow (proposed, Phase 9b): [`docs/desk.md`](docs/desk.md)
 
 Built on the [GSA MCP hackathon template](https://github.com/GSA-TTS/mcp-hackathon-template)
 with [FastMCP 4](https://gofastmcp.com) (MCP spec 2026-07-28, backward compatible
@@ -45,6 +46,19 @@ with 2025-11-25 clients) and [uv](https://docs.astral.sh/uv/).
 | `explain_term` | Definitions of terms, measures and nature-of-suit codes |
 | `sample_dockets` | Example docket references for CourtListener, labelled "match may be inexact" |
 | `server_info` | Version, protocols and which datasets are loaded |
+
+**Request desk (sandbox, [docs/desk.md](docs/desk.md)).** A question never
+writes anything. When a user wants an answer kept, these write to a separate
+sandbox store; the official data stays read-only and the agent is never
+offered them.
+
+| Tool | Does |
+| --- | --- |
+| `find_published_answers` | Search approved answers in the public library (read-only) |
+| `open_request` | Create a request: ask the statistics office, save a verified copy, or get notified |
+| `save_verified_answer` | Save an answer only if every number passes the verification gate |
+| `file_revision_inquiry` | Ask the (simulated) statistics office about one unexplained revision; one inquiry per revision |
+| `record_official_response`, `publish_answer` | Staff only, registered with `DESK_STAFF_MODE=true` |
 
 Resources: `courts://catalog`, `courts://revisions`, `courts://glossary`,
 `courts://editions/{edition}/{table}` (immutable), `courts://codebook/{field}`,
@@ -106,6 +120,8 @@ More in [QUICKSTART.md](QUICKSTART.md).
 | `eval-claude` | The 20-question smoke set with Claude (headless Claude Code + this server) |
 | `variance-report` | Reconcile every court-year into `docs/variance-report.md` |
 | `schemas` | Export result JSON Schemas for the frontend |
+| `desk-seed` / `desk-check` / `desk-reset` | Request desk: demo opening state / flag answers a newer edition revised / empty the sandbox |
+| `eval-write-safety` | The desk's write-safety suite → `eval/results/write-safety.md` |
 | `web` | Placeholder until Phase 8 |
 
 ## Repository layout
@@ -153,6 +169,9 @@ Every setting is optional; see [`.env.example`](.env.example) and
 | `AGENT_MODEL` | `anthropic:claude-sonnet-5` | Model behind `/api/ask` (`openai:<model>` also works) |
 | `COURTLISTENER_API_TOKEN` / `AGENT_COURTLISTENER` | unset / `auto` | Live CourtListener lookups (else a labelled synthetic fixture) |
 | `LOG_LEVEL` / `LOG_FORMAT` | `INFO` / `auto` | `auto` = JSON over HTTP, text on stdio |
+| `DESK_STORE_PATH` | unset (in memory) | Request desk sandbox store (writable, outside `data/build`) |
+| `DESK_STAFF_TOKEN` | unset (staff side off) | Token for the simulated statistics office's screen and routes |
+| `DESK_STAFF_MODE` | `false` | Also register the two staff tools on MCP |
 
 ## HTTP API
 
@@ -169,6 +188,7 @@ explorer and agent at `/api` (schema at `/api/openapi.json`), `/health`.
 | `GET /api/revisions`, `/api/eval/runs[/{id}]` | revision log, committed eval runs |
 | `POST /api/ask` → SSE | the agent (`turn_start` … `turn_end`; schema in `web/src/api/schemas/agent-event.schema.json`) |
 | `POST /api/ask/{turn_id}/clarify` | answers a `clarify` event; the stream resumes |
+| `/api/desk/...` | the request desk (options, My requests, library, staff side): see [docs/desk.md](docs/desk.md) |
 
 ```bash
 make serve-http PORT=8000

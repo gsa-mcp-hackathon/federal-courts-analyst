@@ -1,7 +1,7 @@
 # ADR 0013: A sandboxed request desk; the official data stays read-only
 
-- **Status:** Proposed (awaiting team agreement, the GSA track question and
-  the Third Branch Solutions check below)
+- **Status:** Proposed (implemented in Phase 9b; awaiting team agreement,
+  the GSA track question and the Third Branch Solutions check below)
 - **Date:** 2026-10-21
 
 ## Context
@@ -43,9 +43,11 @@ The proposal page for the team:
 2. **Asking stays read-only.** A question writes nothing, as today. A write
    happens only when the user picks one of three options under an answer:
    *Ask the statistics office why this changed*, *Save a verified copy*, or
-   *Notify me if these numbers change*. The agent never calls a write tool
-   on its own initiative; the loop refuses write tools unless the turn came
-   from one of those actions.
+   *Notify me if these numbers change*. The agent is never offered a desk
+   tool (`agent/mcp_clients.py` filters them out), so a model can't write,
+   and a model that names one gets "Unknown tool". The web app's buttons
+   call the REST routes directly, and the web app (not the model) looks up
+   library matches.
 3. **One pure module, the usual adapters.** `core/desk/` holds the records,
    status rules, roles, the verification gate and the audit log, with no
    MCP or HTTP imports (ADR 0002). Every entry point returns a `Result` and
@@ -70,14 +72,24 @@ The proposal page for the team:
    otherwise in two steps (`confirm=false` returns a preview of what would be
    written; `confirm=true` writes it). No generic tools such as
    `update_status`: statuses change only inside these tools.
-5. **The verification gate.** `save_verified_answer` refuses unless:
-   - every number in the text, other than fiscal years and table codes, is
-     backed by a citation (measure, court, fiscal year, edition, value);
-   - every cited value is exactly what that edition printed;
+5. **The verification gate.** An answer is saved only if:
+   - every number in the text is a cited value (measure, court, fiscal year,
+     edition, value), a published threshold, a difference or percentage
+     change between backed numbers, or a number the server's own read tools
+     produce when it re-runs the answer's tool calls (names and arguments
+     come from the request; values never do). Fiscal years, table codes,
+     docket numbers, dates, links and code are skipped;
+   - every cited value is exactly what that edition printed, and an edition
+     written right after a number is the one it's cited from;
    - the citations for each measure are consistent in the sense of
      `guardrails.vintage` (one series, no edition contradicting another
      point), unless a sentence labels a value as first-published or revised;
    - the PII scanner and the neutral-wording check pass.
+
+   The re-run exists because the agent cites only some figures as citation
+   events; the rest of a real answer (points per district, case counts)
+   comes from tool outputs. MCP's `save_verified_answer` takes citations
+   only.
 
    A refusal names each offending number and what to use instead ("554 is
    JB-2020; the other figures are JFF-2025, which prints 322"). The number
@@ -91,8 +103,9 @@ The proposal page for the team:
    explanation for it. One inquiry exists per revision; later askers are
    attached to it, so the office's workload is capped by the number of
    unexplained revisions, not by users. Table figures route to the AO
-   Statistics Division and IDB-derived figures to IDBonline@fjc.gov. In the
-   sandbox nothing is sent: the record says "would go to … (sandbox: not
+   Statistics Division (every revision the catalog tracks is a published
+   table figure; `route_for` sends IDB-derived figures to IDBonline@fjc.gov
+   when such inquiries are added). In the sandbox nothing is sent: the record says "would go to … (sandbox: not
    sent)".
 7. **Two roles.** Public users and the statistics office. In the sandbox the
    office is played by a teammate and labelled "simulated" everywhere it
@@ -135,6 +148,18 @@ The proposal page for the team:
   review process nobody outside the AO can see. It stays an assumption until
   Third Branch Solutions confirms how the AO handles statistics questions
   today.
+
+## As built (Phase 9b)
+
+- Eligibility is decided by the server for each cited figure, not by the
+  citation's `revised` flag: figures cited from `explain_change` carry
+  `revised: false` (issue #37), which hid the FY2020 inquiry in testing.
+- Write-safety suite: 19 cases, all passing
+  ([eval/results/write-safety.md](../../eval/results/write-safety.md)).
+- FastMCP 4's server-wide cache hint (ADR 0001) also covers desk tools. A
+  client honouring it could reuse a library search for up to an hour; write
+  results are keyed by idempotency key, so a reused write result is the
+  same as a replay.
 
 ## Alternatives considered
 

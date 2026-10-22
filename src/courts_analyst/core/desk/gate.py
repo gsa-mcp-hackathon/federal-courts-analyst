@@ -5,8 +5,10 @@ Rules (ADR 0013, decision 5):
 
 1. Every cited value is exactly what that edition printed.
 2. Every number in the text is a cited value, a published threshold (430,
-   600), or the difference between two cited values of one measure. Fiscal
-   years and table codes are not numbers here. A number the text attributes
+   600), a number the server's own read tools produced when re-run for this
+   answer, or a difference or percentage change between backed values.
+   Fiscal years, table codes, docket numbers, dates, links and code are not
+   numbers here. A number the text attributes
    to an edition ("322 (JFF-2024)") must be cited from that edition.
 3. The cited figures of each measure come from one consistent set of
    editions (``guardrails.vintage``: one publication series, and no edition
@@ -20,14 +22,16 @@ A refusal names each number and what to write instead.
 
 from __future__ import annotations
 
+import re
 from collections import Counter
-from collections.abc import Iterable
+from collections.abc import Iterable, Mapping
 
 from courts_analyst.core.chain import Row, load_chain
 from courts_analyst.core.db import Database
 from courts_analyst.core.desk.models import (
     CheckedCitation,
     CitationIn,
+    ComputedValue,
     GateProblem,
     GateReport,
 )
@@ -47,6 +51,21 @@ from courts_analyst.core.numbers import fmt
 
 TOLERANCE = 1e-6
 YEARS = range(1980, 2036)
+
+_MONTH = r"(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)[a-z]*\.?"
+NOT_STATISTICS = re.compile(
+    "|".join(
+        [
+            r"https?://\S+",  # URLs, including markdown link targets
+            r"\]\([^)]*\)",  # markdown link targets without a scheme
+            r"`[^`\n]*`",  # inline code
+            r"\b\d{1,2}:\d{2}-[a-z]{2,4}-\d+",  # docket numbers (3:19-md-02885)
+            r"\b\d{4}-\d{2}-\d{2}\b",  # ISO dates
+            rf"\b{_MONTH}\s+\d{{1,2}}(?:,\s*\d{{4}})?",  # March 13, 2020
+        ]
+    )
+)
+"""Spans whose digits aren't statistics: links, code, docket numbers, dates."""
 
 
 def _same(a: float, b: float) -> bool:
@@ -208,8 +227,35 @@ def _consistency(
     return problems
 
 
-def verify(db: Database, text: str, citations: Iterable[CitationIn]) -> GateReport:
-    """Check an answer and its citations; nothing is written here."""
+def _not_statistics(text: str) -> list[tuple[int, int]]:
+    return [(m.start(), m.end()) for m in NOT_STATISTICS.finditer(text)]
+
+
+def _derived(values: list[float]) -> set[float]:
+    """Differences and percentage changes between backed values."""
+    out: set[float] = set()
+    for a in values:
+        for b in values:
+            if a == b:
+                continue
+            out.add(round(abs(a - b), 6))
+            if b:
+                pct = abs(a - b) / abs(b) * 100
+                out |= {round(pct), round(pct, 1)}
+    return out
+
+
+def verify(
+    db: Database,
+    text: str,
+    citations: Iterable[CitationIn],
+    computed: Mapping[float, str] | None = None,
+) -> GateReport:
+    """Check an answer and its citations; nothing is written here.
+
+    ``computed`` maps numbers to the read tool whose output produced them,
+    when the caller re-ran the turn's tools on the server (never values a
+    client supplied)."""
     problems: list[GateProblem] = []
     if not text.strip():
         return GateReport(
@@ -220,8 +266,14 @@ def verify(db: Database, text: str, citations: Iterable[CitationIn]) -> GateRepo
     figures = _check_citations(db, citations, problems)
     reported = {fmt(c.value) for c in citations} - {fmt(f.c.value) for f in figures}
     pub_order = {r.edition: r.pub_order for f in figures for r in f.chain}
-    numbers = [n for n in figures_in_text(text) if not _is_year(n, text)]
+    skip = _not_statistics(text)
+    numbers = [
+        n
+        for n in figures_in_text(text)
+        if not _is_year(n, text) and not any(a <= n.start < b for a, b in skip)
+    ]
     allowed = thresholds()
+    computed = computed or {}
 
     used: list[_Figure] = []
     text_of: dict[int, str] = {}
@@ -241,12 +293,26 @@ def verify(db: Database, text: str, citations: Iterable[CitationIn]) -> GateRepo
         for b in used
         if a is not b and a.c.measure == b.c.measure
     }
+    # Percentages and differences derive from the numbers this answer uses.
+    backed = [f.c.value for f in used] + [
+        n.value for n in numbers if any(_same(n.value, v) for v in computed)
+    ]
+    derived = _derived(backed[:60])
+    computed_hits: list[ComputedValue] = []
     for n in numbers:
         if any(_same(n.value, f.c.value) for f in used):
             continue
         if any(_same(n.value, t) for t in allowed):
             continue
         if round(n.value, 6) in differences:
+            continue
+        hit = next((src for v, src in computed.items() if _same(n.value, v)), None)
+        if hit is not None:
+            computed_hits.append(
+                ComputedValue(number=text[n.start : n.end], source=hit)
+            )
+            continue
+        if round(n.value, 6) in derived or round(n.value, 1) in derived:
             continue
         if fmt(n.value) in reported:
             continue  # its citation is already reported as wrong
@@ -296,6 +362,7 @@ def verify(db: Database, text: str, citations: Iterable[CitationIn]) -> GateRepo
         passed=not problems,
         problems=problems,
         citations=[f.checked for f in used],
+        computed=computed_hits,
         edition_basis=basis,
         numbers_checked=len(numbers),
     )

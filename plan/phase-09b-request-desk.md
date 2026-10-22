@@ -1,7 +1,8 @@
 # Phase 9b: Request Desk (proposed)
 
-**Status:** Proposed. Don't start the build until the three checks under
-"Before we build" are answered.
+**Status:** Built on branch `proposal-request-desk` (October 2026) and
+verified (below). Still proposed: the three checks under "Before we build"
+decide whether it ships in the submission and how it's framed.
 
 **Goal:** a sandboxed write workflow on top of the analyst. When an answer
 matters, a user can ask the statistics office why a figure changed, save a
@@ -101,20 +102,20 @@ is a typed error.
 
 ## Tasks
 
-- [ ] Move `figures_in_text` and the revision-wording pattern into `core/figures_text.py`; the scorer imports them (no change in eval scores)
-- [ ] `core/desk/store.py`: schema, migrations by version number, WAL, idempotency keys, `desk_store_path` and `desk_staff_token` settings
-- [ ] Status rules and typed errors
-- [ ] The gate (`gate.py`), with refusal messages that name each number and the fix
-- [ ] Inquiry eligibility, dedup and routing
-- [ ] Library publish, search and the staleness check; `make desk-check`, `make desk-reset`
-- [ ] `revision_notes` reads `office_response` notes from the desk store, labelled as simulated in the sandbox
-- [ ] Six tool files with descriptions that pass `test_description_lint.py`; elicitation confirm with a two-step fallback
-- [ ] REST routes (public and staff) with the same envelopes; rate limits on writes
-- [ ] Agent loop: library check first; write tools only from an option
-- [ ] Web: options under answers, My requests inbox, staff screen
-- [ ] Seed script for the demo (two demo accounts, one staff account, the FY2020 storyline)
-- [ ] Docs: README tools table and track line, `docs/desk.md` (records, statuses, gate rules), concept doc guardrail line
-- [ ] File GitHub issues for anything left open; link #8 and #45
+- [x] Move `figures_in_text` and the revision-wording pattern into `core/figures_text.py`; the scorer imports them (no change in eval scores)
+- [x] `core/desk/store.py`: schema, migrations by version number, WAL, idempotency keys, `desk_store_path` and `desk_staff_token` settings
+- [x] Status rules and typed errors
+- [x] The gate (`gate.py`), with refusal messages that name each number and the fix
+- [x] Inquiry eligibility, dedup and routing
+- [x] Library publish, search and the staleness check; `make desk-check`, `make desk-reset`
+- [x] `revision_notes` reads `office_response` notes from the desk store, labelled as simulated in the sandbox
+- [x] Six tool files with descriptions that pass `test_description_lint.py`; elicitation confirm with a two-step fallback
+- [x] REST routes (public and staff) with the same envelopes; rate limits on writes
+- [x] Agent: never offered desk tools; the web app shows library matches (see Deviations)
+- [x] Web: options under answers, My requests inbox, staff screen
+- [x] Seed script for the demo (two demo accounts, one staff account, the FY2020 storyline)
+- [x] Docs: README tools table and track line, `docs/desk.md` (records, statuses, gate rules), concept doc guardrail line
+- [ ] File GitHub issues for anything left open; link #8 and #45 (listed under Open issues; waiting for the branch to be pushed)
 
 ## Tests
 
@@ -167,12 +168,59 @@ refused) and the refusal reason.
 
 ## Deviations
 
-None yet.
+| Plan | Built | Why |
+| --- | --- | --- |
+| The agent calls `find_published_answers` first and write tools only from an option | The agent is never offered any desk tool; the Ask page looks up the library itself | Keeps the agent strictly read-only and leaves its prompt and eval scores untouched |
+| Gate: every number backed by a citation | Also accepts numbers the server's own read tools produce when it re-runs the answer's tool calls; skips docket numbers, dates, links and code; checks edition labels; allows percentage changes | The live walkthrough showed a real answer cites 2 figures as citation events and quotes ~15 more from tool outputs, so citation-only answers almost never saved |
+| Show *Ask the statistics office* when a citation is `revised` | The server checks eligibility for each cited figure | Figures cited from `explain_change` carry `revised: false` (issue #37), which hid the FY2020 inquiry |
+| Separate `save_verified_answer` and `file_revision_inquiry` calls from the web | One REST call per click (`submit_option`) that verifies first, then writes request, answer and inquiry in one transaction | A refused answer leaves nothing behind |
+| Write-safety suite inside the question bank | `evaluation/write_safety.py` (19 scripted cases) plus `tests/test_desk_write_safety.py` | The bank scores answers to questions; these cases are sequences of desk actions |
+| Requests can name court, years and measure | Taken from the answer's citations | One source of truth |
 
 ## Evidence
 
-To fill in when the phase runs.
+**Automated tests (2026-10-22).** `uv run pytest`: **1,118 passed** (82 new
+desk tests in 9 files, plus one container test), 94% total coverage;
+`core/desk/` 91–99% per module. Ruff, format and mypy (strict on core) clean. Web: typecheck, ESLint,
+Prettier, `types:check`, **44** Vitest tests and **16** Playwright journeys
+(5 new for the desk, against responses captured from the real backend) pass,
+with axe checks. `make docker-test`: **9 passed**, including the desk in the
+hardened container (store in `/tmp`; root filesystem and catalog mount
+refuse writes). Write-safety suite: **19 of 19**
+([results](../eval/results/write-safety.md)).
+
+**Browser walkthrough, against the hardened container** (fixture catalog,
+identical to the full tables build; sample IDB; `make desk-seed` so one
+journalist had already asked). The Chrome extension wasn't connected, so this
+ran headless with Playwright against the live container, with no mocks:
+
+1. Presentation mode, recorded FY2020 answer: all three options appear,
+   with "FY2020 changed from 554 (JB 2020) to 322 (JFF 2025)".
+2. An edited answer mixing 554 with an uncited 318 is refused, naming 318.
+3. *Ask the statistics office* on the recorded answer is refused only for
+   201,017 and 202,463 (IDB case counts the sample can't reproduce). With
+   those edited out it saves: "5 computed figures (206, 322, 232, 332, 211)
+   matched by re-running explain_change", and joins inquiry #1, "2 requests
+   waiting".
+4. Staff screen: the queue shows the inquiry; the response is recorded and
+   the answer published.
+5. My requests (Priya): the full timeline through "Published to the
+   library", with each update. Library: the approved answer. Edition
+   Tracker: the office response note, labelled simulated.
+6. Phone width, dark mode: no horizontal scroll. No console errors.
+
+Fixed during the walkthrough: the missing *Ask the statistics office* option
+(issue #37 flag), citation-only gate too strict for real answers, a stale
+"Verified answer saved: Verified:" wording.
 
 ## Open issues
 
-To file when the phase starts. Related: [#8](https://github.com/syedaun-techsur/federal-courts-analyst/issues/8) (ask the AO about the 2023 revision), [#45](https://github.com/syedaun-techsur/federal-courts-analyst/issues/45) (shareable answer links), [#39](https://github.com/syedaun-techsur/federal-courts-analyst/issues/39) (single worker).
+To file once the branch is pushed:
+
+1. **Confirm the office side with Third Branch Solutions** (`needs domain expert`): who answers statistics questions today; would the AO want inquiries like these. Done when the deck's framing (real process vs. "what the AO could adopt") is settled.
+2. **Track: Dataset Access or Service Write?** (`needs team`): ask GSA; update README, deck, concept doc.
+3. **Re-run the desk walkthrough on the full IDB** (`data`): confirm the recorded answer's case counts (201,017; 202,463) are backed by the re-run, so it saves without edits.
+4. **Live-agent answers through the gate** (`phase 10`): sample real answers and measure how often they save without edits; tune the skip patterns.
+5. **Shared store for more than one worker** (`stretch`): same limit as #39.
+
+Related: [#8](https://github.com/syedaun-techsur/federal-courts-analyst/issues/8) (ask the AO about the 2023 revision), [#45](https://github.com/syedaun-techsur/federal-courts-analyst/issues/45) (shareable answer links), [#39](https://github.com/syedaun-techsur/federal-courts-analyst/issues/39) (single worker).

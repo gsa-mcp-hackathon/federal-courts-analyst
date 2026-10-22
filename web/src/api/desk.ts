@@ -127,6 +127,7 @@ export const desk = {
     answer_text: string;
     citations: CitationIn[];
     inquiry?: { measure: string; court: string; fiscal_year: number } | null;
+    tool_calls?: { tool: string; arguments: Record<string, unknown> }[];
     idempotency_key?: string;
   }) =>
     send<ResultDeskOutcome>("/api/desk/requests", {

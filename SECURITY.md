@@ -43,6 +43,12 @@ See the [threat model](docs/security/threat-model.md) and
   for platform health checks.
 - The container runs as a non-root user and is meant to run with a read-only
   root filesystem (`make docker-run` shows the flags).
+- The request desk ([ADR 0013](docs/adr/0013-request-desk.md)) is the only
+  write path, and it writes only to its own sandbox store; the official data
+  stays read-only. Its staff routes need `DESK_STAFF_TOKEN` (off when
+  unset), writes are rate limited, question and answer text is screened for
+  judge-level requests and party names before it's stored, every write is
+  in an append-only audit log, and the agent is never offered a desk tool.
 - Secrets come only from the environment and are redacted from logs. CI runs
   `pip-audit`, `bandit` and `detect-secrets` (`make security` locally).
 

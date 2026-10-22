@@ -12,7 +12,7 @@ returns a preview and writes nothing.
 from __future__ import annotations
 
 import re
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from typing import Any
 
 from courts_analyst.core.chain import later_revisions, load_chain, revision_status
@@ -138,10 +138,15 @@ def _citations(store: DeskStore, answer_id: int) -> list[CheckedCitation]:
     ]
 
 
-def _stamp(basis: Sequence[str], request_id: int) -> str:
+def _stamp(basis: Sequence[str], request_id: int, tools: Sequence[str] = ()) -> str:
     editions = ", ".join(basis) if basis else "no figures cited"
+    rerun = (
+        f" or re-computed by re-running {', '.join(tools)} on the server"
+        if tools
+        else ""
+    )
     return (
-        f"Verified: every number checked against official data ({editions}). "
+        f"Verified: every number checked against official data ({editions}){rerun}. "
         f"Request #{request_id}. Sandbox."
     )
 
@@ -154,6 +159,7 @@ def _answer_view(store: DeskStore, request_id: int) -> tuple[AnswerView, int] | 
     if row is None:
         return None
     basis = [e for e in row["edition_basis"].split(",") if e]
+    tools = [t for t in (row["computed_sources"] or "").split(",") if t]
     return (
         AnswerView(
             version=row["version"],
@@ -161,7 +167,7 @@ def _answer_view(store: DeskStore, request_id: int) -> tuple[AnswerView, int] | 
             citations=_citations(store, row["id"]),
             edition_basis=basis,
             verified_at=row["verified_at"],
-            stamp=_stamp(basis, request_id),
+            stamp=_stamp(basis, request_id, tools),
         ),
         int(row["id"]),
     )
@@ -565,9 +571,16 @@ def _save_answer(
     ).fetchone()
     version = int(version_row[0]) + 1
     cur = con.execute(
-        "INSERT INTO answer (request_id, version, text, edition_basis, verified_at) "
-        "VALUES (?, ?, ?, ?, ?)",
-        [rid, version, text, ",".join(gate.edition_basis), now()],
+        "INSERT INTO answer (request_id, version, text, edition_basis, "
+        "computed_sources, verified_at) VALUES (?, ?, ?, ?, ?, ?)",
+        [
+            rid,
+            version,
+            text,
+            ",".join(gate.edition_basis),
+            ",".join(sorted({c.source for c in gate.computed})),
+            now(),
+        ],
     )
     aid = int(cur.lastrowid)
     for i, c in enumerate(gate.citations):
@@ -593,7 +606,8 @@ def _save_answer(
             "Verified answer saved. You'll be notified if a newer edition revises "
             "any figure in it."
             if new == "watching"
-            else "Verified answer saved: " + _stamp(gate.edition_basis, rid)
+            else "Answer saved. "
+            + _stamp(gate.edition_basis, rid, sorted({c.source for c in gate.computed}))
         )
         DeskStore.add_update(con, rid, new, text_update)
     else:
@@ -1020,6 +1034,7 @@ def submit_option(
     citations: Sequence[CitationIn],
     inquiry: InquiryTarget | None = None,
     idempotency_key: str | None = None,
+    computed: Mapping[float, str] | None = None,
 ) -> Result[DeskOutcome]:
     """What one click on an option does: verify the answer first, then, only
     if it passes, create the request, save the answer and (for *Ask the
@@ -1029,7 +1044,7 @@ def submit_option(
     question = _clean(question, MAX_QUESTION, "question")
     text = _clean(answer_text, MAX_ANSWER, "answer")
     _screen_text(db, question)
-    gate = verify(db, text, citations)
+    gate = verify(db, text, citations, computed)
     if not gate.passed:
         return _result(
             db,

@@ -31,6 +31,7 @@ from courts_analyst.core.desk.models import (
     Outcome,
 )
 from courts_analyst.core.errors import CoreError
+from courts_analyst.core.figures_text import figures_in_text
 from courts_analyst.http_security import RateLimit
 from courts_analyst.tools._common import get_db, get_desk
 
@@ -56,10 +57,32 @@ STAFF = Actor(
 
 NO_STORE = {"cache-control": "no-store"}
 
+MAX_RERUNS = 8
+RERUNNABLE = frozenset(
+    {
+        "get_official_figure",
+        "explain_change",
+        "compare_courts",
+        "find_cases",
+        "analyze_cohort",
+        "reconcile",
+        "judgeship_context",
+    }
+)
+"""Read tools whose outputs the gate may re-check against: deterministic,
+over the server's own data. Never desk tools, never CourtListener."""
+
 Text = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)]
 Key = Annotated[str | None, Field(default=None, max_length=80)]
 AccountHeader = Annotated[str | None, Header(alias="x-desk-account", max_length=40)]
 StaffHeader = Annotated[str | None, Header(alias="x-desk-staff-token", max_length=200)]
+
+
+class ToolCallIn(BaseModel):
+    """A read tool the agent called for this answer, re-run on the server."""
+
+    tool: Annotated[str, StringConstraints(max_length=64, pattern=r"^[a-z_]+$")]
+    arguments: dict[str, Any] = Field(default_factory=dict)
 
 
 class SubmitBody(BaseModel):
@@ -69,6 +92,12 @@ class SubmitBody(BaseModel):
     citations: list[CitationIn] = Field(max_length=60)
     inquiry: InquiryTarget | None = Field(
         default=None, description="Required for 'ask_office': the revised figure."
+    )
+    tool_calls: list[ToolCallIn] = Field(
+        default_factory=list,
+        max_length=MAX_RERUNS,
+        description="The answer's read tool calls (name and arguments only). The "
+        "server re-runs them; numbers their outputs hold count as backed.",
     )
     idempotency_key: Key = None
 
@@ -150,6 +179,50 @@ async def _as(who: Any, fn: Any, *args: Any, **kwargs: Any) -> Response:
     return await _call(fn, get_db(), get_desk(), actor, *args, **kwargs)
 
 
+def _numbers(node: Any, out: set[float]) -> None:
+    if isinstance(node, bool):
+        return
+    if isinstance(node, int | float):
+        out |= {float(node), float(round(node)), round(float(node), 1)}
+    elif isinstance(node, str):
+        out |= {f.value for f in figures_in_text(node)}
+    elif isinstance(node, dict):
+        for v in node.values():
+            _numbers(v, out)
+    elif isinstance(node, list):
+        for v in node:
+            _numbers(v, out)
+
+
+async def recompute(calls: list[ToolCallIn]) -> dict[float, str]:
+    """Re-run the answer's read tools in process and map every number their
+    outputs hold to the tool. The values come from this server, never from
+    the request."""
+    from fastmcp import Client
+
+    from courts_analyst.app import mcp
+
+    out: dict[float, str] = {}
+    calls = [c for c in calls if c.tool in RERUNNABLE][:MAX_RERUNS]
+    if not calls:
+        return out
+    async with Client(mcp) as client:
+        for call in calls:
+            try:
+                r = await client.call_tool(
+                    call.tool, call.arguments, raise_on_error=False
+                )
+            except Exception:  # bad arguments, protocol errors: just no values
+                continue
+            if r.is_error or not r.structured_content:
+                continue
+            found: set[float] = set()
+            _numbers(r.structured_content, found)
+            for v in found:
+                out.setdefault(v, call.tool)
+    return out
+
+
 # ── public ───────────────────────────────────────────────────────────────────
 
 
@@ -190,6 +263,7 @@ async def submit(
 ) -> Response:
     if (limited := _limited(request)) is not None:
         return limited
+    computed = await recompute(body.tool_calls)
     return await _as(
         lambda: _public(x_desk_account),
         desk.submit_option,
@@ -199,6 +273,7 @@ async def submit(
         body.citations,
         body.inquiry,
         body.idempotency_key,
+        computed,
     )
 
 

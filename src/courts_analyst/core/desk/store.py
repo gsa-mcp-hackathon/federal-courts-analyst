@@ -48,6 +48,7 @@ CREATE TABLE IF NOT EXISTS answer (
     version INTEGER NOT NULL,
     text TEXT NOT NULL,
     edition_basis TEXT NOT NULL,
+    computed_sources TEXT NOT NULL DEFAULT '',
     verified_at TEXT NOT NULL,
     UNIQUE (request_id, version)
 );

@@ -232,6 +232,27 @@
       "title": "Clarification",
       "type": "object"
     },
+    "ComputedValue": {
+      "description": "A number the server's own tools produced when the gate re-ran them.",
+      "properties": {
+        "number": {
+          "description": "The number as written in the answer.",
+          "title": "Number",
+          "type": "string"
+        },
+        "source": {
+          "description": "The read tool whose re-run output holds it.",
+          "title": "Source",
+          "type": "string"
+        }
+      },
+      "required": [
+        "number",
+        "source"
+      ],
+      "title": "ComputedValue",
+      "type": "object"
+    },
     "Decline": {
       "description": "Why a guardrail policy withheld the answer, and what to ask instead.",
       "properties": {
@@ -460,6 +481,14 @@
             "$ref": "#/$defs/CheckedCitation"
           },
           "title": "Citations",
+          "type": "array"
+        },
+        "computed": {
+          "description": "Numbers backed by re-running the turn's read tools on the server.",
+          "items": {
+            "$ref": "#/$defs/ComputedValue"
+          },
+          "title": "Computed",
           "type": "array"
         },
         "edition_basis": {

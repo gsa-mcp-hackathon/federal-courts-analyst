@@ -1226,6 +1226,10 @@ export interface GateReport {
   problems: GateProblem[];
   citations: CheckedCitation[];
   /**
+   * Numbers backed by re-running the turn's read tools on the server.
+   */
+  computed: ComputedValue[];
+  /**
    * Editions the answer's figures come from.
    */
   edition_basis: string[];
@@ -1249,6 +1253,19 @@ export interface GateProblem {
    */
   number: string | null;
   fix: string | null;
+}
+/**
+ * A number the server's own tools produced when the gate re-ran them.
+ */
+export interface ComputedValue {
+  /**
+   * The number as written in the answer.
+   */
+  number: string;
+  /**
+   * The read tool whose re-run output holds it.
+   */
+  source: string;
 }
 /**
  * A question the server needs answered before it can give one figure.

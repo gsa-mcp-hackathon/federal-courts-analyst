@@ -152,6 +152,7 @@
       "historical": false
      }
     ],
+    "computed": [],
     "edition_basis": [
      "JB-2020",
      "JFF-2024"
@@ -264,8 +265,8 @@
     "asker_name": "Priya Shah",
     "asker_role": "congressional_staff",
     "status": "waiting_for_office",
-    "created_at": "2026-10-21T21:03:07+00:00",
-    "updated_at": "2026-10-21T21:03:07+00:00",
+    "created_at": "2026-10-22T15:29:50+00:00",
+    "updated_at": "2026-10-22T15:29:50+00:00",
     "answer": {
      "version": 1,
      "text": "National weighted civil filings per judgeship were 322 in FY2020 (JFF-2025); the figure was first published as 554 (JB-2020).",
@@ -300,7 +301,7 @@
      "edition_basis": [
       "JFF-2025"
      ],
-     "verified_at": "2026-10-21T21:03:07+00:00",
+     "verified_at": "2026-10-22T15:29:50+00:00",
      "stamp": "Verified: every number checked against official data (JFF-2025). Request #1001. Sandbox."
     },
     "inquiry": {
@@ -318,7 +319,7 @@
      "route_label": "AO Statistics Division (uscourts.gov Contact Us)",
      "status": "waiting_for_office",
      "waiting_requests": 1,
-     "created_at": "2026-10-21T21:03:07+00:00",
+     "created_at": "2026-10-22T15:29:50+00:00",
      "response": null,
      "delivery": "Sandbox: recorded here, not sent."
     },
@@ -327,21 +328,21 @@
       "id": 3,
       "kind": "inquiry_filed",
       "text": "Sent to the statistics office: why FY2020 Weighted civil filings per judgeship, All district courts: 554 (JB-2020) \u2192 322 (JFF-2025) changed. (Sandbox: recorded here, not sent.)",
-      "created_at": "2026-10-21T21:03:07+00:00",
+      "created_at": "2026-10-22T15:29:50+00:00",
       "read": false
      },
      {
       "id": 2,
       "kind": "verified",
       "text": "Verified answer saved: Verified: every number checked against official data (JFF-2025). Request #1001. Sandbox.",
-      "created_at": "2026-10-21T21:03:07+00:00",
+      "created_at": "2026-10-22T15:29:50+00:00",
       "read": false
      },
      {
       "id": 1,
       "kind": "received",
       "text": "Request #1001 received.",
-      "created_at": "2026-10-21T21:03:07+00:00",
+      "created_at": "2026-10-22T15:29:50+00:00",
       "read": false
      }
     ],
@@ -364,7 +365,7 @@
     "route_label": "AO Statistics Division (uscourts.gov Contact Us)",
     "status": "waiting_for_office",
     "waiting_requests": 1,
-    "created_at": "2026-10-21T21:03:07+00:00",
+    "created_at": "2026-10-22T15:29:50+00:00",
     "response": null,
     "delivery": "Sandbox: recorded here, not sent."
    },
@@ -399,6 +400,7 @@
       "historical": true
      }
     ],
+    "computed": [],
     "edition_basis": [
      "JFF-2025"
     ],
@@ -508,8 +510,8 @@
      "asker_name": "Priya Shah",
      "asker_role": "congressional_staff",
      "status": "waiting_for_office",
-     "created_at": "2026-10-21T21:03:07+00:00",
-     "updated_at": "2026-10-21T21:03:07+00:00",
+     "created_at": "2026-10-22T15:29:50+00:00",
+     "updated_at": "2026-10-22T15:29:50+00:00",
      "answer": {
       "version": 1,
       "text": "National weighted civil filings per judgeship were 322 in FY2020 (JFF-2025); the figure was first published as 554 (JB-2020).",
@@ -544,7 +546,7 @@
       "edition_basis": [
        "JFF-2025"
       ],
-      "verified_at": "2026-10-21T21:03:07+00:00",
+      "verified_at": "2026-10-22T15:29:50+00:00",
       "stamp": "Verified: every number checked against official data (JFF-2025). Request #1001. Sandbox."
      },
      "inquiry": {
@@ -562,7 +564,7 @@
       "route_label": "AO Statistics Division (uscourts.gov Contact Us)",
       "status": "waiting_for_office",
       "waiting_requests": 1,
-      "created_at": "2026-10-21T21:03:07+00:00",
+      "created_at": "2026-10-22T15:29:50+00:00",
       "response": null,
       "delivery": "Sandbox: recorded here, not sent."
      },
@@ -571,21 +573,21 @@
        "id": 3,
        "kind": "inquiry_filed",
        "text": "Sent to the statistics office: why FY2020 Weighted civil filings per judgeship, All district courts: 554 (JB-2020) \u2192 322 (JFF-2025) changed. (Sandbox: recorded here, not sent.)",
-       "created_at": "2026-10-21T21:03:07+00:00",
+       "created_at": "2026-10-22T15:29:50+00:00",
        "read": false
       },
       {
        "id": 2,
        "kind": "verified",
        "text": "Verified answer saved: Verified: every number checked against official data (JFF-2025). Request #1001. Sandbox.",
-       "created_at": "2026-10-21T21:03:07+00:00",
+       "created_at": "2026-10-22T15:29:50+00:00",
        "read": false
       },
       {
        "id": 1,
        "kind": "received",
        "text": "Request #1001 received.",
-       "created_at": "2026-10-21T21:03:07+00:00",
+       "created_at": "2026-10-22T15:29:50+00:00",
        "read": false
       }
      ],
@@ -706,7 +708,7 @@
      "route_label": "AO Statistics Division (uscourts.gov Contact Us)",
      "status": "waiting_for_office",
      "waiting_requests": 1,
-     "created_at": "2026-10-21T21:03:07+00:00",
+     "created_at": "2026-10-22T15:29:50+00:00",
      "response": null,
      "delivery": "Sandbox: recorded here, not sent."
     }
@@ -753,8 +755,8 @@
      "asker_name": "Priya Shah",
      "asker_role": "congressional_staff",
      "status": "office_responded",
-     "created_at": "2026-10-21T21:03:07+00:00",
-     "updated_at": "2026-10-21T21:03:07+00:00",
+     "created_at": "2026-10-22T15:29:50+00:00",
+     "updated_at": "2026-10-22T15:29:50+00:00",
      "answer": {
       "version": 1,
       "text": "National weighted civil filings per judgeship were 322 in FY2020 (JFF-2025); the figure was first published as 554 (JB-2020).",
@@ -789,7 +791,7 @@
       "edition_basis": [
        "JFF-2025"
       ],
-      "verified_at": "2026-10-21T21:03:07+00:00",
+      "verified_at": "2026-10-22T15:29:50+00:00",
       "stamp": "Verified: every number checked against official data (JFF-2025). Request #1001. Sandbox."
      },
      "inquiry": {
@@ -807,12 +809,12 @@
       "route_label": "AO Statistics Division (uscourts.gov Contact Us)",
       "status": "office_responded",
       "waiting_requests": 1,
-      "created_at": "2026-10-21T21:03:07+00:00",
+      "created_at": "2026-10-22T15:29:50+00:00",
       "response": {
        "outcome": "confirmed",
        "text": "The 2023 edition re-weighted directly filed MDL cases.",
        "entered_by": "Statistics office (simulated)",
-       "created_at": "2026-10-21T21:03:07+00:00",
+       "created_at": "2026-10-22T15:29:50+00:00",
        "label": "Response entered by the simulated statistics office (sandbox)"
       },
       "delivery": "Sandbox: recorded here, not sent."
@@ -822,28 +824,28 @@
        "id": 4,
        "kind": "office_responded",
        "text": "The statistics office confirmed the figure and explained the change: The 2023 edition re-weighted directly filed MDL cases. (Simulated statistics office, sandbox.)",
-       "created_at": "2026-10-21T21:03:07+00:00",
+       "created_at": "2026-10-22T15:29:50+00:00",
        "read": false
       },
       {
        "id": 3,
        "kind": "inquiry_filed",
        "text": "Sent to the statistics office: why FY2020 Weighted civil filings per judgeship, All district courts: 554 (JB-2020) \u2192 322 (JFF-2025) changed. (Sandbox: recorded here, not sent.)",
-       "created_at": "2026-10-21T21:03:07+00:00",
+       "created_at": "2026-10-22T15:29:50+00:00",
        "read": false
       },
       {
        "id": 2,
        "kind": "verified",
        "text": "Verified answer saved: Verified: every number checked against official data (JFF-2025). Request #1001. Sandbox.",
-       "created_at": "2026-10-21T21:03:07+00:00",
+       "created_at": "2026-10-22T15:29:50+00:00",
        "read": false
       },
       {
        "id": 1,
        "kind": "received",
        "text": "Request #1001 received.",
-       "created_at": "2026-10-21T21:03:07+00:00",
+       "created_at": "2026-10-22T15:29:50+00:00",
        "read": false
       }
      ],
@@ -951,7 +953,7 @@
    "events": [
     {
      "id": 6,
-     "at": "2026-10-21T21:03:07+00:00",
+     "at": "2026-10-22T15:29:50+00:00",
      "actor": "office",
      "tool": "record_official_response",
      "record": "request:1001",
@@ -960,7 +962,7 @@
     },
     {
      "id": 5,
-     "at": "2026-10-21T21:03:07+00:00",
+     "at": "2026-10-22T15:29:50+00:00",
      "actor": "office",
      "tool": "record_official_response",
      "record": "inquiry:1",
@@ -969,7 +971,7 @@
     },
     {
      "id": 4,
-     "at": "2026-10-21T21:03:07+00:00",
+     "at": "2026-10-22T15:29:50+00:00",
      "actor": "priya",
      "tool": "file_revision_inquiry",
      "record": "request:1001",
@@ -978,7 +980,7 @@
     },
     {
      "id": 3,
-     "at": "2026-10-21T21:03:07+00:00",
+     "at": "2026-10-22T15:29:50+00:00",
      "actor": "priya",
      "tool": "file_revision_inquiry",
      "record": "inquiry:1",
@@ -987,7 +989,7 @@
     },
     {
      "id": 2,
-     "at": "2026-10-21T21:03:07+00:00",
+     "at": "2026-10-22T15:29:50+00:00",
      "actor": "priya",
      "tool": "save_verified_answer",
      "record": "request:1001:answer:1",
@@ -996,7 +998,7 @@
     },
     {
      "id": 1,
-     "at": "2026-10-21T21:03:07+00:00",
+     "at": "2026-10-22T15:29:50+00:00",
      "actor": "priya",
      "tool": "open_request",
      "record": "request:1001",
@@ -1046,8 +1048,8 @@
      "asker_name": "Priya Shah",
      "asker_role": "congressional_staff",
      "status": "published",
-     "created_at": "2026-10-21T21:03:07+00:00",
-     "updated_at": "2026-10-21T21:03:07+00:00",
+     "created_at": "2026-10-22T15:29:50+00:00",
+     "updated_at": "2026-10-22T15:29:50+00:00",
      "answer": {
       "version": 1,
       "text": "National weighted civil filings per judgeship were 322 in FY2020 (JFF-2025); the figure was first published as 554 (JB-2020).",
@@ -1082,7 +1084,7 @@
       "edition_basis": [
        "JFF-2025"
       ],
-      "verified_at": "2026-10-21T21:03:07+00:00",
+      "verified_at": "2026-10-22T15:29:50+00:00",
       "stamp": "Verified: every number checked against official data (JFF-2025). Request #1001. Sandbox."
      },
      "inquiry": {
@@ -1100,12 +1102,12 @@
       "route_label": "AO Statistics Division (uscourts.gov Contact Us)",
       "status": "office_responded",
       "waiting_requests": 1,
-      "created_at": "2026-10-21T21:03:07+00:00",
+      "created_at": "2026-10-22T15:29:50+00:00",
       "response": {
        "outcome": "confirmed",
        "text": "The 2023 edition re-weighted directly filed MDL cases.",
        "entered_by": "Statistics office (simulated)",
-       "created_at": "2026-10-21T21:03:07+00:00",
+       "created_at": "2026-10-22T15:29:50+00:00",
        "label": "Response entered by the simulated statistics office (sandbox)"
       },
       "delivery": "Sandbox: recorded here, not sent."
@@ -1115,35 +1117,35 @@
        "id": 5,
        "kind": "published",
        "text": "Approved and published to the public library. The next person who asks gets this answer.",
-       "created_at": "2026-10-21T21:03:07+00:00",
+       "created_at": "2026-10-22T15:29:50+00:00",
        "read": false
       },
       {
        "id": 4,
        "kind": "office_responded",
        "text": "The statistics office confirmed the figure and explained the change: The 2023 edition re-weighted directly filed MDL cases. (Simulated statistics office, sandbox.)",
-       "created_at": "2026-10-21T21:03:07+00:00",
+       "created_at": "2026-10-22T15:29:50+00:00",
        "read": false
       },
       {
        "id": 3,
        "kind": "inquiry_filed",
        "text": "Sent to the statistics office: why FY2020 Weighted civil filings per judgeship, All district courts: 554 (JB-2020) \u2192 322 (JFF-2025) changed. (Sandbox: recorded here, not sent.)",
-       "created_at": "2026-10-21T21:03:07+00:00",
+       "created_at": "2026-10-22T15:29:50+00:00",
        "read": false
       },
       {
        "id": 2,
        "kind": "verified",
        "text": "Verified answer saved: Verified: every number checked against official data (JFF-2025). Request #1001. Sandbox.",
-       "created_at": "2026-10-21T21:03:07+00:00",
+       "created_at": "2026-10-22T15:29:50+00:00",
        "read": false
       },
       {
        "id": 1,
        "kind": "received",
        "text": "Request #1001 received.",
-       "created_at": "2026-10-21T21:03:07+00:00",
+       "created_at": "2026-10-22T15:29:50+00:00",
        "read": false
       }
      ],
@@ -1287,7 +1289,7 @@
       "edition_basis": [
        "JFF-2025"
       ],
-      "verified_at": "2026-10-21T21:03:07+00:00",
+      "verified_at": "2026-10-22T15:29:50+00:00",
       "stamp": "Verified: every number checked against official data (JFF-2025). Request #1001. Sandbox."
      },
      "inquiry": {
@@ -1305,17 +1307,17 @@
       "route_label": "AO Statistics Division (uscourts.gov Contact Us)",
       "status": "office_responded",
       "waiting_requests": 1,
-      "created_at": "2026-10-21T21:03:07+00:00",
+      "created_at": "2026-10-22T15:29:50+00:00",
       "response": {
        "outcome": "confirmed",
        "text": "The 2023 edition re-weighted directly filed MDL cases.",
        "entered_by": "Statistics office (simulated)",
-       "created_at": "2026-10-21T21:03:07+00:00",
+       "created_at": "2026-10-22T15:29:50+00:00",
        "label": "Response entered by the simulated statistics office (sandbox)"
       },
       "delivery": "Sandbox: recorded here, not sent."
      },
-     "published_at": "2026-10-21T21:03:07+00:00",
+     "published_at": "2026-10-22T15:29:50+00:00",
      "needs_reverification": false
     }
    ],

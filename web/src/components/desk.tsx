@@ -3,7 +3,7 @@
 // My requests inbox. A question writes nothing; only these buttons do.
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ApiError } from "@/api/client";
 import { citationsFrom, desk, deskAccount, OPTION_LABELS, type DeskOption } from "@/api/desk";
 import type { TurnState } from "@/api/turn";
@@ -67,22 +67,47 @@ export function AccountPicker({ onChange }: { onChange?: (id: string | null) => 
 
 // ── the three options under an answer ────────────────────────────────────────
 
-function eligibleFigure(turn: TurnState) {
-  const ref = turn.citations.map((c) => c.ref).find((r) => r.revised);
-  return ref ? { measure: ref.measure, court: ref.court, fiscal_year: ref.fiscal_year } : null;
+const MAX_ELIGIBILITY_CHECKS = 5;
+
+/** The figures an answer cites, once each. The server decides which were
+ * revised without explanation: a citation's own `revised` flag can miss one
+ * (figures cited from explain_change, issue #37). */
+function citedFigures(turn: TurnState) {
+  const seen = new Map<string, { measure: string; court: string; fiscal_year: number }>();
+  for (const { ref } of turn.citations) {
+    const key = `${ref.measure}|${ref.court}|${ref.fiscal_year}`;
+    if (!seen.has(key)) {
+      seen.set(key, { measure: ref.measure, court: ref.court, fiscal_year: ref.fiscal_year });
+    }
+  }
+  return [...seen.values()].slice(0, MAX_ELIGIBILITY_CHECKS);
 }
 
 export function DeskOptions({ turn }: { turn: TurnState }) {
-  const target = eligibleFigure(turn);
-  const eligibility = useQuery({
-    queryKey: ["desk", "eligibility", target],
-    queryFn: () => desk.eligibility(target!),
-    enabled: target !== null,
-    staleTime: Infinity,
+  const ended = turn.end?.stop_reason === "end_turn";
+  const checks = useQueries({
+    queries: citedFigures(turn).map((f) => ({
+      queryKey: ["desk", "eligibility", f],
+      queryFn: () => desk.eligibility(f),
+      enabled: ended,
+      staleTime: Infinity,
+    })),
   });
+  // Of the eligible figures, the one whose revision is largest.
+  const eligible = checks
+    .map((c) => c.data?.data)
+    .filter((e) => e?.eligible)
+    .sort(
+      (a, b) =>
+        Math.abs((b!.to_value ?? 0) - (b!.from_value ?? 0)) -
+        Math.abs((a!.to_value ?? 0) - (a!.from_value ?? 0)),
+    )[0];
+  const target = eligible
+    ? { measure: eligible.measure, court: eligible.court, fiscal_year: eligible.fiscal_year }
+    : null;
   const [open, setOpen] = useState<DeskOption | null>(null);
-  const canAsk = eligibility.data?.data?.eligible === true;
-  if (turn.end?.stop_reason !== "end_turn" || !turn.text || turn.citations.length === 0) {
+  const canAsk = eligible !== undefined;
+  if (!ended || !turn.text || turn.citations.length === 0) {
     return null;
   }
   const options: DeskOption[] = [
@@ -110,13 +135,13 @@ export function DeskOptions({ turn }: { turn: TurnState }) {
           </button>
         ))}
       </div>
-      {canAsk && eligibility.data?.data && !open && (
+      {eligible && !open && (
         <p className="mt-2 text-sm text-ink-2">
-          FY{eligibility.data.data.fiscal_year} changed from{" "}
-          <span className="num">{fmtValue(eligibility.data.data.from_value)}</span> (
-          {editionLabel(eligibility.data.data.from_edition ?? "")}) to{" "}
-          <span className="num">{fmtValue(eligibility.data.data.to_value)}</span> (
-          {editionLabel(eligibility.data.data.to_edition ?? "")}). {eligibility.data.data.reason}
+          FY{eligible.fiscal_year} changed from{" "}
+          <span className="num">{fmtValue(eligible.from_value)}</span> (
+          {editionLabel(eligible.from_edition ?? "")}) to{" "}
+          <span className="num">{fmtValue(eligible.to_value)}</span> (
+          {editionLabel(eligible.to_edition ?? "")}). {eligible.reason}
         </p>
       )}
       {open && (
@@ -155,6 +180,12 @@ function SavePanel({
         answer_text: text,
         citations: citationsFrom(turn.citations.map((c) => c.ref)),
         inquiry: target,
+        // The server re-runs these read tools itself; only names and
+        // arguments are sent, never values.
+        tool_calls: turn.steps
+          .filter((st) => st.call.server === "courts-analyst")
+          .slice(0, 8)
+          .map((st) => ({ tool: st.call.tool, arguments: st.call.arguments })),
         idempotency_key: key,
       }),
     onSuccess: () => void client.invalidateQueries({ queryKey: ["desk"] }),
@@ -230,6 +261,18 @@ export function OutcomeView({ outcome }: { outcome: DeskOutcome }) {
       </p>
       {outcome.request?.answer && (
         <p className="mt-1 font-mono text-xs text-ink-2">{outcome.request.answer.stamp}</p>
+      )}
+      {outcome.gate && outcome.gate.computed.length > 0 && (
+        <p className="mt-1 text-xs text-muted">
+          {outcome.gate.computed.length} computed figure
+          {outcome.gate.computed.length === 1 ? "" : "s"} (
+          {outcome.gate.computed
+            .slice(0, 6)
+            .map((c) => c.number)
+            .join(", ")}
+          ) matched by re-running{" "}
+          {[...new Set(outcome.gate.computed.map((c) => c.source))].join(", ")} on the server.
+        </p>
       )}
       {outcome.inquiry && <InquiryLine inquiry={outcome.inquiry} />}
       <Link to="/requests" className="mt-2 inline-block text-accent underline">

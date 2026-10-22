@@ -117,6 +117,9 @@ web-geo: ## Rebuild the county→district crosswalk (needs the IDB) and the dist
 	uv run python -m courts_analyst.pipeline.geo
 	cd web && npm run geo
 
+eval-write-safety: ## Request desk write-safety suite → eval/results/write-safety.md
+	uv run python -m courts_analyst.evaluation.write_safety
+
 eval-validate: ## Validate the question bank (schema, ids, splits)
 	uv run courts-eval validate
 
