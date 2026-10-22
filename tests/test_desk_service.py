@@ -18,14 +18,16 @@ from courts_analyst.core.desk.errors import (
     InvalidTransitionError,
     NotEligibleError,
 )
-from courts_analyst.core.desk.models import Actor, CitationIn
+from courts_analyst.core.desk.models import Actor, CitationIn, InquiryTarget
 from courts_analyst.core.desk.store import FIRST_REQUEST_ID, DeskStore
 from courts_analyst.core.official import get_official_figure
 
 W = "weighted_civil_filings_per_judgeship"
 PRIYA = Actor(account_id="priya", name="Priya", role="congressional_staff")
 SAM = Actor(account_id="sam", name="Sam", role="journalist")
-OFFICE = Actor(account_id="office", name="Stats Office", role="statistics_office", staff=True)
+OFFICE = Actor(
+    account_id="office", name="Stats Office", role="statistics_office", staff=True
+)
 QUESTION = "How has the national weighted civil filings per judgeship changed?"
 ANSWER = (
     "National weighted civil filings per judgeship were 322 in FY2020 and 318 in "
@@ -36,7 +38,7 @@ CITES = [
     CitationIn(measure=W, fiscal_year=2021, edition="JFF-2024", value=318),
     CitationIn(measure=W, fiscal_year=2020, edition="JB-2020", value=554),
 ]
-FY2020 = CitationIn(measure=W, fiscal_year=2020, edition="JFF-2024", value=322)
+FY2020 = InquiryTarget(measure=W, fiscal_year=2020)
 
 
 @pytest.fixture
@@ -98,8 +100,13 @@ def test_failed_gate_writes_nothing(core_db: Any, store: DeskStore) -> None:
         CitationIn(measure=W, fiscal_year=2021, edition="JFF-2024", value=318),
     ]
     r = desk.submit_option(
-        core_db, store, PRIYA, "verified_copy", QUESTION,
-        "National weighted civil filings were 554 in FY2020 and 318 in FY2021.", bad,
+        core_db,
+        store,
+        PRIYA,
+        "verified_copy",
+        QUESTION,
+        "National weighted civil filings were 554 in FY2020 and 318 in FY2021.",
+        bad,
     )
     assert not r.data.written and not r.data.gate.passed
     assert "didn't pass verification" in r.data.message
@@ -127,7 +134,11 @@ def test_office_response_updates_everyone_and_the_read_tools(
     first = ask_office(core_db, store).data
     ask_office(core_db, store, SAM)
     r = desk.record_official_response(
-        core_db, store, OFFICE, first.inquiry.id, "confirmed",
+        core_db,
+        store,
+        OFFICE,
+        first.inquiry.id,
+        "confirmed",
         "The 2023 revision re-weighted directly filed MDL cases.",
     ).data
     assert r.written and r.inquiry.status == "office_responded"
@@ -144,7 +155,9 @@ def test_office_response_updates_everyone_and_the_read_tools(
     assert "re-weighted directly filed MDL cases" in notes["office_response"]
 
     # A later asker gets the answer at once.
-    third = ask_office(core_db, store, Actor(account_id="r", name="R", role="researcher"))
+    third = ask_office(
+        core_db, store, Actor(account_id="r", name="R", role="researcher")
+    )
     assert third.data.request.status == "office_responded"
     assert third.data.request.updates[0].kind == "inquiry_joined"
 
@@ -183,14 +196,18 @@ def test_eligibility(core_db: Any) -> None:
     assert yes.eligible and (yes.from_value, yes.to_value) == (554, 322)
     pending = desk.inquiry_eligibility(core_db, "civil_cases_pending", "AK", 2016).data
     assert not pending.eligible and "Table C-1" in pending.reason
-    unrevised = desk.inquiry_eligibility(core_db, "civil_cases_pending", "US", 2023).data
+    unrevised = desk.inquiry_eligibility(
+        core_db, "civil_cases_pending", "US", 2023
+    ).data
     assert not unrevised.eligible and "wasn't revised" in unrevised.reason
 
 
 def test_inquiry_needs_a_cited_unexplained_revision(
     core_db: Any, store: DeskStore
 ) -> None:
-    rid = desk.open_request(core_db, store, PRIYA, "ask_office", QUESTION).data.request.id
+    rid = desk.open_request(
+        core_db, store, PRIYA, "ask_office", QUESTION
+    ).data.request.id
     with pytest.raises(InvalidTransitionError):
         desk.file_revision_inquiry(core_db, store, PRIYA, rid, W, "US", 2020)
     desk.save_verified_answer(core_db, store, PRIYA, rid, ANSWER, CITES)
@@ -202,7 +219,9 @@ def test_inquiry_needs_a_cited_unexplained_revision(
         desk.file_revision_inquiry(core_db, store, PRIYA, rid, W, "US", 2021)
 
 
-def test_inquiry_only_from_the_ask_office_option(core_db: Any, store: DeskStore) -> None:
+def test_inquiry_only_from_the_ask_office_option(
+    core_db: Any, store: DeskStore
+) -> None:
     copy = desk.submit_option(
         core_db, store, PRIYA, "verified_copy", QUESTION, ANSWER, CITES
     ).data.request
@@ -273,7 +292,9 @@ def test_invalid_transitions(core_db: Any, store: DeskStore) -> None:
         )
     desk.publish_answer(core_db, store, OFFICE, first.request.id)
     with pytest.raises(InvalidTransitionError):
-        desk.save_verified_answer(core_db, store, PRIYA, first.request.id, ANSWER, CITES)
+        desk.save_verified_answer(
+            core_db, store, PRIYA, first.request.id, ANSWER, CITES
+        )
 
 
 def test_preview_writes_nothing(core_db: Any, store: DeskStore) -> None:

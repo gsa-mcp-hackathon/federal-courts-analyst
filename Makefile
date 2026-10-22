@@ -55,6 +55,15 @@ security: ## pip-audit, bandit and detect-secrets, as CI runs them
 	uvx bandit==1.9.4 -q -c pyproject.toml -r src
 	uv run pre-commit run detect-secrets --all-files
 
+desk-check: ## Request desk: flag answers citing figures a newer edition revised
+	uv run python -m courts_analyst.desk_cli check
+
+desk-reset: ## Request desk: empty the sandbox store at $$DESK_STORE_PATH
+	uv run python -m courts_analyst.desk_cli reset
+
+desk-seed: ## Request desk: the demo's opening state (one inquiry already waiting)
+	uv run python -m courts_analyst.desk_cli seed
+
 variance-report: ## Reconcile every court-year (IDB vs Table C-1) into docs/variance-report.md
 	uv run python -m courts_analyst.pipeline.reports variance
 
@@ -79,6 +88,7 @@ docker-build: ## Build the container image
 docker-run: docker-build ## Run the container on :8080 (read-only root fs, no capabilities)
 	docker run --rm -p 8080:8080 --read-only --tmpfs /tmp:rw,noexec,nosuid,size=64m \
 	  --cap-drop ALL --security-opt no-new-privileges \
+	  -e DESK_STORE_PATH=/tmp/desk/desk.sqlite -e DESK_STAFF_TOKEN \
 	  -v $(CURDIR)/data/build:/app/data/build:ro $(IMAGE)
 
 docker-test: docker-build ## Integration tests against the running container

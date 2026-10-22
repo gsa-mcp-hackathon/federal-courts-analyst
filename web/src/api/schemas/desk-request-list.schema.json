@@ -1,0 +1,1016 @@
+{
+  "$defs": {
+    "AnswerView": {
+      "properties": {
+        "version": {
+          "title": "Version",
+          "type": "integer"
+        },
+        "text": {
+          "title": "Text",
+          "type": "string"
+        },
+        "citations": {
+          "items": {
+            "$ref": "#/$defs/CheckedCitation"
+          },
+          "title": "Citations",
+          "type": "array"
+        },
+        "edition_basis": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Edition Basis",
+          "type": "array"
+        },
+        "verified_at": {
+          "title": "Verified At",
+          "type": "string"
+        },
+        "stamp": {
+          "description": "The line to quote with the answer.",
+          "title": "Stamp",
+          "type": "string"
+        }
+      },
+      "required": [
+        "version",
+        "text",
+        "citations",
+        "edition_basis",
+        "verified_at",
+        "stamp"
+      ],
+      "title": "AnswerView",
+      "type": "object"
+    },
+    "Caveat": {
+      "description": "Something the reader must know to use the result correctly.",
+      "properties": {
+        "code": {
+          "enum": [
+            "small_cell",
+            "suppressed",
+            "data_break",
+            "revised_figure",
+            "period_mismatch",
+            "inferred_not_official",
+            "inexact_match",
+            "out_of_scope",
+            "mixed_editions",
+            "partial_year",
+            "truncated",
+            "no_recommendation",
+            "sandbox"
+          ],
+          "title": "Code",
+          "type": "string"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        },
+        "severity": {
+          "default": "caution",
+          "enum": [
+            "info",
+            "caution",
+            "block"
+          ],
+          "title": "Severity",
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "message"
+      ],
+      "title": "Warning",
+      "type": "object"
+    },
+    "CheckedCitation": {
+      "description": "A citation the gate matched to the catalog.",
+      "properties": {
+        "measure": {
+          "description": "Measure id, e.g. weighted_civil_filings_per_judgeship.",
+          "title": "Measure",
+          "type": "string"
+        },
+        "court": {
+          "default": "US",
+          "description": "US or a court code such as FL-N.",
+          "title": "Court",
+          "type": "string"
+        },
+        "fiscal_year": {
+          "maximum": 2030,
+          "minimum": 1990,
+          "title": "Fiscal Year",
+          "type": "integer"
+        },
+        "edition": {
+          "description": "Edition id, e.g. JFF-2025 or JB-2020.",
+          "title": "Edition",
+          "type": "string"
+        },
+        "value": {
+          "description": "The value as quoted in the answer.",
+          "title": "Value",
+          "type": "number"
+        },
+        "measure_label": {
+          "title": "Measure Label",
+          "type": "string"
+        },
+        "table_code": {
+          "title": "Table Code",
+          "type": "string"
+        },
+        "latest_value": {
+          "title": "Latest Value",
+          "type": "number"
+        },
+        "latest_edition": {
+          "title": "Latest Edition",
+          "type": "string"
+        },
+        "revised": {
+          "description": "Editions print different values for it.",
+          "title": "Revised",
+          "type": "boolean"
+        },
+        "historical": {
+          "default": false,
+          "description": "Quoted as an earlier edition's value, in a sentence that says so; left out of the consistency check.",
+          "title": "Historical",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "measure",
+        "fiscal_year",
+        "edition",
+        "value",
+        "measure_label",
+        "table_code",
+        "latest_value",
+        "latest_edition",
+        "revised"
+      ],
+      "title": "CheckedCitation",
+      "type": "object"
+    },
+    "Choice": {
+      "properties": {
+        "value": {
+          "title": "Value",
+          "type": "string"
+        },
+        "label": {
+          "title": "Label",
+          "type": "string"
+        },
+        "description": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Description"
+        }
+      },
+      "required": [
+        "value",
+        "label"
+      ],
+      "title": "Choice",
+      "type": "object"
+    },
+    "Clarification": {
+      "description": "A question the server needs answered before it can give one figure.\n\nClients that support elicitation show it as a form; others get it in the\nresult. Either way, calling again with ``parameter`` set to a choice's\n``value`` answers it.",
+      "properties": {
+        "parameter": {
+          "description": "The argument to set when calling again.",
+          "title": "Parameter",
+          "type": "string"
+        },
+        "question": {
+          "title": "Question",
+          "type": "string"
+        },
+        "choices": {
+          "items": {
+            "$ref": "#/$defs/Choice"
+          },
+          "title": "Choices",
+          "type": "array"
+        },
+        "default": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "What the server would pick if it had to.",
+          "title": "Default"
+        }
+      },
+      "required": [
+        "parameter",
+        "question",
+        "choices"
+      ],
+      "title": "Clarification",
+      "type": "object"
+    },
+    "Decline": {
+      "description": "Why a guardrail policy withheld the answer, and what to ask instead.",
+      "properties": {
+        "reason": {
+          "enum": [
+            "judge_level",
+            "pii",
+            "small_cell",
+            "policy",
+            "advocacy"
+          ],
+          "title": "Reason",
+          "type": "string"
+        },
+        "message": {
+          "description": "The explanation to relay to the user.",
+          "title": "Message",
+          "type": "string"
+        },
+        "policy": {
+          "description": "The rule that applies and where it comes from.",
+          "title": "Policy",
+          "type": "string"
+        },
+        "alternative": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "A question the server can answer instead.",
+          "title": "Alternative"
+        }
+      },
+      "required": [
+        "reason",
+        "message",
+        "policy"
+      ],
+      "title": "Decline",
+      "type": "object"
+    },
+    "FigureRef": {
+      "description": "One published value of a figure in one edition.",
+      "properties": {
+        "value": {
+          "description": "The value as printed (rounded to the table's precision).",
+          "title": "Value",
+          "type": "number"
+        },
+        "edition": {
+          "description": "Edition id, for example JB-2020 or JFF-2023.",
+          "title": "Edition",
+          "type": "string"
+        },
+        "table_code": {
+          "description": "Table, for example X-1A or 6.2.",
+          "title": "Table Code",
+          "type": "string"
+        },
+        "url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Published file the value was read from.",
+          "title": "Url"
+        },
+        "cell_ref": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Sheet!cell (xlsx) or page/line (PDF) of the value.",
+          "title": "Cell Ref"
+        }
+      },
+      "required": [
+        "value",
+        "edition",
+        "table_code"
+      ],
+      "title": "FigureRef",
+      "type": "object"
+    },
+    "InquiryView": {
+      "description": "One question to the statistics office about one revision.",
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "integer"
+        },
+        "measure": {
+          "title": "Measure",
+          "type": "string"
+        },
+        "measure_label": {
+          "title": "Measure Label",
+          "type": "string"
+        },
+        "court": {
+          "title": "Court",
+          "type": "string"
+        },
+        "court_name": {
+          "title": "Court Name",
+          "type": "string"
+        },
+        "fiscal_year": {
+          "title": "Fiscal Year",
+          "type": "integer"
+        },
+        "from_edition": {
+          "title": "From Edition",
+          "type": "string"
+        },
+        "from_value": {
+          "title": "From Value",
+          "type": "number"
+        },
+        "to_edition": {
+          "title": "To Edition",
+          "type": "string"
+        },
+        "to_value": {
+          "title": "To Value",
+          "type": "number"
+        },
+        "route": {
+          "enum": [
+            "ao_statistics",
+            "fjc_idb"
+          ],
+          "title": "Route",
+          "type": "string"
+        },
+        "route_label": {
+          "title": "Route Label",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "waiting_for_office",
+            "office_responded"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "waiting_requests": {
+          "description": "Requests attached to this inquiry.",
+          "title": "Waiting Requests",
+          "type": "integer"
+        },
+        "created_at": {
+          "title": "Created At",
+          "type": "string"
+        },
+        "response": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ResponseView"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "delivery": {
+          "default": "Sandbox: recorded here, not sent.",
+          "title": "Delivery",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "measure",
+        "measure_label",
+        "court",
+        "court_name",
+        "fiscal_year",
+        "from_edition",
+        "from_value",
+        "to_edition",
+        "to_value",
+        "route",
+        "route_label",
+        "status",
+        "waiting_requests",
+        "created_at"
+      ],
+      "title": "InquiryView",
+      "type": "object"
+    },
+    "Period": {
+      "description": "The 12-month period a figure covers.",
+      "properties": {
+        "fiscal_year": {
+          "description": "Year the period ends in (FY2020 ends 2020).",
+          "title": "Fiscal Year",
+          "type": "integer"
+        },
+        "period_end": {
+          "description": "Last day of the period.",
+          "format": "date",
+          "title": "Period End",
+          "type": "string"
+        },
+        "period_type": {
+          "description": "'fiscal_year' (Oct 1\u2013Sep 30) or 'statistical_year' (Jul 1\u2013Jun 30, used for the 1990 rows).",
+          "enum": [
+            "fiscal_year",
+            "statistical_year"
+          ],
+          "title": "Period Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "fiscal_year",
+        "period_end",
+        "period_type"
+      ],
+      "title": "Period",
+      "type": "object"
+    },
+    "Provenance": {
+      "description": "Where a number came from and how far to trust it.",
+      "properties": {
+        "source": {
+          "description": "'official_table' (printed in a uscourts.gov table), 'idb_derived' (computed from FJC IDB records) or 'derived' (computed from official figures).",
+          "enum": [
+            "official_table",
+            "idb_derived",
+            "derived"
+          ],
+          "title": "Source",
+          "type": "string"
+        },
+        "table_code": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Table Code"
+        },
+        "series": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Publication series title.",
+          "title": "Series"
+        },
+        "edition": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Edition"
+        },
+        "period": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Period"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "definition": {
+          "description": "Plain-language definition of the measure.",
+          "title": "Definition",
+          "type": "string"
+        },
+        "url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Url"
+        },
+        "cell_ref": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Cell Ref"
+        },
+        "revision_status": {
+          "anyOf": [
+            {
+              "enum": [
+                "only_edition",
+                "original",
+                "revised"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "'only_edition' (published once), 'original' (republished unchanged) or 'revised' (a later edition printed a different value).",
+          "title": "Revision Status"
+        },
+        "first_published": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FigureRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "later_revisions": {
+          "description": "Every later edition whose value differs from the one before it.",
+          "items": {
+            "$ref": "#/$defs/FigureRef"
+          },
+          "title": "Later Revisions",
+          "type": "array"
+        },
+        "reconciliation": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ReconciliationBadge"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "dataset_release": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "IDB release the figure was computed from.",
+          "title": "Dataset Release"
+        },
+        "note": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Note"
+        }
+      },
+      "required": [
+        "source",
+        "definition"
+      ],
+      "title": "Provenance",
+      "type": "object"
+    },
+    "ReconciliationBadge": {
+      "description": "How an IDB rebuild of a figure compares with the official table.",
+      "properties": {
+        "status": {
+          "enum": [
+            "matched",
+            "explained_variance",
+            "unexplained",
+            "no_official_counterpart"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "official_value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Official Value"
+        },
+        "idb_value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Idb Value"
+        },
+        "variance": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "IDB minus official.",
+          "title": "Variance"
+        },
+        "variance_pct": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Variance Pct"
+        },
+        "explanation": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Explanation"
+        }
+      },
+      "required": [
+        "status"
+      ],
+      "title": "ReconciliationBadge",
+      "type": "object"
+    },
+    "RequestList": {
+      "properties": {
+        "requests": {
+          "items": {
+            "$ref": "#/$defs/RequestView"
+          },
+          "title": "Requests",
+          "type": "array"
+        },
+        "unread_total": {
+          "title": "Unread Total",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "requests",
+        "unread_total"
+      ],
+      "title": "RequestList",
+      "type": "object"
+    },
+    "RequestView": {
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "integer"
+        },
+        "option": {
+          "enum": [
+            "ask_office",
+            "verified_copy",
+            "notify"
+          ],
+          "title": "Option",
+          "type": "string"
+        },
+        "option_label": {
+          "title": "Option Label",
+          "type": "string"
+        },
+        "question": {
+          "title": "Question",
+          "type": "string"
+        },
+        "asker_name": {
+          "title": "Asker Name",
+          "type": "string"
+        },
+        "asker_role": {
+          "enum": [
+            "congressional_staff",
+            "journalist",
+            "researcher",
+            "public",
+            "statistics_office"
+          ],
+          "title": "Asker Role",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "received",
+            "verified",
+            "watching",
+            "waiting_for_office",
+            "office_responded",
+            "published"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "created_at": {
+          "title": "Created At",
+          "type": "string"
+        },
+        "updated_at": {
+          "title": "Updated At",
+          "type": "string"
+        },
+        "answer": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/AnswerView"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "inquiry": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/InquiryView"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "updates": {
+          "items": {
+            "$ref": "#/$defs/UpdateView"
+          },
+          "title": "Updates",
+          "type": "array"
+        },
+        "unread": {
+          "default": 0,
+          "title": "Unread",
+          "type": "integer"
+        },
+        "needs_reverification": {
+          "default": false,
+          "title": "Needs Reverification",
+          "type": "boolean"
+        },
+        "published": {
+          "default": false,
+          "title": "Published",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "option",
+        "option_label",
+        "question",
+        "asker_name",
+        "asker_role",
+        "status",
+        "created_at",
+        "updated_at"
+      ],
+      "title": "RequestView",
+      "type": "object"
+    },
+    "ResponseView": {
+      "properties": {
+        "outcome": {
+          "enum": [
+            "confirmed",
+            "corrected"
+          ],
+          "title": "Outcome",
+          "type": "string"
+        },
+        "text": {
+          "title": "Text",
+          "type": "string"
+        },
+        "entered_by": {
+          "title": "Entered By",
+          "type": "string"
+        },
+        "created_at": {
+          "title": "Created At",
+          "type": "string"
+        },
+        "label": {
+          "default": "Response entered by the simulated statistics office (sandbox)",
+          "title": "Label",
+          "type": "string"
+        }
+      },
+      "required": [
+        "outcome",
+        "text",
+        "entered_by",
+        "created_at"
+      ],
+      "title": "ResponseView",
+      "type": "object"
+    },
+    "UpdateView": {
+      "description": "One entry in the asker's My requests inbox.",
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "integer"
+        },
+        "kind": {
+          "enum": [
+            "received",
+            "verified",
+            "watching",
+            "inquiry_filed",
+            "inquiry_joined",
+            "office_responded",
+            "published",
+            "figure_revised"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "text": {
+          "title": "Text",
+          "type": "string"
+        },
+        "created_at": {
+          "title": "Created At",
+          "type": "string"
+        },
+        "read": {
+          "title": "Read",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "text",
+        "created_at",
+        "read"
+      ],
+      "title": "UpdateView",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "status": {
+      "default": "ok",
+      "enum": [
+        "ok",
+        "needs_clarification",
+        "declined"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "data": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/RequestList"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "clarification": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Clarification"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "declined": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Decline"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "provenance": {
+      "items": {
+        "$ref": "#/$defs/Provenance"
+      },
+      "title": "Provenance",
+      "type": "array"
+    },
+    "warnings": {
+      "items": {
+        "$ref": "#/$defs/Caveat"
+      },
+      "title": "Warnings",
+      "type": "array"
+    },
+    "suggested_next": {
+      "description": "Hints for a follow-up call.",
+      "items": {
+        "type": "string"
+      },
+      "title": "Suggested Next",
+      "type": "array"
+    }
+  },
+  "title": "Result[RequestList]",
+  "type": "object"
+}

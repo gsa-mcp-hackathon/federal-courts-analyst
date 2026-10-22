@@ -5,6 +5,7 @@ import { answerClarification, ask, StreamError } from "@/api/sse";
 import { foldTurn, initialTurn, reduceTurn, type TurnState } from "@/api/turn";
 import type { AgentEvent, ClarifyEvent } from "@/api/types.gen";
 import { ClarifyChips, DocketCard, ToolTrace } from "@/components/agent";
+import { DeskOptions, LibraryMatch } from "@/components/desk";
 import { Icon } from "@/components/Icon";
 import { Markdown } from "@/components/Markdown";
 import { RevisionChip, WarningCallout } from "@/components/Provenance";
@@ -232,6 +233,7 @@ export function AnswerView({
   return (
     <article aria-busy={live && turn.status === "streaming"} className="space-y-4">
       <h2 className="font-serif text-2xl font-semibold text-ink">{turn.question}</h2>
+      <LibraryMatch question={turn.question} />
       <div className={hasEvidence ? "grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,26rem)]" : ""}>
         <div className="min-w-0 space-y-4">
           {guard.map((w) => (
@@ -270,6 +272,7 @@ export function AnswerView({
             )}
           </AnimatePresence>
           {turn.citations.length > 0 && <Citations turn={turn} />}
+          <DeskOptions turn={turn} />
           {other.length > 0 && (
             <div className="space-y-2">
               {other.map((w) => (

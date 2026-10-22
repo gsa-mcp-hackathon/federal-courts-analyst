@@ -10,12 +10,25 @@ const FIXTURES = JSON.parse(
   readFileSync(join(dirname(fileURLToPath(import.meta.url)), "fixtures", "api.json"), "utf8"),
 ) as Record<string, { status: number; body: unknown }>;
 
+// Request desk (ADR 0013) responses captured from the real backend; the Ask
+// page looks up the library and eligibility on every answer.
+const DESK = JSON.parse(
+  readFileSync(join(dirname(fileURLToPath(import.meta.url)), "fixtures", "desk.json"), "utf8"),
+) as Record<string, unknown>;
+const DESK_DEFAULTS: Record<string, string> = {
+  "/api/desk/library": "library_empty",
+  "/api/desk/eligibility": "eligibility",
+  "/api/desk/accounts": "accounts",
+};
+
 export const unmocked: string[] = [];
 
 export async function mockApi(page: Page) {
   await page.route("**/api/**", async (route) => {
     const url = new URL(route.request().url());
     if (url.pathname.startsWith("/api/ask")) return route.fallback();
+    const desk = DESK_DEFAULTS[url.pathname];
+    if (desk) return route.fulfill({ status: 200, json: DESK[desk] });
     const hit = FIXTURES[keyOf(url.pathname + url.search)];
     if (!hit) {
       unmocked.push(url.pathname + url.search);

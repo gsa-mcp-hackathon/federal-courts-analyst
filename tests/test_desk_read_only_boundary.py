@@ -27,9 +27,7 @@ DUCKDB_OPENERS = {"db.py", "cohorts.py"}
 def _calls(pattern: str) -> set[str]:
     rx = re.compile(pattern)
     return {
-        str(p.relative_to(CORE))
-        for p in CORE.rglob("*.py")
-        if rx.search(p.read_text())
+        str(p.relative_to(CORE)) for p in CORE.rglob("*.py") if rx.search(p.read_text())
     }
 
 
@@ -57,7 +55,7 @@ def test_desk_never_touches_the_catalog_connection_for_writes() -> None:
     ],
 )
 def test_catalog_still_refuses_writes(core_db: Database, sql: str) -> None:
-    with pytest.raises(Exception, match="(?i)read.only|read-only"):
+    with pytest.raises(Exception, match=r"(?i)read.only"):
         core_db.rows(sql)
 
 

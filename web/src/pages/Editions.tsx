@@ -165,7 +165,12 @@ export function EditionsPage({
                   <WarningCallout
                     key={n.text}
                     w={{
-                      code: n.basis === "inferred" ? "inferred_not_official" : "revised_figure",
+                      code:
+                        n.basis === "inferred"
+                          ? "inferred_not_official"
+                          : n.basis === "office_response"
+                            ? "office_response"
+                            : "revised_figure",
                       message: n.text,
                       severity: n.basis === "inferred" ? "caution" : "info",
                     }}

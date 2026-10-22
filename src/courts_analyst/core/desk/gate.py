@@ -6,7 +6,8 @@ Rules (ADR 0013, decision 5):
 1. Every cited value is exactly what that edition printed.
 2. Every number in the text is a cited value, a published threshold (430,
    600), or the difference between two cited values of one measure. Fiscal
-   years and table codes are not numbers here.
+   years and table codes are not numbers here. A number the text attributes
+   to an edition ("322 (JFF-2024)") must be cited from that edition.
 3. The cited figures of each measure come from one consistent set of
    editions (``guardrails.vintage``: one publication series, and no edition
    used for one figure printing another one differently). A figure quoted as
@@ -31,7 +32,13 @@ from courts_analyst.core.desk.models import (
     GateReport,
 )
 from courts_analyst.core.errors import CoreError
-from courts_analyst.core.figures_text import REVISION_WORDS, TextFigure, figures_in_text
+from courts_analyst.core.figures_text import (
+    REVISION_WORDS,
+    Mention,
+    TextFigure,
+    figures_in_text,
+    find_editions,
+)
 from courts_analyst.core.guardrails.intent import advocacy_phrases
 from courts_analyst.core.guardrails.vintage import series_of
 from courts_analyst.core.judgeships import reference
@@ -59,6 +66,25 @@ def _is_year(fig: TextFigure, text: str) -> bool:
 def _label(c: CitationIn) -> str:
     court = "national" if c.court == "US" else c.court
     return f"FY{c.fiscal_year} {court} {c.measure.replace('_', ' ')}"
+
+
+LABEL_WINDOW = 30
+"""Characters after a number in which an edition still labels it."""
+
+
+def _label_after(
+    n: TextFigure, mentions: list[Mention], numbers: list[TextFigure]
+) -> str | None:
+    """The edition written right after a number ("322 (JFF-2024)", "322 in
+    JFF-2024"): same sentence, within a few words, no other number between."""
+    nxt = min((m.start for m in numbers if m.start > n.start), default=None)
+    for m in mentions:
+        if m.start < n.end or m.start - n.end > LABEL_WINDOW:
+            continue
+        if m.end > n.sentence[1] or (nxt is not None and nxt < m.start):
+            continue
+        return m.edition
+    return None
 
 
 class _Figure:
@@ -233,6 +259,24 @@ def verify(db: Database, text: str, citations: Iterable[CitationIn]) -> GateRepo
                 fix="Cite the official figure it comes from, or remove it.",
             )
         )
+
+    mentions = find_editions(text)
+    for n in numbers:
+        label = _label_after(n, mentions, numbers)
+        if label is None:
+            continue
+        cited = {f.c.edition for f in used if _same(n.value, f.c.value)}
+        if cited and label not in cited:
+            written = text[n.start : n.end]
+            problems.append(
+                GateProblem(
+                    code="edition_label",
+                    message=f"{written} is labelled {label} in the text, but its "
+                    f"citation is {', '.join(sorted(cited))}.",
+                    number=written,
+                    fix=f"Label it {sorted(cited)[0]}, or cite {label}'s value.",
+                )
+            )
 
     problems += _consistency(used, pub_order, text_of)
     for phrase in advocacy_phrases(text):

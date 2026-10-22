@@ -278,6 +278,8 @@ const CODE_TITLE: Record<string, string> = {
   partial_year: "Partial year",
   truncated: "Truncated",
   no_recommendation: "No recommendation",
+  sandbox: "Request desk sandbox",
+  office_response: "Statistics office response (simulated)",
   advocacy: "Neutral facts only",
   judge_level: "No judge-level data",
   pii: "No party names",

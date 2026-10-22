@@ -16,7 +16,8 @@
             "mixed_editions",
             "partial_year",
             "truncated",
-            "no_recommendation"
+            "no_recommendation",
+            "sandbox"
           ],
           "title": "Code",
           "type": "string"
@@ -610,7 +611,8 @@
         "basis": {
           "enum": [
             "official",
-            "inferred"
+            "inferred",
+            "office_response"
           ],
           "title": "Basis",
           "type": "string"

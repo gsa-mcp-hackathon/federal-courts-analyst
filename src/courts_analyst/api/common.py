@@ -43,6 +43,11 @@ STATUS_BY_CODE: dict[str, int] = {
     "timeout": 504,
     "output_too_large": 413,
     "policy_violation": 500,
+    # Request desk (ADR 0013)
+    "forbidden": 403,
+    "not_found": 404,
+    "invalid_transition": 409,
+    "not_eligible": 422,
 }
 CACHE_SECONDS = 3600
 

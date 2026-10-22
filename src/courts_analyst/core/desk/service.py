@@ -41,6 +41,7 @@ from courts_analyst.core.desk.models import (
     Eligibility,
     GateReport,
     InquiryQueue,
+    InquiryTarget,
     InquiryView,
     LibraryEntryView,
     LibraryResults,
@@ -432,6 +433,25 @@ def find_published_answers(
     entries = [e for _, e in scored[: max(1, min(limit, MAX_LIST))]]
     data = LibraryResults(entries=entries, query=query)
     return _result(db, data, [c for e in entries for c in e.answer.citations])
+
+
+@guarded
+def all_requests(
+    db: Database, store: DeskStore, actor: Actor, status: str | None = None
+) -> Result[RequestList]:
+    """Every request, newest first, optionally by status (staff)."""
+    _staff(actor)
+    ids = [
+        r[0]
+        for r in store.rows(
+            "SELECT id FROM request WHERE (? IS NULL OR status = ?) "
+            "ORDER BY id DESC LIMIT ?",
+            [status, status, MAX_LIST],
+        )
+    ]
+    views = [_request_view(store, i) for i in ids]
+    data = RequestList(requests=views, unread_total=0)
+    return _result(db, data, _all_citations(views))
 
 
 @guarded
@@ -998,7 +1018,7 @@ def submit_option(
     question: str,
     answer_text: str,
     citations: Sequence[CitationIn],
-    inquiry: CitationIn | None = None,
+    inquiry: InquiryTarget | None = None,
     idempotency_key: str | None = None,
 ) -> Result[DeskOutcome]:
     """What one click on an option does: verify the answer first, then, only

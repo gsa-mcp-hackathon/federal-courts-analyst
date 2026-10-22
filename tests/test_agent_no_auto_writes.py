@@ -60,9 +60,11 @@ async def test_a_plain_question_writes_nothing(desk: Any) -> None:
 @pytest.mark.parametrize("tool", sorted(DESK_TOOLS))
 async def test_a_model_calling_a_desk_tool_is_refused(desk: Any, tool: str) -> None:
     events, _ = await _run(
-        [Step("", [(tool, {"option": "notify", "question": "x", "confirm": True})]),
-         Step("Sorry.")]
+        [
+            Step("", [(tool, {"option": "notify", "question": "x", "confirm": True})]),
+            Step("Sorry."),
+        ]
     )
-    r = [e for e in events if isinstance(e, ToolResultEvent)][0]
+    r = next(e for e in events if isinstance(e, ToolResultEvent))
     assert r.status == "error" and "Unknown tool" in (r.error or "")
     assert _writes(desk) == 0

@@ -470,7 +470,8 @@ export interface Warning {
     | "mixed_editions"
     | "partial_year"
     | "truncated"
-    | "no_recommendation";
+    | "no_recommendation"
+    | "sandbox";
   message: string;
   severity: "info" | "caution" | "block";
 }
@@ -958,6 +959,334 @@ export interface CourtRow {
 /**
  * One published value of a figure in one edition.
  */
+// ── desk-audit-log.schema.json ──
+export interface ResultAuditLog {
+  status: "ok" | "needs_clarification" | "declined";
+  data: AuditLog | null;
+  clarification: Clarification | null;
+  declined: Decline | null;
+  provenance: Provenance[];
+  warnings: Warning[];
+  /**
+   * Hints for a follow-up call.
+   */
+  suggested_next: string[];
+}
+export interface AuditLog {
+  events: AuditEventView[];
+}
+export interface AuditEventView {
+  id: number;
+  at: string;
+  actor: string;
+  tool: string;
+  record: string;
+  before: string | null;
+  after: string | null;
+}
+/**
+ * A question the server needs answered before it can give one figure.
+ *
+ * Clients that support elicitation show it as a form; others get it in the
+ * result. Either way, calling again with ``parameter`` set to a choice's
+ * ``value`` answers it.
+ */
+// ── desk-eligibility.schema.json ──
+export interface ResultEligibility {
+  status: "ok" | "needs_clarification" | "declined";
+  data: Eligibility | null;
+  clarification: Clarification | null;
+  declined: Decline | null;
+  provenance: Provenance[];
+  warnings: Warning[];
+  /**
+   * Hints for a follow-up call.
+   */
+  suggested_next: string[];
+}
+/**
+ * Whether a figure's revision can be sent to the statistics office.
+ */
+export interface Eligibility {
+  eligible: boolean;
+  reason: string;
+  measure: string;
+  court: string;
+  fiscal_year: number;
+  from_edition: string | null;
+  from_value: number | null;
+  to_edition: string | null;
+  to_value: number | null;
+  existing_inquiry: number | null;
+}
+/**
+ * A question the server needs answered before it can give one figure.
+ *
+ * Clients that support elicitation show it as a form; others get it in the
+ * result. Either way, calling again with ``parameter`` set to a choice's
+ * ``value`` answers it.
+ */
+// ── desk-inquiry-queue.schema.json ──
+export interface ResultInquiryQueue {
+  status: "ok" | "needs_clarification" | "declined";
+  data: InquiryQueue | null;
+  clarification: Clarification | null;
+  declined: Decline | null;
+  provenance: Provenance[];
+  warnings: Warning[];
+  /**
+   * Hints for a follow-up call.
+   */
+  suggested_next: string[];
+}
+/**
+ * The statistics office's queue, one row per revision.
+ */
+export interface InquiryQueue {
+  inquiries: InquiryView[];
+}
+/**
+ * One question to the statistics office about one revision.
+ */
+export interface InquiryView {
+  id: number;
+  measure: string;
+  measure_label: string;
+  court: string;
+  court_name: string;
+  fiscal_year: number;
+  from_edition: string;
+  from_value: number;
+  to_edition: string;
+  to_value: number;
+  route: "ao_statistics" | "fjc_idb";
+  route_label: string;
+  status: "waiting_for_office" | "office_responded";
+  /**
+   * Requests attached to this inquiry.
+   */
+  waiting_requests: number;
+  created_at: string;
+  response: ResponseView | null;
+  delivery: string;
+}
+export interface ResponseView {
+  outcome: "confirmed" | "corrected";
+  text: string;
+  entered_by: string;
+  created_at: string;
+  label: string;
+}
+/**
+ * A question the server needs answered before it can give one figure.
+ *
+ * Clients that support elicitation show it as a form; others get it in the
+ * result. Either way, calling again with ``parameter`` set to a choice's
+ * ``value`` answers it.
+ */
+// ── desk-library.schema.json ──
+export interface ResultLibraryResults {
+  status: "ok" | "needs_clarification" | "declined";
+  data: LibraryResults | null;
+  clarification: Clarification | null;
+  declined: Decline | null;
+  provenance: Provenance[];
+  warnings: Warning[];
+  /**
+   * Hints for a follow-up call.
+   */
+  suggested_next: string[];
+}
+export interface LibraryResults {
+  entries: LibraryEntryView[];
+  query: string | null;
+}
+export interface LibraryEntryView {
+  id: number;
+  request_id: number;
+  question: string;
+  answer: AnswerView;
+  inquiry: InquiryView | null;
+  published_at: string;
+  /**
+   * A newer edition revised a figure this answer cites.
+   */
+  needs_reverification: boolean;
+}
+export interface AnswerView {
+  version: number;
+  text: string;
+  citations: CheckedCitation[];
+  edition_basis: string[];
+  verified_at: string;
+  /**
+   * The line to quote with the answer.
+   */
+  stamp: string;
+}
+/**
+ * A citation the gate matched to the catalog.
+ */
+export interface CheckedCitation {
+  /**
+   * Measure id, e.g. weighted_civil_filings_per_judgeship.
+   */
+  measure: string;
+  /**
+   * US or a court code such as FL-N.
+   */
+  court: string;
+  fiscal_year: number;
+  /**
+   * Edition id, e.g. JFF-2025 or JB-2020.
+   */
+  edition: string;
+  /**
+   * The value as quoted in the answer.
+   */
+  value: number;
+  measure_label: string;
+  table_code: string;
+  latest_value: number;
+  latest_edition: string;
+  /**
+   * Editions print different values for it.
+   */
+  revised: boolean;
+  /**
+   * Quoted as an earlier edition's value, in a sentence that says so; left out of the consistency check.
+   */
+  historical: boolean;
+}
+/**
+ * One question to the statistics office about one revision.
+ */
+// ── desk-outcome.schema.json ──
+export interface ResultDeskOutcome {
+  status: "ok" | "needs_clarification" | "declined";
+  data: DeskOutcome | null;
+  clarification: Clarification | null;
+  declined: Decline | null;
+  provenance: Provenance[];
+  warnings: Warning[];
+  /**
+   * Hints for a follow-up call.
+   */
+  suggested_next: string[];
+}
+/**
+ * What a desk write did. ``preview`` means nothing was written yet.
+ */
+export interface DeskOutcome {
+  written: boolean;
+  preview: boolean;
+  message: string;
+  request: RequestView | null;
+  inquiry: InquiryView | null;
+  gate: GateReport | null;
+}
+export interface RequestView {
+  id: number;
+  option: "ask_office" | "verified_copy" | "notify";
+  option_label: string;
+  question: string;
+  asker_name: string;
+  asker_role: "congressional_staff" | "journalist" | "researcher" | "public" | "statistics_office";
+  status:
+    "received" | "verified" | "watching" | "waiting_for_office" | "office_responded" | "published";
+  created_at: string;
+  updated_at: string;
+  answer: AnswerView | null;
+  inquiry: InquiryView | null;
+  updates: UpdateView[];
+  unread: number;
+  needs_reverification: boolean;
+  published: boolean;
+}
+export interface UpdateView {
+  id: number;
+  kind:
+    | "received"
+    | "verified"
+    | "watching"
+    | "inquiry_filed"
+    | "inquiry_joined"
+    | "office_responded"
+    | "published"
+    | "figure_revised";
+  text: string;
+  created_at: string;
+  read: boolean;
+}
+/**
+ * The verification gate's verdict on one answer.
+ */
+export interface GateReport {
+  passed: boolean;
+  problems: GateProblem[];
+  citations: CheckedCitation[];
+  /**
+   * Editions the answer's figures come from.
+   */
+  edition_basis: string[];
+  numbers_checked: number;
+}
+/**
+ * Why the gate refused an answer, and what to do instead.
+ */
+export interface GateProblem {
+  code:
+    | "empty"
+    | "unknown_figure"
+    | "wrong_value"
+    | "uncited_number"
+    | "edition_label"
+    | "mixed_editions"
+    | "advocacy";
+  message: string;
+  /**
+   * The number as written.
+   */
+  number: string | null;
+  fix: string | null;
+}
+/**
+ * A question the server needs answered before it can give one figure.
+ *
+ * Clients that support elicitation show it as a form; others get it in the
+ * result. Either way, calling again with ``parameter`` set to a choice's
+ * ``value`` answers it.
+ */
+// ── desk-request-list.schema.json ──
+export interface ResultRequestList {
+  status: "ok" | "needs_clarification" | "declined";
+  data: RequestList | null;
+  clarification: Clarification | null;
+  declined: Decline | null;
+  provenance: Provenance[];
+  warnings: Warning[];
+  /**
+   * Hints for a follow-up call.
+   */
+  suggested_next: string[];
+}
+export interface RequestList {
+  requests: RequestView[];
+  unread_total: number;
+}
+// ── desk-request.schema.json ──
+export interface ResultRequestView {
+  status: "ok" | "needs_clarification" | "declined";
+  data: RequestView | null;
+  clarification: Clarification | null;
+  declined: Decline | null;
+  provenance: Provenance[];
+  warnings: Warning[];
+  /**
+   * Hints for a follow-up call.
+   */
+  suggested_next: string[];
+}
 // ── docket-sample.schema.json ──
 export interface ResultDocketSample {
   status: "ok" | "needs_clarification" | "declined";
@@ -1170,7 +1499,7 @@ export interface OfficialFigure {
  * The 12-month period a figure covers.
  */
 export interface RevisionNote {
-  basis: "official" | "inferred";
+  basis: "official" | "inferred" | "office_response";
   text: string;
   /**
    * The district an inference is about.

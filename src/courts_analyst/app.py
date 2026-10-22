@@ -42,7 +42,10 @@ INSTRUCTIONS = (
     "policy decision for Congress, so give the neutral facts and the Judicial "
     "Conference's own recommendation. A result with status 'declined' explains "
     "why and suggests an alternative: relay both. Call `server_info` to check "
-    "what data is loaded."
+    "what data is loaded. The request desk tools (open_request, "
+    "save_verified_answer, file_revision_inquiry) write to a sandbox: call them "
+    "only when the user asks to keep an answer, ask the statistics office, or be "
+    "notified, and never on your own initiative."
 )
 
 # The data only changes when `make data` rebuilds it (ADR 0001: FastMCP 4 has

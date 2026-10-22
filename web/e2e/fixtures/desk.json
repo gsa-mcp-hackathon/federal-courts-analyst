@@ -1,0 +1,1415 @@
+{
+ "accounts": {
+  "accounts": [
+   {
+    "id": "priya",
+    "name": "Priya Shah",
+    "role": "congressional_staff",
+    "role_label": "Congressional staff"
+   },
+   {
+    "id": "sam",
+    "name": "Sam Ortega",
+    "role": "journalist",
+    "role_label": "Journalist"
+   },
+   {
+    "id": "rae",
+    "name": "Rae Kim",
+    "role": "researcher",
+    "role_label": "Researcher"
+   },
+   {
+    "id": "alex",
+    "name": "Alex Doe",
+    "role": "public",
+    "role_label": "Member of the public"
+   }
+  ],
+  "staff_enabled": true
+ },
+ "eligibility": {
+  "status": "ok",
+  "data": {
+   "eligible": true,
+   "reason": "The figure was revised between editions and no published note explains why.",
+   "measure": "weighted_civil_filings_per_judgeship",
+   "court": "US",
+   "fiscal_year": 2020,
+   "from_edition": "JB-2020",
+   "from_value": 554.0,
+   "to_edition": "JFF-2025",
+   "to_value": 322.0,
+   "existing_inquiry": null
+  },
+  "clarification": null,
+  "declined": null,
+  "provenance": [
+   {
+    "source": "derived",
+    "table_code": null,
+    "series": null,
+    "edition": null,
+    "period": null,
+    "definition": "A request desk record in the sandbox: what someone asked and what the simulated statistics office answered. Not official data.",
+    "url": null,
+    "cell_ref": null,
+    "revision_status": null,
+    "first_published": null,
+    "later_revisions": [],
+    "reconciliation": null,
+    "dataset_release": null,
+    "note": "Sandbox (ADR 0013)."
+   }
+  ],
+  "warnings": [
+   {
+    "code": "sandbox",
+    "message": "Request desk sandbox: nothing is sent to the AO or the FJC, and statistics-office responses are entered by a teammate playing that role.",
+    "severity": "info"
+   }
+  ],
+  "suggested_next": []
+ },
+ "library_empty": {
+  "status": "ok",
+  "data": {
+   "entries": [],
+   "query": "x"
+  },
+  "clarification": null,
+  "declined": null,
+  "provenance": [
+   {
+    "source": "derived",
+    "table_code": null,
+    "series": null,
+    "edition": null,
+    "period": null,
+    "definition": "A request desk record in the sandbox: what someone asked and what the simulated statistics office answered. Not official data.",
+    "url": null,
+    "cell_ref": null,
+    "revision_status": null,
+    "first_published": null,
+    "later_revisions": [],
+    "reconciliation": null,
+    "dataset_release": null,
+    "note": "Sandbox (ADR 0013)."
+   }
+  ],
+  "warnings": [
+   {
+    "code": "sandbox",
+    "message": "Request desk sandbox: nothing is sent to the AO or the FJC, and statistics-office responses are entered by a teammate playing that role.",
+    "severity": "info"
+   }
+  ],
+  "suggested_next": []
+ },
+ "submit_mixed": {
+  "status": "ok",
+  "data": {
+   "written": false,
+   "preview": false,
+   "message": "Not saved: the answer didn't pass verification. 554 comes from JB-2020, but the other weighted civil filings per judgeship figures come from JFF-2024. JFF-2024 prints FY2020 national weighted civil filings per judgeship as 322.",
+   "request": null,
+   "inquiry": null,
+   "gate": {
+    "passed": false,
+    "problems": [
+     {
+      "code": "mixed_editions",
+      "message": "554 comes from JB-2020, but the other weighted civil filings per judgeship figures come from JFF-2024. JFF-2024 prints FY2020 national weighted civil filings per judgeship as 322.",
+      "number": "554",
+      "fix": "Use 322 (JFF-2024), or say that 554 was the first-published figure."
+     }
+    ],
+    "citations": [
+     {
+      "measure": "weighted_civil_filings_per_judgeship",
+      "court": "US",
+      "fiscal_year": 2020,
+      "edition": "JB-2020",
+      "value": 554.0,
+      "measure_label": "Weighted civil filings per judgeship",
+      "table_code": "X-1A",
+      "latest_value": 322.0,
+      "latest_edition": "JFF-2025",
+      "revised": true,
+      "historical": false
+     },
+     {
+      "measure": "weighted_civil_filings_per_judgeship",
+      "court": "US",
+      "fiscal_year": 2021,
+      "edition": "JFF-2024",
+      "value": 318.0,
+      "measure_label": "Weighted civil filings per judgeship",
+      "table_code": "6.2",
+      "latest_value": 318.0,
+      "latest_edition": "JFF-2024",
+      "revised": true,
+      "historical": false
+     }
+    ],
+    "edition_basis": [
+     "JB-2020",
+     "JFF-2024"
+    ],
+    "numbers_checked": 2
+   }
+  },
+  "clarification": null,
+  "declined": null,
+  "provenance": [
+   {
+    "source": "official_table",
+    "table_code": "X-1A",
+    "series": "Judicial Business of the United States Courts",
+    "edition": "JB-2020",
+    "period": {
+     "fiscal_year": 2020,
+     "period_end": "2020-09-30",
+     "period_type": "fiscal_year"
+    },
+    "definition": "Civil filings multiplied by Federal Judicial Center case weights (which reflect the relative judge time each case type needs), divided by authorized judgeships. The Judicial Conference uses weighted filings when assessing judgeship needs.",
+    "url": "https://www.uscourts.gov/sites/default/files/data_tables/jb_x1a_0930.2020.xlsx",
+    "cell_ref": "Table X-1A.!G6",
+    "revision_status": "revised",
+    "first_published": {
+     "value": 554.0,
+     "edition": "JB-2020",
+     "table_code": "X-1A",
+     "url": "https://www.uscourts.gov/sites/default/files/data_tables/jb_x1a_0930.2020.xlsx",
+     "cell_ref": "Table X-1A.!G6"
+    },
+    "later_revisions": [
+     {
+      "value": 322.0,
+      "edition": "JFF-2023",
+      "table_code": "6.2",
+      "url": "https://www.uscourts.gov/sites/default/files/data_tables/jff_6.2_0930.2023.xlsx",
+      "cell_ref": "Table 6.2!D8"
+     }
+    ],
+    "reconciliation": null,
+    "dataset_release": null,
+    "note": null
+   },
+   {
+    "source": "official_table",
+    "table_code": "6.2",
+    "series": "Judicial Facts and Figures",
+    "edition": "JFF-2024",
+    "period": {
+     "fiscal_year": 2021,
+     "period_end": "2021-09-30",
+     "period_type": "fiscal_year"
+    },
+    "definition": "Civil filings multiplied by Federal Judicial Center case weights (which reflect the relative judge time each case type needs), divided by authorized judgeships. The Judicial Conference uses weighted filings when assessing judgeship needs.",
+    "url": "https://www.uscourts.gov/sites/default/files/document/jff_6.2_0930.2024.xlsx",
+    "cell_ref": "Table 6.2!D8",
+    "revision_status": "revised",
+    "first_published": {
+     "value": 434.0,
+     "edition": "JB-2021",
+     "table_code": "X-1A",
+     "url": "https://www.uscourts.gov/sites/default/files/data_tables/jb_x1a_0930.2021.xlsx",
+     "cell_ref": "Table X-1A.!G6"
+    },
+    "later_revisions": [
+     {
+      "value": 318.0,
+      "edition": "JFF-2023",
+      "table_code": "6.2",
+      "url": "https://www.uscourts.gov/sites/default/files/data_tables/jff_6.2_0930.2023.xlsx",
+      "cell_ref": "Table 6.2!D7"
+     }
+    ],
+    "reconciliation": null,
+    "dataset_release": null,
+    "note": null
+   }
+  ],
+  "warnings": [
+   {
+    "code": "sandbox",
+    "message": "Request desk sandbox: nothing is sent to the AO or the FJC, and statistics-office responses are entered by a teammate playing that role.",
+    "severity": "info"
+   },
+   {
+    "code": "mixed_editions",
+    "message": "An earlier edition's value is quoted as history, next to the current figure; each is named with its edition.",
+    "severity": "info"
+   },
+   {
+    "code": "revised_figure",
+    "message": "A figure here was revised between editions; name the edition you quote.",
+    "severity": "caution"
+   }
+  ],
+  "suggested_next": []
+ },
+ "submit_ok": {
+  "status": "ok",
+  "data": {
+   "written": true,
+   "preview": false,
+   "message": "Request #1001: verified answer saved and the question filed with the statistics office (sandbox: not sent).",
+   "request": {
+    "id": 1001,
+    "option": "ask_office",
+    "option_label": "Ask the statistics office why this changed",
+    "question": "How busy were federal courts per judgeship in FY2020?",
+    "asker_name": "Priya Shah",
+    "asker_role": "congressional_staff",
+    "status": "waiting_for_office",
+    "created_at": "2026-10-21T21:03:07+00:00",
+    "updated_at": "2026-10-21T21:03:07+00:00",
+    "answer": {
+     "version": 1,
+     "text": "National weighted civil filings per judgeship were 322 in FY2020 (JFF-2025); the figure was first published as 554 (JB-2020).",
+     "citations": [
+      {
+       "measure": "weighted_civil_filings_per_judgeship",
+       "court": "US",
+       "fiscal_year": 2020,
+       "edition": "JFF-2025",
+       "value": 322.0,
+       "measure_label": "Weighted civil filings per judgeship",
+       "table_code": "6.2",
+       "latest_value": 322.0,
+       "latest_edition": "JFF-2025",
+       "revised": true,
+       "historical": false
+      },
+      {
+       "measure": "weighted_civil_filings_per_judgeship",
+       "court": "US",
+       "fiscal_year": 2020,
+       "edition": "JB-2020",
+       "value": 554.0,
+       "measure_label": "Weighted civil filings per judgeship",
+       "table_code": "X-1A",
+       "latest_value": 322.0,
+       "latest_edition": "JFF-2025",
+       "revised": true,
+       "historical": true
+      }
+     ],
+     "edition_basis": [
+      "JFF-2025"
+     ],
+     "verified_at": "2026-10-21T21:03:07+00:00",
+     "stamp": "Verified: every number checked against official data (JFF-2025). Request #1001. Sandbox."
+    },
+    "inquiry": {
+     "id": 1,
+     "measure": "weighted_civil_filings_per_judgeship",
+     "measure_label": "Weighted civil filings per judgeship",
+     "court": "US",
+     "court_name": "All district courts",
+     "fiscal_year": 2020,
+     "from_edition": "JB-2020",
+     "from_value": 554.0,
+     "to_edition": "JFF-2025",
+     "to_value": 322.0,
+     "route": "ao_statistics",
+     "route_label": "AO Statistics Division (uscourts.gov Contact Us)",
+     "status": "waiting_for_office",
+     "waiting_requests": 1,
+     "created_at": "2026-10-21T21:03:07+00:00",
+     "response": null,
+     "delivery": "Sandbox: recorded here, not sent."
+    },
+    "updates": [
+     {
+      "id": 3,
+      "kind": "inquiry_filed",
+      "text": "Sent to the statistics office: why FY2020 Weighted civil filings per judgeship, All district courts: 554 (JB-2020) \u2192 322 (JFF-2025) changed. (Sandbox: recorded here, not sent.)",
+      "created_at": "2026-10-21T21:03:07+00:00",
+      "read": false
+     },
+     {
+      "id": 2,
+      "kind": "verified",
+      "text": "Verified answer saved: Verified: every number checked against official data (JFF-2025). Request #1001. Sandbox.",
+      "created_at": "2026-10-21T21:03:07+00:00",
+      "read": false
+     },
+     {
+      "id": 1,
+      "kind": "received",
+      "text": "Request #1001 received.",
+      "created_at": "2026-10-21T21:03:07+00:00",
+      "read": false
+     }
+    ],
+    "unread": 3,
+    "needs_reverification": false,
+    "published": false
+   },
+   "inquiry": {
+    "id": 1,
+    "measure": "weighted_civil_filings_per_judgeship",
+    "measure_label": "Weighted civil filings per judgeship",
+    "court": "US",
+    "court_name": "All district courts",
+    "fiscal_year": 2020,
+    "from_edition": "JB-2020",
+    "from_value": 554.0,
+    "to_edition": "JFF-2025",
+    "to_value": 322.0,
+    "route": "ao_statistics",
+    "route_label": "AO Statistics Division (uscourts.gov Contact Us)",
+    "status": "waiting_for_office",
+    "waiting_requests": 1,
+    "created_at": "2026-10-21T21:03:07+00:00",
+    "response": null,
+    "delivery": "Sandbox: recorded here, not sent."
+   },
+   "gate": {
+    "passed": true,
+    "problems": [],
+    "citations": [
+     {
+      "measure": "weighted_civil_filings_per_judgeship",
+      "court": "US",
+      "fiscal_year": 2020,
+      "edition": "JFF-2025",
+      "value": 322.0,
+      "measure_label": "Weighted civil filings per judgeship",
+      "table_code": "6.2",
+      "latest_value": 322.0,
+      "latest_edition": "JFF-2025",
+      "revised": true,
+      "historical": false
+     },
+     {
+      "measure": "weighted_civil_filings_per_judgeship",
+      "court": "US",
+      "fiscal_year": 2020,
+      "edition": "JB-2020",
+      "value": 554.0,
+      "measure_label": "Weighted civil filings per judgeship",
+      "table_code": "X-1A",
+      "latest_value": 322.0,
+      "latest_edition": "JFF-2025",
+      "revised": true,
+      "historical": true
+     }
+    ],
+    "edition_basis": [
+     "JFF-2025"
+    ],
+    "numbers_checked": 2
+   }
+  },
+  "clarification": null,
+  "declined": null,
+  "provenance": [
+   {
+    "source": "official_table",
+    "table_code": "6.2",
+    "series": "Judicial Facts and Figures",
+    "edition": "JFF-2025",
+    "period": {
+     "fiscal_year": 2020,
+     "period_end": "2020-09-30",
+     "period_type": "fiscal_year"
+    },
+    "definition": "Civil filings multiplied by Federal Judicial Center case weights (which reflect the relative judge time each case type needs), divided by authorized judgeships. The Judicial Conference uses weighted filings when assessing judgeship needs.",
+    "url": "https://www.uscourts.gov/sites/default/files/document/jff_6.2_0930.2025.xlsx",
+    "cell_ref": "Table 6.2!D5",
+    "revision_status": "revised",
+    "first_published": {
+     "value": 554.0,
+     "edition": "JB-2020",
+     "table_code": "X-1A",
+     "url": "https://www.uscourts.gov/sites/default/files/data_tables/jb_x1a_0930.2020.xlsx",
+     "cell_ref": "Table X-1A.!G6"
+    },
+    "later_revisions": [
+     {
+      "value": 322.0,
+      "edition": "JFF-2023",
+      "table_code": "6.2",
+      "url": "https://www.uscourts.gov/sites/default/files/data_tables/jff_6.2_0930.2023.xlsx",
+      "cell_ref": "Table 6.2!D8"
+     }
+    ],
+    "reconciliation": null,
+    "dataset_release": null,
+    "note": null
+   },
+   {
+    "source": "official_table",
+    "table_code": "X-1A",
+    "series": "Judicial Business of the United States Courts",
+    "edition": "JB-2020",
+    "period": {
+     "fiscal_year": 2020,
+     "period_end": "2020-09-30",
+     "period_type": "fiscal_year"
+    },
+    "definition": "Civil filings multiplied by Federal Judicial Center case weights (which reflect the relative judge time each case type needs), divided by authorized judgeships. The Judicial Conference uses weighted filings when assessing judgeship needs.",
+    "url": "https://www.uscourts.gov/sites/default/files/data_tables/jb_x1a_0930.2020.xlsx",
+    "cell_ref": "Table X-1A.!G6",
+    "revision_status": "revised",
+    "first_published": {
+     "value": 554.0,
+     "edition": "JB-2020",
+     "table_code": "X-1A",
+     "url": "https://www.uscourts.gov/sites/default/files/data_tables/jb_x1a_0930.2020.xlsx",
+     "cell_ref": "Table X-1A.!G6"
+    },
+    "later_revisions": [
+     {
+      "value": 322.0,
+      "edition": "JFF-2023",
+      "table_code": "6.2",
+      "url": "https://www.uscourts.gov/sites/default/files/data_tables/jff_6.2_0930.2023.xlsx",
+      "cell_ref": "Table 6.2!D8"
+     }
+    ],
+    "reconciliation": null,
+    "dataset_release": null,
+    "note": null
+   }
+  ],
+  "warnings": [
+   {
+    "code": "sandbox",
+    "message": "Request desk sandbox: nothing is sent to the AO or the FJC, and statistics-office responses are entered by a teammate playing that role.",
+    "severity": "info"
+   },
+   {
+    "code": "mixed_editions",
+    "message": "An earlier edition's value is quoted as history, next to the current figure; each is named with its edition.",
+    "severity": "info"
+   },
+   {
+    "code": "revised_figure",
+    "message": "A figure here was revised between editions; name the edition you quote.",
+    "severity": "caution"
+   }
+  ],
+  "suggested_next": []
+ },
+ "mine": {
+  "status": "ok",
+  "data": {
+   "requests": [
+    {
+     "id": 1001,
+     "option": "ask_office",
+     "option_label": "Ask the statistics office why this changed",
+     "question": "How busy were federal courts per judgeship in FY2020?",
+     "asker_name": "Priya Shah",
+     "asker_role": "congressional_staff",
+     "status": "waiting_for_office",
+     "created_at": "2026-10-21T21:03:07+00:00",
+     "updated_at": "2026-10-21T21:03:07+00:00",
+     "answer": {
+      "version": 1,
+      "text": "National weighted civil filings per judgeship were 322 in FY2020 (JFF-2025); the figure was first published as 554 (JB-2020).",
+      "citations": [
+       {
+        "measure": "weighted_civil_filings_per_judgeship",
+        "court": "US",
+        "fiscal_year": 2020,
+        "edition": "JFF-2025",
+        "value": 322.0,
+        "measure_label": "Weighted civil filings per judgeship",
+        "table_code": "6.2",
+        "latest_value": 322.0,
+        "latest_edition": "JFF-2025",
+        "revised": true,
+        "historical": false
+       },
+       {
+        "measure": "weighted_civil_filings_per_judgeship",
+        "court": "US",
+        "fiscal_year": 2020,
+        "edition": "JB-2020",
+        "value": 554.0,
+        "measure_label": "Weighted civil filings per judgeship",
+        "table_code": "X-1A",
+        "latest_value": 322.0,
+        "latest_edition": "JFF-2025",
+        "revised": true,
+        "historical": true
+       }
+      ],
+      "edition_basis": [
+       "JFF-2025"
+      ],
+      "verified_at": "2026-10-21T21:03:07+00:00",
+      "stamp": "Verified: every number checked against official data (JFF-2025). Request #1001. Sandbox."
+     },
+     "inquiry": {
+      "id": 1,
+      "measure": "weighted_civil_filings_per_judgeship",
+      "measure_label": "Weighted civil filings per judgeship",
+      "court": "US",
+      "court_name": "All district courts",
+      "fiscal_year": 2020,
+      "from_edition": "JB-2020",
+      "from_value": 554.0,
+      "to_edition": "JFF-2025",
+      "to_value": 322.0,
+      "route": "ao_statistics",
+      "route_label": "AO Statistics Division (uscourts.gov Contact Us)",
+      "status": "waiting_for_office",
+      "waiting_requests": 1,
+      "created_at": "2026-10-21T21:03:07+00:00",
+      "response": null,
+      "delivery": "Sandbox: recorded here, not sent."
+     },
+     "updates": [
+      {
+       "id": 3,
+       "kind": "inquiry_filed",
+       "text": "Sent to the statistics office: why FY2020 Weighted civil filings per judgeship, All district courts: 554 (JB-2020) \u2192 322 (JFF-2025) changed. (Sandbox: recorded here, not sent.)",
+       "created_at": "2026-10-21T21:03:07+00:00",
+       "read": false
+      },
+      {
+       "id": 2,
+       "kind": "verified",
+       "text": "Verified answer saved: Verified: every number checked against official data (JFF-2025). Request #1001. Sandbox.",
+       "created_at": "2026-10-21T21:03:07+00:00",
+       "read": false
+      },
+      {
+       "id": 1,
+       "kind": "received",
+       "text": "Request #1001 received.",
+       "created_at": "2026-10-21T21:03:07+00:00",
+       "read": false
+      }
+     ],
+     "unread": 3,
+     "needs_reverification": false,
+     "published": false
+    }
+   ],
+   "unread_total": 3
+  },
+  "clarification": null,
+  "declined": null,
+  "provenance": [
+   {
+    "source": "official_table",
+    "table_code": "6.2",
+    "series": "Judicial Facts and Figures",
+    "edition": "JFF-2025",
+    "period": {
+     "fiscal_year": 2020,
+     "period_end": "2020-09-30",
+     "period_type": "fiscal_year"
+    },
+    "definition": "Civil filings multiplied by Federal Judicial Center case weights (which reflect the relative judge time each case type needs), divided by authorized judgeships. The Judicial Conference uses weighted filings when assessing judgeship needs.",
+    "url": "https://www.uscourts.gov/sites/default/files/document/jff_6.2_0930.2025.xlsx",
+    "cell_ref": "Table 6.2!D5",
+    "revision_status": "revised",
+    "first_published": {
+     "value": 554.0,
+     "edition": "JB-2020",
+     "table_code": "X-1A",
+     "url": "https://www.uscourts.gov/sites/default/files/data_tables/jb_x1a_0930.2020.xlsx",
+     "cell_ref": "Table X-1A.!G6"
+    },
+    "later_revisions": [
+     {
+      "value": 322.0,
+      "edition": "JFF-2023",
+      "table_code": "6.2",
+      "url": "https://www.uscourts.gov/sites/default/files/data_tables/jff_6.2_0930.2023.xlsx",
+      "cell_ref": "Table 6.2!D8"
+     }
+    ],
+    "reconciliation": null,
+    "dataset_release": null,
+    "note": null
+   },
+   {
+    "source": "official_table",
+    "table_code": "X-1A",
+    "series": "Judicial Business of the United States Courts",
+    "edition": "JB-2020",
+    "period": {
+     "fiscal_year": 2020,
+     "period_end": "2020-09-30",
+     "period_type": "fiscal_year"
+    },
+    "definition": "Civil filings multiplied by Federal Judicial Center case weights (which reflect the relative judge time each case type needs), divided by authorized judgeships. The Judicial Conference uses weighted filings when assessing judgeship needs.",
+    "url": "https://www.uscourts.gov/sites/default/files/data_tables/jb_x1a_0930.2020.xlsx",
+    "cell_ref": "Table X-1A.!G6",
+    "revision_status": "revised",
+    "first_published": {
+     "value": 554.0,
+     "edition": "JB-2020",
+     "table_code": "X-1A",
+     "url": "https://www.uscourts.gov/sites/default/files/data_tables/jb_x1a_0930.2020.xlsx",
+     "cell_ref": "Table X-1A.!G6"
+    },
+    "later_revisions": [
+     {
+      "value": 322.0,
+      "edition": "JFF-2023",
+      "table_code": "6.2",
+      "url": "https://www.uscourts.gov/sites/default/files/data_tables/jff_6.2_0930.2023.xlsx",
+      "cell_ref": "Table 6.2!D8"
+     }
+    ],
+    "reconciliation": null,
+    "dataset_release": null,
+    "note": null
+   }
+  ],
+  "warnings": [
+   {
+    "code": "sandbox",
+    "message": "Request desk sandbox: nothing is sent to the AO or the FJC, and statistics-office responses are entered by a teammate playing that role.",
+    "severity": "info"
+   },
+   {
+    "code": "mixed_editions",
+    "message": "An earlier edition's value is quoted as history, next to the current figure; each is named with its edition.",
+    "severity": "info"
+   },
+   {
+    "code": "revised_figure",
+    "message": "A figure here was revised between editions; name the edition you quote.",
+    "severity": "caution"
+   }
+  ],
+  "suggested_next": []
+ },
+ "staff_inquiries": {
+  "status": "ok",
+  "data": {
+   "inquiries": [
+    {
+     "id": 1,
+     "measure": "weighted_civil_filings_per_judgeship",
+     "measure_label": "Weighted civil filings per judgeship",
+     "court": "US",
+     "court_name": "All district courts",
+     "fiscal_year": 2020,
+     "from_edition": "JB-2020",
+     "from_value": 554.0,
+     "to_edition": "JFF-2025",
+     "to_value": 322.0,
+     "route": "ao_statistics",
+     "route_label": "AO Statistics Division (uscourts.gov Contact Us)",
+     "status": "waiting_for_office",
+     "waiting_requests": 1,
+     "created_at": "2026-10-21T21:03:07+00:00",
+     "response": null,
+     "delivery": "Sandbox: recorded here, not sent."
+    }
+   ]
+  },
+  "clarification": null,
+  "declined": null,
+  "provenance": [
+   {
+    "source": "derived",
+    "table_code": null,
+    "series": null,
+    "edition": null,
+    "period": null,
+    "definition": "A request desk record in the sandbox: what someone asked and what the simulated statistics office answered. Not official data.",
+    "url": null,
+    "cell_ref": null,
+    "revision_status": null,
+    "first_published": null,
+    "later_revisions": [],
+    "reconciliation": null,
+    "dataset_release": null,
+    "note": "Sandbox (ADR 0013)."
+   }
+  ],
+  "warnings": [
+   {
+    "code": "sandbox",
+    "message": "Request desk sandbox: nothing is sent to the AO or the FJC, and statistics-office responses are entered by a teammate playing that role.",
+    "severity": "info"
+   }
+  ],
+  "suggested_next": []
+ },
+ "staff_requests": {
+  "status": "ok",
+  "data": {
+   "requests": [
+    {
+     "id": 1001,
+     "option": "ask_office",
+     "option_label": "Ask the statistics office why this changed",
+     "question": "How busy were federal courts per judgeship in FY2020?",
+     "asker_name": "Priya Shah",
+     "asker_role": "congressional_staff",
+     "status": "office_responded",
+     "created_at": "2026-10-21T21:03:07+00:00",
+     "updated_at": "2026-10-21T21:03:07+00:00",
+     "answer": {
+      "version": 1,
+      "text": "National weighted civil filings per judgeship were 322 in FY2020 (JFF-2025); the figure was first published as 554 (JB-2020).",
+      "citations": [
+       {
+        "measure": "weighted_civil_filings_per_judgeship",
+        "court": "US",
+        "fiscal_year": 2020,
+        "edition": "JFF-2025",
+        "value": 322.0,
+        "measure_label": "Weighted civil filings per judgeship",
+        "table_code": "6.2",
+        "latest_value": 322.0,
+        "latest_edition": "JFF-2025",
+        "revised": true,
+        "historical": false
+       },
+       {
+        "measure": "weighted_civil_filings_per_judgeship",
+        "court": "US",
+        "fiscal_year": 2020,
+        "edition": "JB-2020",
+        "value": 554.0,
+        "measure_label": "Weighted civil filings per judgeship",
+        "table_code": "X-1A",
+        "latest_value": 322.0,
+        "latest_edition": "JFF-2025",
+        "revised": true,
+        "historical": true
+       }
+      ],
+      "edition_basis": [
+       "JFF-2025"
+      ],
+      "verified_at": "2026-10-21T21:03:07+00:00",
+      "stamp": "Verified: every number checked against official data (JFF-2025). Request #1001. Sandbox."
+     },
+     "inquiry": {
+      "id": 1,
+      "measure": "weighted_civil_filings_per_judgeship",
+      "measure_label": "Weighted civil filings per judgeship",
+      "court": "US",
+      "court_name": "All district courts",
+      "fiscal_year": 2020,
+      "from_edition": "JB-2020",
+      "from_value": 554.0,
+      "to_edition": "JFF-2025",
+      "to_value": 322.0,
+      "route": "ao_statistics",
+      "route_label": "AO Statistics Division (uscourts.gov Contact Us)",
+      "status": "office_responded",
+      "waiting_requests": 1,
+      "created_at": "2026-10-21T21:03:07+00:00",
+      "response": {
+       "outcome": "confirmed",
+       "text": "The 2023 edition re-weighted directly filed MDL cases.",
+       "entered_by": "Statistics office (simulated)",
+       "created_at": "2026-10-21T21:03:07+00:00",
+       "label": "Response entered by the simulated statistics office (sandbox)"
+      },
+      "delivery": "Sandbox: recorded here, not sent."
+     },
+     "updates": [
+      {
+       "id": 4,
+       "kind": "office_responded",
+       "text": "The statistics office confirmed the figure and explained the change: The 2023 edition re-weighted directly filed MDL cases. (Simulated statistics office, sandbox.)",
+       "created_at": "2026-10-21T21:03:07+00:00",
+       "read": false
+      },
+      {
+       "id": 3,
+       "kind": "inquiry_filed",
+       "text": "Sent to the statistics office: why FY2020 Weighted civil filings per judgeship, All district courts: 554 (JB-2020) \u2192 322 (JFF-2025) changed. (Sandbox: recorded here, not sent.)",
+       "created_at": "2026-10-21T21:03:07+00:00",
+       "read": false
+      },
+      {
+       "id": 2,
+       "kind": "verified",
+       "text": "Verified answer saved: Verified: every number checked against official data (JFF-2025). Request #1001. Sandbox.",
+       "created_at": "2026-10-21T21:03:07+00:00",
+       "read": false
+      },
+      {
+       "id": 1,
+       "kind": "received",
+       "text": "Request #1001 received.",
+       "created_at": "2026-10-21T21:03:07+00:00",
+       "read": false
+      }
+     ],
+     "unread": 4,
+     "needs_reverification": false,
+     "published": false
+    }
+   ],
+   "unread_total": 0
+  },
+  "clarification": null,
+  "declined": null,
+  "provenance": [
+   {
+    "source": "official_table",
+    "table_code": "6.2",
+    "series": "Judicial Facts and Figures",
+    "edition": "JFF-2025",
+    "period": {
+     "fiscal_year": 2020,
+     "period_end": "2020-09-30",
+     "period_type": "fiscal_year"
+    },
+    "definition": "Civil filings multiplied by Federal Judicial Center case weights (which reflect the relative judge time each case type needs), divided by authorized judgeships. The Judicial Conference uses weighted filings when assessing judgeship needs.",
+    "url": "https://www.uscourts.gov/sites/default/files/document/jff_6.2_0930.2025.xlsx",
+    "cell_ref": "Table 6.2!D5",
+    "revision_status": "revised",
+    "first_published": {
+     "value": 554.0,
+     "edition": "JB-2020",
+     "table_code": "X-1A",
+     "url": "https://www.uscourts.gov/sites/default/files/data_tables/jb_x1a_0930.2020.xlsx",
+     "cell_ref": "Table X-1A.!G6"
+    },
+    "later_revisions": [
+     {
+      "value": 322.0,
+      "edition": "JFF-2023",
+      "table_code": "6.2",
+      "url": "https://www.uscourts.gov/sites/default/files/data_tables/jff_6.2_0930.2023.xlsx",
+      "cell_ref": "Table 6.2!D8"
+     }
+    ],
+    "reconciliation": null,
+    "dataset_release": null,
+    "note": null
+   },
+   {
+    "source": "official_table",
+    "table_code": "X-1A",
+    "series": "Judicial Business of the United States Courts",
+    "edition": "JB-2020",
+    "period": {
+     "fiscal_year": 2020,
+     "period_end": "2020-09-30",
+     "period_type": "fiscal_year"
+    },
+    "definition": "Civil filings multiplied by Federal Judicial Center case weights (which reflect the relative judge time each case type needs), divided by authorized judgeships. The Judicial Conference uses weighted filings when assessing judgeship needs.",
+    "url": "https://www.uscourts.gov/sites/default/files/data_tables/jb_x1a_0930.2020.xlsx",
+    "cell_ref": "Table X-1A.!G6",
+    "revision_status": "revised",
+    "first_published": {
+     "value": 554.0,
+     "edition": "JB-2020",
+     "table_code": "X-1A",
+     "url": "https://www.uscourts.gov/sites/default/files/data_tables/jb_x1a_0930.2020.xlsx",
+     "cell_ref": "Table X-1A.!G6"
+    },
+    "later_revisions": [
+     {
+      "value": 322.0,
+      "edition": "JFF-2023",
+      "table_code": "6.2",
+      "url": "https://www.uscourts.gov/sites/default/files/data_tables/jff_6.2_0930.2023.xlsx",
+      "cell_ref": "Table 6.2!D8"
+     }
+    ],
+    "reconciliation": null,
+    "dataset_release": null,
+    "note": null
+   }
+  ],
+  "warnings": [
+   {
+    "code": "sandbox",
+    "message": "Request desk sandbox: nothing is sent to the AO or the FJC, and statistics-office responses are entered by a teammate playing that role.",
+    "severity": "info"
+   },
+   {
+    "code": "mixed_editions",
+    "message": "An earlier edition's value is quoted as history, next to the current figure; each is named with its edition.",
+    "severity": "info"
+   },
+   {
+    "code": "revised_figure",
+    "message": "A figure here was revised between editions; name the edition you quote.",
+    "severity": "caution"
+   }
+  ],
+  "suggested_next": []
+ },
+ "staff_audit": {
+  "status": "ok",
+  "data": {
+   "events": [
+    {
+     "id": 6,
+     "at": "2026-10-21T21:03:07+00:00",
+     "actor": "office",
+     "tool": "record_official_response",
+     "record": "request:1001",
+     "before": "waiting_for_office",
+     "after": "office_responded"
+    },
+    {
+     "id": 5,
+     "at": "2026-10-21T21:03:07+00:00",
+     "actor": "office",
+     "tool": "record_official_response",
+     "record": "inquiry:1",
+     "before": "waiting_for_office",
+     "after": "office_responded"
+    },
+    {
+     "id": 4,
+     "at": "2026-10-21T21:03:07+00:00",
+     "actor": "priya",
+     "tool": "file_revision_inquiry",
+     "record": "request:1001",
+     "before": "verified",
+     "after": "waiting_for_office"
+    },
+    {
+     "id": 3,
+     "at": "2026-10-21T21:03:07+00:00",
+     "actor": "priya",
+     "tool": "file_revision_inquiry",
+     "record": "inquiry:1",
+     "before": null,
+     "after": "waiting_for_office"
+    },
+    {
+     "id": 2,
+     "at": "2026-10-21T21:03:07+00:00",
+     "actor": "priya",
+     "tool": "save_verified_answer",
+     "record": "request:1001:answer:1",
+     "before": "received",
+     "after": "verified"
+    },
+    {
+     "id": 1,
+     "at": "2026-10-21T21:03:07+00:00",
+     "actor": "priya",
+     "tool": "open_request",
+     "record": "request:1001",
+     "before": null,
+     "after": "received"
+    }
+   ]
+  },
+  "clarification": null,
+  "declined": null,
+  "provenance": [
+   {
+    "source": "derived",
+    "table_code": null,
+    "series": null,
+    "edition": null,
+    "period": null,
+    "definition": "A request desk record in the sandbox: what someone asked and what the simulated statistics office answered. Not official data.",
+    "url": null,
+    "cell_ref": null,
+    "revision_status": null,
+    "first_published": null,
+    "later_revisions": [],
+    "reconciliation": null,
+    "dataset_release": null,
+    "note": "Sandbox (ADR 0013)."
+   }
+  ],
+  "warnings": [
+   {
+    "code": "sandbox",
+    "message": "Request desk sandbox: nothing is sent to the AO or the FJC, and statistics-office responses are entered by a teammate playing that role.",
+    "severity": "info"
+   }
+  ],
+  "suggested_next": []
+ },
+ "mine_after": {
+  "status": "ok",
+  "data": {
+   "requests": [
+    {
+     "id": 1001,
+     "option": "ask_office",
+     "option_label": "Ask the statistics office why this changed",
+     "question": "How busy were federal courts per judgeship in FY2020?",
+     "asker_name": "Priya Shah",
+     "asker_role": "congressional_staff",
+     "status": "published",
+     "created_at": "2026-10-21T21:03:07+00:00",
+     "updated_at": "2026-10-21T21:03:07+00:00",
+     "answer": {
+      "version": 1,
+      "text": "National weighted civil filings per judgeship were 322 in FY2020 (JFF-2025); the figure was first published as 554 (JB-2020).",
+      "citations": [
+       {
+        "measure": "weighted_civil_filings_per_judgeship",
+        "court": "US",
+        "fiscal_year": 2020,
+        "edition": "JFF-2025",
+        "value": 322.0,
+        "measure_label": "Weighted civil filings per judgeship",
+        "table_code": "6.2",
+        "latest_value": 322.0,
+        "latest_edition": "JFF-2025",
+        "revised": true,
+        "historical": false
+       },
+       {
+        "measure": "weighted_civil_filings_per_judgeship",
+        "court": "US",
+        "fiscal_year": 2020,
+        "edition": "JB-2020",
+        "value": 554.0,
+        "measure_label": "Weighted civil filings per judgeship",
+        "table_code": "X-1A",
+        "latest_value": 322.0,
+        "latest_edition": "JFF-2025",
+        "revised": true,
+        "historical": true
+       }
+      ],
+      "edition_basis": [
+       "JFF-2025"
+      ],
+      "verified_at": "2026-10-21T21:03:07+00:00",
+      "stamp": "Verified: every number checked against official data (JFF-2025). Request #1001. Sandbox."
+     },
+     "inquiry": {
+      "id": 1,
+      "measure": "weighted_civil_filings_per_judgeship",
+      "measure_label": "Weighted civil filings per judgeship",
+      "court": "US",
+      "court_name": "All district courts",
+      "fiscal_year": 2020,
+      "from_edition": "JB-2020",
+      "from_value": 554.0,
+      "to_edition": "JFF-2025",
+      "to_value": 322.0,
+      "route": "ao_statistics",
+      "route_label": "AO Statistics Division (uscourts.gov Contact Us)",
+      "status": "office_responded",
+      "waiting_requests": 1,
+      "created_at": "2026-10-21T21:03:07+00:00",
+      "response": {
+       "outcome": "confirmed",
+       "text": "The 2023 edition re-weighted directly filed MDL cases.",
+       "entered_by": "Statistics office (simulated)",
+       "created_at": "2026-10-21T21:03:07+00:00",
+       "label": "Response entered by the simulated statistics office (sandbox)"
+      },
+      "delivery": "Sandbox: recorded here, not sent."
+     },
+     "updates": [
+      {
+       "id": 5,
+       "kind": "published",
+       "text": "Approved and published to the public library. The next person who asks gets this answer.",
+       "created_at": "2026-10-21T21:03:07+00:00",
+       "read": false
+      },
+      {
+       "id": 4,
+       "kind": "office_responded",
+       "text": "The statistics office confirmed the figure and explained the change: The 2023 edition re-weighted directly filed MDL cases. (Simulated statistics office, sandbox.)",
+       "created_at": "2026-10-21T21:03:07+00:00",
+       "read": false
+      },
+      {
+       "id": 3,
+       "kind": "inquiry_filed",
+       "text": "Sent to the statistics office: why FY2020 Weighted civil filings per judgeship, All district courts: 554 (JB-2020) \u2192 322 (JFF-2025) changed. (Sandbox: recorded here, not sent.)",
+       "created_at": "2026-10-21T21:03:07+00:00",
+       "read": false
+      },
+      {
+       "id": 2,
+       "kind": "verified",
+       "text": "Verified answer saved: Verified: every number checked against official data (JFF-2025). Request #1001. Sandbox.",
+       "created_at": "2026-10-21T21:03:07+00:00",
+       "read": false
+      },
+      {
+       "id": 1,
+       "kind": "received",
+       "text": "Request #1001 received.",
+       "created_at": "2026-10-21T21:03:07+00:00",
+       "read": false
+      }
+     ],
+     "unread": 5,
+     "needs_reverification": false,
+     "published": true
+    }
+   ],
+   "unread_total": 5
+  },
+  "clarification": null,
+  "declined": null,
+  "provenance": [
+   {
+    "source": "official_table",
+    "table_code": "6.2",
+    "series": "Judicial Facts and Figures",
+    "edition": "JFF-2025",
+    "period": {
+     "fiscal_year": 2020,
+     "period_end": "2020-09-30",
+     "period_type": "fiscal_year"
+    },
+    "definition": "Civil filings multiplied by Federal Judicial Center case weights (which reflect the relative judge time each case type needs), divided by authorized judgeships. The Judicial Conference uses weighted filings when assessing judgeship needs.",
+    "url": "https://www.uscourts.gov/sites/default/files/document/jff_6.2_0930.2025.xlsx",
+    "cell_ref": "Table 6.2!D5",
+    "revision_status": "revised",
+    "first_published": {
+     "value": 554.0,
+     "edition": "JB-2020",
+     "table_code": "X-1A",
+     "url": "https://www.uscourts.gov/sites/default/files/data_tables/jb_x1a_0930.2020.xlsx",
+     "cell_ref": "Table X-1A.!G6"
+    },
+    "later_revisions": [
+     {
+      "value": 322.0,
+      "edition": "JFF-2023",
+      "table_code": "6.2",
+      "url": "https://www.uscourts.gov/sites/default/files/data_tables/jff_6.2_0930.2023.xlsx",
+      "cell_ref": "Table 6.2!D8"
+     }
+    ],
+    "reconciliation": null,
+    "dataset_release": null,
+    "note": null
+   },
+   {
+    "source": "official_table",
+    "table_code": "X-1A",
+    "series": "Judicial Business of the United States Courts",
+    "edition": "JB-2020",
+    "period": {
+     "fiscal_year": 2020,
+     "period_end": "2020-09-30",
+     "period_type": "fiscal_year"
+    },
+    "definition": "Civil filings multiplied by Federal Judicial Center case weights (which reflect the relative judge time each case type needs), divided by authorized judgeships. The Judicial Conference uses weighted filings when assessing judgeship needs.",
+    "url": "https://www.uscourts.gov/sites/default/files/data_tables/jb_x1a_0930.2020.xlsx",
+    "cell_ref": "Table X-1A.!G6",
+    "revision_status": "revised",
+    "first_published": {
+     "value": 554.0,
+     "edition": "JB-2020",
+     "table_code": "X-1A",
+     "url": "https://www.uscourts.gov/sites/default/files/data_tables/jb_x1a_0930.2020.xlsx",
+     "cell_ref": "Table X-1A.!G6"
+    },
+    "later_revisions": [
+     {
+      "value": 322.0,
+      "edition": "JFF-2023",
+      "table_code": "6.2",
+      "url": "https://www.uscourts.gov/sites/default/files/data_tables/jff_6.2_0930.2023.xlsx",
+      "cell_ref": "Table 6.2!D8"
+     }
+    ],
+    "reconciliation": null,
+    "dataset_release": null,
+    "note": null
+   }
+  ],
+  "warnings": [
+   {
+    "code": "sandbox",
+    "message": "Request desk sandbox: nothing is sent to the AO or the FJC, and statistics-office responses are entered by a teammate playing that role.",
+    "severity": "info"
+   },
+   {
+    "code": "mixed_editions",
+    "message": "An earlier edition's value is quoted as history, next to the current figure; each is named with its edition.",
+    "severity": "info"
+   },
+   {
+    "code": "revised_figure",
+    "message": "A figure here was revised between editions; name the edition you quote.",
+    "severity": "caution"
+   }
+  ],
+  "suggested_next": []
+ },
+ "library": {
+  "status": "ok",
+  "data": {
+   "entries": [
+    {
+     "id": 1,
+     "request_id": 1001,
+     "question": "How busy were federal courts per judgeship in FY2020?",
+     "answer": {
+      "version": 1,
+      "text": "National weighted civil filings per judgeship were 322 in FY2020 (JFF-2025); the figure was first published as 554 (JB-2020).",
+      "citations": [
+       {
+        "measure": "weighted_civil_filings_per_judgeship",
+        "court": "US",
+        "fiscal_year": 2020,
+        "edition": "JFF-2025",
+        "value": 322.0,
+        "measure_label": "Weighted civil filings per judgeship",
+        "table_code": "6.2",
+        "latest_value": 322.0,
+        "latest_edition": "JFF-2025",
+        "revised": true,
+        "historical": false
+       },
+       {
+        "measure": "weighted_civil_filings_per_judgeship",
+        "court": "US",
+        "fiscal_year": 2020,
+        "edition": "JB-2020",
+        "value": 554.0,
+        "measure_label": "Weighted civil filings per judgeship",
+        "table_code": "X-1A",
+        "latest_value": 322.0,
+        "latest_edition": "JFF-2025",
+        "revised": true,
+        "historical": true
+       }
+      ],
+      "edition_basis": [
+       "JFF-2025"
+      ],
+      "verified_at": "2026-10-21T21:03:07+00:00",
+      "stamp": "Verified: every number checked against official data (JFF-2025). Request #1001. Sandbox."
+     },
+     "inquiry": {
+      "id": 1,
+      "measure": "weighted_civil_filings_per_judgeship",
+      "measure_label": "Weighted civil filings per judgeship",
+      "court": "US",
+      "court_name": "All district courts",
+      "fiscal_year": 2020,
+      "from_edition": "JB-2020",
+      "from_value": 554.0,
+      "to_edition": "JFF-2025",
+      "to_value": 322.0,
+      "route": "ao_statistics",
+      "route_label": "AO Statistics Division (uscourts.gov Contact Us)",
+      "status": "office_responded",
+      "waiting_requests": 1,
+      "created_at": "2026-10-21T21:03:07+00:00",
+      "response": {
+       "outcome": "confirmed",
+       "text": "The 2023 edition re-weighted directly filed MDL cases.",
+       "entered_by": "Statistics office (simulated)",
+       "created_at": "2026-10-21T21:03:07+00:00",
+       "label": "Response entered by the simulated statistics office (sandbox)"
+      },
+      "delivery": "Sandbox: recorded here, not sent."
+     },
+     "published_at": "2026-10-21T21:03:07+00:00",
+     "needs_reverification": false
+    }
+   ],
+   "query": "How busy were federal courts per judgeship in FY2020?"
+  },
+  "clarification": null,
+  "declined": null,
+  "provenance": [
+   {
+    "source": "official_table",
+    "table_code": "6.2",
+    "series": "Judicial Facts and Figures",
+    "edition": "JFF-2025",
+    "period": {
+     "fiscal_year": 2020,
+     "period_end": "2020-09-30",
+     "period_type": "fiscal_year"
+    },
+    "definition": "Civil filings multiplied by Federal Judicial Center case weights (which reflect the relative judge time each case type needs), divided by authorized judgeships. The Judicial Conference uses weighted filings when assessing judgeship needs.",
+    "url": "https://www.uscourts.gov/sites/default/files/document/jff_6.2_0930.2025.xlsx",
+    "cell_ref": "Table 6.2!D5",
+    "revision_status": "revised",
+    "first_published": {
+     "value": 554.0,
+     "edition": "JB-2020",
+     "table_code": "X-1A",
+     "url": "https://www.uscourts.gov/sites/default/files/data_tables/jb_x1a_0930.2020.xlsx",
+     "cell_ref": "Table X-1A.!G6"
+    },
+    "later_revisions": [
+     {
+      "value": 322.0,
+      "edition": "JFF-2023",
+      "table_code": "6.2",
+      "url": "https://www.uscourts.gov/sites/default/files/data_tables/jff_6.2_0930.2023.xlsx",
+      "cell_ref": "Table 6.2!D8"
+     }
+    ],
+    "reconciliation": null,
+    "dataset_release": null,
+    "note": null
+   },
+   {
+    "source": "official_table",
+    "table_code": "X-1A",
+    "series": "Judicial Business of the United States Courts",
+    "edition": "JB-2020",
+    "period": {
+     "fiscal_year": 2020,
+     "period_end": "2020-09-30",
+     "period_type": "fiscal_year"
+    },
+    "definition": "Civil filings multiplied by Federal Judicial Center case weights (which reflect the relative judge time each case type needs), divided by authorized judgeships. The Judicial Conference uses weighted filings when assessing judgeship needs.",
+    "url": "https://www.uscourts.gov/sites/default/files/data_tables/jb_x1a_0930.2020.xlsx",
+    "cell_ref": "Table X-1A.!G6",
+    "revision_status": "revised",
+    "first_published": {
+     "value": 554.0,
+     "edition": "JB-2020",
+     "table_code": "X-1A",
+     "url": "https://www.uscourts.gov/sites/default/files/data_tables/jb_x1a_0930.2020.xlsx",
+     "cell_ref": "Table X-1A.!G6"
+    },
+    "later_revisions": [
+     {
+      "value": 322.0,
+      "edition": "JFF-2023",
+      "table_code": "6.2",
+      "url": "https://www.uscourts.gov/sites/default/files/data_tables/jff_6.2_0930.2023.xlsx",
+      "cell_ref": "Table 6.2!D8"
+     }
+    ],
+    "reconciliation": null,
+    "dataset_release": null,
+    "note": null
+   }
+  ],
+  "warnings": [
+   {
+    "code": "sandbox",
+    "message": "Request desk sandbox: nothing is sent to the AO or the FJC, and statistics-office responses are entered by a teammate playing that role.",
+    "severity": "info"
+   },
+   {
+    "code": "mixed_editions",
+    "message": "An earlier edition's value is quoted as history, next to the current figure; each is named with its edition.",
+    "severity": "info"
+   },
+   {
+    "code": "revised_figure",
+    "message": "A figure here was revised between editions; name the edition you quote.",
+    "severity": "caution"
+   }
+  ],
+  "suggested_next": []
+ }
+}

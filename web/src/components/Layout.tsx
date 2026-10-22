@@ -7,6 +7,8 @@ const NAV = [
   { to: "/", label: "Ask" },
   { to: "/explore", label: "Explore" },
   { to: "/editions", label: "Edition Tracker" },
+  { to: "/requests", label: "My requests" },
+  { to: "/library", label: "Library" },
   { to: "/eval", label: "Evaluation" },
   { to: "/methodology", label: "Methodology" },
 ] as const;
@@ -76,6 +78,9 @@ export function Layout() {
           </span>
           <Link to="/demo" className="underline underline-offset-2">
             Presentation mode
+          </Link>
+          <Link to="/staff" className="underline underline-offset-2">
+            Statistics office (simulated)
           </Link>
         </div>
       </footer>

@@ -9,6 +9,7 @@ cover every route. The FastAPI app is mounted inside it at ``/api``.
 
 from __future__ import annotations
 
+import logging
 from typing import Any
 
 from fastapi import FastAPI
@@ -19,10 +20,20 @@ from starlette.requests import Request
 from starlette.routing import Mount
 
 from courts_analyst import SERVER_NAME, __version__
-from courts_analyst.api.routes import ask, courts, eval, explain, figures, methodology
+from courts_analyst.api.routes import (
+    ask,
+    courts,
+    desk,
+    eval,
+    explain,
+    figures,
+    methodology,
+)
 from courts_analyst.api.web import WebApp
 from courts_analyst.config import Settings, settings
 from courts_analyst.http_security import http_middleware
+
+log = logging.getLogger("courts_analyst.api")
 
 
 def build_api() -> FastAPI:
@@ -58,9 +69,27 @@ def build_api() -> FastAPI:
             status_code=422,
         )
 
-    for module in (figures, courts, explain, eval, methodology, ask):
+    for module in (figures, courts, explain, eval, methodology, ask, desk):
         api.include_router(module.router)
     return api
+
+
+def _check_desk(cfg: Settings) -> None:
+    """With a persistent desk store, compare saved citations with the catalog
+    at startup (ADR 0013: a rebuilt catalog may have revised a cited
+    figure). Best effort: the app starts either way."""
+    if cfg.desk_store_path is None:
+        return
+    from courts_analyst.core.desk.service import check_staleness
+    from courts_analyst.tools._common import get_db, get_desk
+
+    try:
+        report = check_staleness(get_db(), get_desk())
+    except Exception:  # missing catalog, unreadable store: log and carry on
+        log.warning("desk staleness check skipped", exc_info=True)
+        return
+    if report.data is not None:
+        log.info("desk staleness check", extra=report.data.model_dump())
 
 
 def build_app(cfg: Settings = settings, **http_app_kwargs: Any) -> Any:
@@ -77,6 +106,7 @@ def build_app(cfg: Settings = settings, **http_app_kwargs: Any) -> Any:
     api.state.settings = cfg
     app.state.api = api
     app.router.routes.insert(0, Mount("/api", app=api))
+    _check_desk(cfg)
     if cfg.web_dist_dir.is_dir():
         app.router.routes.append(Mount("/", app=WebApp(cfg.web_dist_dir), name="web"))
     return app

@@ -18,6 +18,9 @@ const EvaluationPage = lazyRouteComponent(() => import("./pages/Evaluation"), "E
 const MethodologyPage = lazyRouteComponent(() => import("./pages/Methodology"), "MethodologyPage");
 const DemoPage = lazyRouteComponent(() => import("./pages/Demo"), "DemoPage");
 const GalleryPage = lazyRouteComponent(() => import("./pages/Gallery"), "GalleryPage");
+const RequestsPage = lazyRouteComponent(() => import("./pages/Requests"), "RequestsPage");
+const LibraryPage = lazyRouteComponent(() => import("./pages/Library"), "LibraryPage");
+const StaffPage = lazyRouteComponent(() => import("./pages/Staff"), "StaffPage");
 import type { ExploreSearch } from "./pages/Explore";
 
 const rootRoute = createRootRoute({
@@ -123,6 +126,21 @@ const demoRoute = createRoute({
   path: "/demo",
   component: DemoPage,
 });
+const requestsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/requests",
+  component: RequestsPage,
+});
+const libraryRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/library",
+  component: LibraryPage,
+});
+const staffRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/staff",
+  component: StaffPage,
+});
 const galleryRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/dev/gallery",
@@ -140,6 +158,9 @@ const routeTree = rootRoute.addChildren([
   evalRunRoute,
   methodologyRoute,
   demoRoute,
+  requestsRoute,
+  libraryRoute,
+  staffRoute,
   galleryRoute,
 ]);
 

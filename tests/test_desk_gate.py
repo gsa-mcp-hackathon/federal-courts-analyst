@@ -85,9 +85,11 @@ def test_earlier_value_labelled_as_history_passes(core_db: Any) -> None:
 
 
 def test_uncited_number_is_refused(core_db: Any) -> None:
-    r = verify(core_db, "It was 322 in FY2020, or about 400 a judge.", [
-        cite(2020, "JFF-2024", 322)
-    ])
+    r = verify(
+        core_db,
+        "It was 322 in FY2020, or about 400 a judge.",
+        [cite(2020, "JFF-2024", 322)],
+    )
     assert codes(r) == ["uncited_number"]
     assert r.problems[0].number == "400"
 
@@ -152,3 +154,15 @@ def test_thousands_separators_and_district_figures(core_db: Any) -> None:
         [cite(2020, "JB-2020", 35430, court="FL-N"), cite(2020, "JB-2020", 554)],
     )
     assert r.passed, r.problems
+
+
+def test_edition_named_in_the_text_must_match_the_citation(core_db: Any) -> None:
+    r = verify(
+        core_db, "It was 322 (JB-2020) in FY2020.", [cite(2020, "JFF-2024", 322)]
+    )
+    assert codes(r) == ["edition_label"]
+    assert r.problems[0].fix == "Label it JFF-2024, or cite JB-2020's value."
+    ok = verify(
+        core_db, "It was 322 (JFF-2024) in FY2020.", [cite(2020, "JFF-2024", 322)]
+    )
+    assert ok.passed

@@ -42,6 +42,7 @@ GateProblemCode = Literal[
     "unknown_figure",
     "wrong_value",
     "uncited_number",
+    "edition_label",
     "mixed_editions",
     "advocacy",
 ]
@@ -85,6 +86,14 @@ class CitationIn(BaseModel):
     fiscal_year: int = Field(ge=1990, le=2030)
     edition: str = Field(description="Edition id, e.g. JFF-2025 or JB-2020.")
     value: float = Field(description="The value as quoted in the answer.")
+
+
+class InquiryTarget(BaseModel):
+    """The figure whose revision the asker wants explained."""
+
+    measure: str
+    court: str = "US"
+    fiscal_year: int = Field(ge=1990, le=2030)
 
 
 class CheckedCitation(CitationIn):

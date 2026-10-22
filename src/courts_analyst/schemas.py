@@ -14,6 +14,15 @@ from pydantic import BaseModel, TypeAdapter
 
 from courts_analyst.agent.events import EVENT_ADAPTER
 from courts_analyst.core.cohorts import CohortAnalysis, CohortSpec, CohortSummary
+from courts_analyst.core.desk.models import (
+    AuditLog,
+    DeskOutcome,
+    Eligibility,
+    InquiryQueue,
+    LibraryResults,
+    RequestList,
+    RequestView,
+)
 from courts_analyst.core.dockets import DocketSample
 from courts_analyst.core.explain import ChangeExplanation
 from courts_analyst.core.glossary import TermLookup
@@ -43,6 +52,14 @@ MODELS: dict[str, type[BaseModel]] = {
     "judgeship-context": Result[JudgeshipContext],
     "term-lookup": Result[TermLookup],
     "docket-sample": Result[DocketSample],
+    # Request desk (ADR 0013)
+    "desk-outcome": Result[DeskOutcome],
+    "desk-request": Result[RequestView],
+    "desk-request-list": Result[RequestList],
+    "desk-library": Result[LibraryResults],
+    "desk-inquiry-queue": Result[InquiryQueue],
+    "desk-eligibility": Result[Eligibility],
+    "desk-audit-log": Result[AuditLog],
 }
 ADAPTERS: dict[str, TypeAdapter] = {  # type: ignore[type-arg]
     # The agent's SSE events (Phase 7), one discriminated union.

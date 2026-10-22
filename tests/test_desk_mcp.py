@@ -126,14 +126,23 @@ async def test_someone_elses_request_is_refused(desk_path: Path) -> None:
     async with Client(mcp) as c:
         opened = await c.call_tool(
             "open_request",
-            {"option": "notify", "question": QUESTION, "asker_name": "Priya",
-             "confirm": True},
+            {
+                "option": "notify",
+                "question": QUESTION,
+                "asker_name": "Priya",
+                "confirm": True,
+            },
         )
         rid = opened.structured_content["data"]["request"]["id"]
         r = await c.call_tool(
             "save_verified_answer",
-            {"request_id": rid, "text": ANSWER, "citations": CITES,
-             "asker_name": "Sam", "confirm": True},
+            {
+                "request_id": rid,
+                "text": ANSWER,
+                "citations": CITES,
+                "asker_name": "Sam",
+                "confirm": True,
+            },
             raise_on_error=False,
         )
     assert r.is_error and "[forbidden]" in r.content[0].text
@@ -162,8 +171,12 @@ async def test_staff_mode_records_and_publishes(desk_path: Path) -> None:
     async with Client(staff) as s:
         r = await s.call_tool(
             "record_official_response",
-            {"inquiry_id": iid, "outcome": "confirmed", "text": "Explained.",
-             "confirm": True},
+            {
+                "inquiry_id": iid,
+                "outcome": "confirmed",
+                "text": "Explained.",
+                "confirm": True,
+            },
         )
         assert r.structured_content["data"]["inquiry"]["status"] == "office_responded"
         p = await s.call_tool("publish_answer", {"request_id": rid, "confirm": True})
