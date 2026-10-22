@@ -37,8 +37,8 @@ export interface CitationIn {
   value: number;
 }
 
-const ACCOUNT_KEY = "fca-desk-account";
-const STAFF_KEY = "fca-desk-staff";
+const ACCOUNT_STORAGE = "fca-desk-account";
+const STAFF_SESSION = "fca-desk-office";
 
 function read(storage: () => Storage, key: string): string | null {
   try {
@@ -58,13 +58,13 @@ function write(storage: () => Storage, key: string, value: string | null) {
 }
 
 export const deskAccount = {
-  get: () => read(() => localStorage, ACCOUNT_KEY),
-  set: (id: string | null) => write(() => localStorage, ACCOUNT_KEY, id),
+  get: () => read(() => localStorage, ACCOUNT_STORAGE),
+  set: (id: string | null) => write(() => localStorage, ACCOUNT_STORAGE, id),
 };
 
 export const staffToken = {
-  get: () => read(() => sessionStorage, STAFF_KEY),
-  set: (t: string | null) => write(() => sessionStorage, STAFF_KEY, t),
+  get: () => read(() => sessionStorage, STAFF_SESSION),
+  set: (t: string | null) => write(() => sessionStorage, STAFF_SESSION, t),
 };
 
 async function send<T>(

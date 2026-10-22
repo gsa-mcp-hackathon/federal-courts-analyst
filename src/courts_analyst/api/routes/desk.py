@@ -10,6 +10,7 @@ share a per-client rate limit.
 
 from __future__ import annotations
 
+import logging
 import secrets
 from typing import Annotated, Any
 
@@ -36,6 +37,7 @@ from courts_analyst.http_security import RateLimit
 from courts_analyst.tools._common import get_db, get_desk
 
 router = APIRouter(prefix="/desk", tags=["request desk"])
+log = logging.getLogger("courts_analyst.api.desk")
 
 DEMO_ACCOUNTS: dict[str, Actor] = {
     a.account_id: a
@@ -212,9 +214,13 @@ async def recompute(calls: list[ToolCallIn]) -> dict[float, str]:
                 r = await client.call_tool(
                     call.tool, call.arguments, raise_on_error=False
                 )
-            except Exception:  # bad arguments, protocol errors: just no values
-                continue
-            if r.is_error or not r.structured_content:
+            except Exception as exc:  # bad arguments, protocol errors: no values
+                log.info(
+                    "desk re-run skipped",
+                    extra={"tool": call.tool, "error": type(exc).__name__},
+                )
+                r = None
+            if r is None or r.is_error or not r.structured_content:
                 continue
             found: set[float] = set()
             _numbers(r.structured_content, found)
