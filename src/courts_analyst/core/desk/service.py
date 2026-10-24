@@ -138,6 +138,12 @@ def _citations(store: DeskStore, answer_id: int) -> list[CheckedCitation]:
     ]
 
 
+def _editions_checked(citations: Sequence[CheckedCitation]) -> list[str]:
+    """Every edition the gate checked a figure against, in order of first use
+    (current figures and values quoted as history alike)."""
+    return list(dict.fromkeys(c.edition for c in citations))
+
+
 def _stamp(basis: Sequence[str], request_id: int, tools: Sequence[str] = ()) -> str:
     editions = ", ".join(basis) if basis else "no figures cited"
     rerun = (
@@ -167,7 +173,9 @@ def _answer_view(store: DeskStore, request_id: int) -> tuple[AnswerView, int] | 
             citations=_citations(store, row["id"]),
             edition_basis=basis,
             verified_at=row["verified_at"],
-            stamp=_stamp(basis, request_id, tools),
+            stamp=_stamp(
+                _editions_checked(_citations(store, row["id"])), request_id, tools
+            ),
         ),
         int(row["id"]),
     )
@@ -607,7 +615,11 @@ def _save_answer(
             "any figure in it."
             if new == "watching"
             else "Answer saved. "
-            + _stamp(gate.edition_basis, rid, sorted({c.source for c in gate.computed}))
+            + _stamp(
+                _editions_checked(gate.citations),
+                rid,
+                sorted({c.source for c in gate.computed}),
+            )
         )
         DeskStore.add_update(con, rid, new, text_update)
     else:

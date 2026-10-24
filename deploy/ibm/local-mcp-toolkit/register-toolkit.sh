@@ -79,13 +79,27 @@ mkdir -p "${STAGE_DIR}"
 cp -R "${REPO_ROOT}/src/${PACKAGE_NAME}" "${STAGE_DIR}/${PACKAGE_NAME}"
 cp "${SCRIPT_DIR}/server.py" "${STAGE_DIR}/server.py"
 cp "${SCRIPT_DIR}/requirements.txt" "${STAGE_DIR}/requirements.txt"
+# Ship the official tables catalog (~7 MB): without it every tool answers
+# "data not built". The IDB is left out (too large to upload); tools that need
+# case-level data say so.
+CATALOG="${DUCKDB_PATH:-${REPO_ROOT}/data/build/courts.duckdb}"
+if [[ ! -f "${CATALOG}" ]]; then
+  echo "FATAL: no catalog at ${CATALOG}. Build it first:" >&2
+  echo "       uv run python -m courts_analyst.pipeline.tables all" >&2
+  exit 1
+fi
+mkdir -p "${STAGE_DIR}/data"
+cp "${CATALOG}" "${STAGE_DIR}/data/courts.duckdb"
 # Drop caches that may have been copied from src/.
 find "${STAGE_DIR}" -type d -name '__pycache__' -prune -exec rm -rf {} + 2>/dev/null || true
 STAGE_SIZE="$(du -sh "${STAGE_DIR}" | cut -f1)"
 echo "  staged package_root size: ${STAGE_SIZE}"
 
 # --- Generate the toolkit spec pointing at the staging dir --------------------
-sed -E "s#^package_root:.*#package_root: ${STAGE_DIR}#" \
+# The toolkit is registered under TOOLKIT_NAME (several participants share one
+# instance, so names must be unique), not the template's placeholder name.
+sed -E -e "s#^package_root:.*#package_root: ${STAGE_DIR}#" \
+  -e "s#^name:.*#name: ${TOOLKIT_NAME}#" \
   "${SCRIPT_DIR}/toolkit.yaml" > "${TOOLKIT_YAML}"
 
 # --- Import (or re-import) the local MCP toolkit ------------------------------

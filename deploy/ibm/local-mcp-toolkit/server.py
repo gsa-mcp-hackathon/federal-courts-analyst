@@ -19,7 +19,16 @@ import sys
 
 # Ensure the directory containing this file (which also contains the
 # `courts_analyst` package after staging) is importable, regardless of CWD.
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, HERE)
+
+# The register script ships the official tables catalog next to this file
+# (data/courts.duckdb). Settings are read at import, so set the paths first;
+# an explicit environment variable still wins.
+os.environ.setdefault("DUCKDB_PATH", os.path.join(HERE, "data", "courts.duckdb"))
+# The request desk (ADR 0013) needs a writable file; the toolkit's own folder
+# may not be writable, /tmp is.
+os.environ.setdefault("DESK_STORE_PATH", "/tmp/courts-analyst/desk.sqlite")
 
 from courts_analyst.app import mcp  # noqa: E402
 

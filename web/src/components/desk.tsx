@@ -291,7 +291,7 @@ export function GateProblems({ gate }: { gate: GateReport }) {
       <ul className="mt-2 space-y-2">
         {gate.problems.map((p, i) => (
           <li key={i}>
-            {p.number && (
+            {p.number && !p.message.startsWith(p.number) && (
               <span className="num mr-1 rounded bg-paper-2 px-1.5 font-mono font-semibold">
                 {p.number}
               </span>

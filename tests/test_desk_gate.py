@@ -187,3 +187,18 @@ def test_server_computed_values_and_derived_percentages(core_db: Any) -> None:
     ok = verify(core_db, text, cites, computed={206.0: "explain_change"})
     assert ok.passed, ok.problems
     assert [(c.number, c.source) for c in ok.computed] == [("206", "explain_change")]
+
+
+def test_a_range_label_is_right_when_every_edition_prints_the_value(
+    core_db: Any,
+) -> None:
+    # JFF-2023 to JFF-2025 all print 322: labelling it with the first is true.
+    r = verify(
+        core_db,
+        "FY2020 was 554 (JB-2020), later revised to 322 (JFF-2023 to JFF-2025).",
+        [cite(2020, "JB-2020", 554), cite(2020, "JFF-2025", 322)],
+    )
+    assert r.passed, r.problems
+    # JFF-2022 still printed 554, so "322 (JFF-2022)" is a wrong label.
+    bad = verify(core_db, "It was 322 (JFF-2022).", [cite(2020, "JFF-2025", 322)])
+    assert codes(bad) == ["edition_label"]

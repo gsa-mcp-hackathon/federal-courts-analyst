@@ -320,9 +320,11 @@ def verify(
         problems.append(
             GateProblem(
                 code="uncited_number",
-                message=f"{written} isn't backed by a cited official figure.",
+                message="Not a cited official figure, and re-running the "
+                "answer's tools didn't produce it.",
                 number=written,
-                fix="Cite the official figure it comes from, or remove it.",
+                fix="Cite the official figure it comes from, include the tool call "
+                "that computed it, or remove it.",
             )
         )
 
@@ -331,8 +333,14 @@ def verify(
         label = _label_after(n, mentions, numbers)
         if label is None:
             continue
-        cited = {f.c.edition for f in used if _same(n.value, f.c.value)}
-        if cited and label not in cited:
+        matched = [f for f in used if _same(n.value, f.c.value)]
+        cited = {f.c.edition for f in matched}
+        # A label is right when that edition prints this value too ("322
+        # (JFF-2023 to JFF-2025)": all three print 322).
+        prints_it = any(
+            (r := f.row(label)) is not None and _same(r.shown, n.value) for f in matched
+        )
+        if cited and label not in cited and not prints_it:
             written = text[n.start : n.end]
             problems.append(
                 GateProblem(
