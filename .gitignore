@@ -13,8 +13,10 @@ deploy/ibm/local-mcp-toolkit/_toolkit.generated.yaml
 deploy/**/eval-results/
 
 
-# IBM Bob IDE directory (skills and MCP tool definition)
-.bob/
+# IBM Bob IDE directory (skills and MCP tool definition). The MCP server
+# config is shared: it connects Bob to this server (docs/desk.md).
+.bob/*
+!.bob/mcp.json
 
 
 # Python

@@ -1,0 +1,53 @@
+{
+  "mcpServers": {
+    "courts-analyst": {
+      "type": "streamable-http",
+      "url": "http://localhost:8080/mcp",
+      "alwaysAllow": [
+        "explain_change",
+        "get_official_figure",
+        "compare_courts",
+        "find_cases",
+        "analyze_cohort",
+        "reconcile",
+        "judgeship_context",
+        "explain_term",
+        "sample_dockets",
+        "find_published_answers",
+        "check_inquiry_eligibility",
+        "my_requests",
+        "server_info"
+      ],
+      "disabled": false
+    },
+    "courts-analyst-local": {
+      "command": "uv",
+      "args": [
+        "run",
+        "--quiet",
+        "--directory",
+        "${workspaceFolder}",
+        "courts-analyst"
+      ],
+      "env": {
+        "DESK_STORE_PATH": "data/sandbox/desk.sqlite"
+      },
+      "alwaysAllow": [
+        "explain_change",
+        "get_official_figure",
+        "compare_courts",
+        "find_cases",
+        "analyze_cohort",
+        "reconcile",
+        "judgeship_context",
+        "explain_term",
+        "sample_dockets",
+        "find_published_answers",
+        "check_inquiry_eligibility",
+        "my_requests",
+        "server_info"
+      ],
+      "disabled": true
+    }
+  }
+}
