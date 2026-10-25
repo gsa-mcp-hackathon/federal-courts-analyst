@@ -84,6 +84,38 @@ def test_earlier_value_labelled_as_history_passes(core_db: Any) -> None:
     assert r.edition_basis == ["JFF-2024"]
 
 
+@pytest.mark.parametrize(
+    "text",
+    [
+        # The answer watsonx Orchestrate's agent wrote: "updated", not "revised".
+        "National weighted civil filings per judgeship in FY 2020 are:\n\n"
+        "* **322 (JFF\u20112025)** \u2013 the latest official figure.\n"
+        "* **554 (JB\u20112020)** \u2013 the value first published in the Judicial "
+        "Business edition and used through JFF\u20112022.\n\n"
+        "The two values exist because the statistic was revised in later editions. "
+        "The Judicial Business of the United States Courts (JB\u20112020) reported "
+        "554 filings per judgeship, but the Judicial Facts and Figures series "
+        "(JFF\u20112023 onward) updated the number to 322.",
+        # Both editions' values side by side, no revision wording.
+        "FY2020: 554 (JB-2020) and 322 (JFF-2025).",
+    ],
+)
+def test_earlier_value_beside_a_change_passes(core_db: Any, text: str) -> None:
+    r = verify(core_db, text, [cite(2020, "JB-2020", 554), cite(2020, "JFF-2025", 322)])
+    assert r.passed, r.problems
+    assert {c.value: c.historical for c in r.citations} == {554: True, 322: False}
+
+
+def test_earlier_value_alone_in_a_sentence_is_refused(core_db: Any) -> None:
+    r = verify(
+        core_db,
+        "FY2020 was 322 (JFF-2025). The figure was 554 (JB-2020).",
+        [cite(2020, "JB-2020", 554), cite(2020, "JFF-2025", 322)],
+    )
+    assert codes(r) == ["mixed_editions"]
+    assert r.problems[0].number == "554"
+
+
 def test_uncited_number_is_refused(core_db: Any) -> None:
     r = verify(
         core_db,

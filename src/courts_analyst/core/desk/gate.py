@@ -14,7 +14,8 @@ Rules (ADR 0013, decision 5):
    editions (``guardrails.vintage``: one publication series, and no edition
    used for one figure printing another one differently). A figure quoted as
    an earlier edition's value, in a sentence that says so ("first published
-   as 554"), is history, not part of the set.
+   as 554", "updated the number to 322") or that quotes another edition's
+   value for the same figure beside it, is history, not part of the set.
 4. The text argues for no outcome.
 
 A refusal names each number and what to write instead.
@@ -67,6 +68,9 @@ NOT_STATISTICS = re.compile(
 )
 """Spans whose digits aren't statistics: links, code, docket numbers, dates."""
 
+HISTORY_WORDS = re.compile(rf"{REVISION_WORDS.pattern}|\bupdat", re.I)
+"""Wording that marks an earlier edition's value as history."""
+
 
 def _same(a: float, b: float) -> bool:
     return abs(a - b) < TOLERANCE
@@ -116,6 +120,37 @@ class _Figure:
 
     def row(self, edition: str) -> Row | None:
         return next((r for r in self.chain if r.edition == edition), None)
+
+
+def _as_history(
+    f: _Figure,
+    hits: list[TextFigure],
+    figures: list[_Figure],
+    numbers: list[TextFigure],
+    text: str,
+) -> bool:
+    """Every mention of an earlier edition's value says it changed, or sits in a
+    sentence quoting another edition's value for the same figure."""
+    if _same(f.c.value, f.checked.latest_value):
+        return False
+    others = [
+        g.c.value
+        for g in figures
+        if (g.c.measure, g.c.court, g.c.fiscal_year)
+        == (f.c.measure, f.c.court, f.c.fiscal_year)
+        and not _same(g.c.value, f.c.value)
+    ]
+
+    def beside(n: TextFigure) -> bool:
+        return any(
+            m.sentence == n.sentence and any(_same(m.value, v) for v in others)
+            for m in numbers
+        )
+
+    return all(
+        HISTORY_WORDS.search(text[n.sentence[0] : n.sentence[1]]) or beside(n)
+        for n in hits
+    )
 
 
 def _check_citations(
@@ -283,9 +318,7 @@ def verify(
             continue  # cited but not quoted: not saved
         used.append(f)
         text_of[id(f)] = text[hits[0].start : hits[0].end]
-        f.checked.historical = not _same(f.c.value, f.checked.latest_value) and all(
-            REVISION_WORDS.search(text[n.sentence[0] : n.sentence[1]]) for n in hits
-        )
+        f.checked.historical = _as_history(f, hits, figures, numbers, text)
 
     differences = {
         round(abs(a.c.value - b.c.value), 6)
