@@ -131,6 +131,12 @@ def _paid(module: str, cls: str, model: str) -> Callable[[], Answerer]:
     return make
 
 
+def _wxo() -> Answerer:
+    from courts_analyst.evaluation.wxo_agent import WxOAnswerer
+
+    return WxOAnswerer()
+
+
 ANSWERERS: dict[str, Callable[[], Answerer]] = {
     "gold": GoldAnswerer,
     "null": NullAnswerer,
@@ -162,6 +168,8 @@ ANSWERERS: dict[str, Callable[[], Answerer]] = {
     "agent-openai": _paid(
         "courts_analyst.agent.transcript", "AgentAnswerer", "openai:gpt-5.6-sol"
     ),
+    # wxO runs API; needs WXO_INSTANCE_URL / WXO_API_KEY / WXO_AGENT_ID; not in PAID
+    "wxo": _wxo,
 }
 PAID = frozenset(
     {"claude-api", "claude-api-opus", "openai-api", "agent", "agent-openai"}

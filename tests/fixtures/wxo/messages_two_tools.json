@@ -1,0 +1,102 @@
+[
+  {
+    "id": "msg-0001",
+    "tenant_id": "tenant-test-0001",
+    "created_by": "iam-user-test",
+    "created_by_username": "test-user",
+    "created_on": "2025-01-01T12:00:00.000Z",
+    "updated_at": "2025-01-01T12:00:00.000Z",
+    "thread_id": "thread-0001",
+    "assistant": {"is_default": true},
+    "parent_message_id": null,
+    "role": "user",
+    "content": [
+      {
+        "response_type": "text",
+        "text": "What were filings in FY2020?"
+      }
+    ],
+    "mentions": null,
+    "document_ids": null,
+    "additional_properties": {},
+    "context": null,
+    "step_history": null,
+    "message_state": null,
+    "log_id": null,
+    "_meta": null,
+    "session_id": "session-0001"
+  },
+  {
+    "id": "msg-0002",
+    "tenant_id": "tenant-test-0001",
+    "created_by": "iam-user-test",
+    "created_by_username": "test-user",
+    "created_on": "2025-01-01T12:00:10.000Z",
+    "updated_at": "2025-01-01T12:00:10.000Z",
+    "thread_id": "thread-0001",
+    "assistant": {"is_default": true},
+    "parent_message_id": "msg-0001",
+    "role": "assistant",
+    "content": [
+      {
+        "response_type": "text",
+        "id": "1",
+        "text": "The filings in FY2020 were 554 (first published) and 322 (revised)."
+      }
+    ],
+    "mentions": null,
+    "document_ids": null,
+    "additional_properties": {
+      "display_properties": {"skip_render": false, "is_async": false},
+      "is_interrupt": false
+    },
+    "context": {
+      "wxo_run_id": "run-0001",
+      "wxo_thread_id": "thread-0001"
+    },
+    "step_history": [
+      {
+        "role": "assistant",
+        "step_details": [
+          {
+            "type": "tool_calls",
+            "tool_calls": [
+              {
+                "id": "fc_call_0001",
+                "args": {"court": "US", "measure": "civil_filings", "fiscal_year": 2020},
+                "name": "get_official_figure"
+              },
+              {
+                "id": "fc_call_0002",
+                "args": {"court": "US", "measure": "weighted_civil_filings_per_judgeship", "fiscal_year": 2020},
+                "name": "get_official_figure"
+              }
+            ],
+            "agent_display_name": "courts-analyst-test"
+          }
+        ]
+      },
+      {
+        "role": "assistant",
+        "step_details": [
+          {
+            "name": "get_official_figure",
+            "type": "tool_response",
+            "content": "{\"status\": \"ok\", \"data\": {\"value\": 554, \"measure\": \"civil_filings\", \"court\": \"US\", \"fiscal_year\": 2020}}",
+            "tool_call_id": "fc_call_0001"
+          },
+          {
+            "name": "get_official_figure",
+            "type": "tool_response",
+            "content": "{\"status\": \"ok\", \"data\": {\"value\": 322, \"measure\": \"weighted_civil_filings_per_judgeship\", \"court\": \"US\", \"fiscal_year\": 2020}}",
+            "tool_call_id": "fc_call_0002"
+          }
+        ]
+      }
+    ],
+    "message_state": null,
+    "log_id": null,
+    "_meta": null,
+    "session_id": "session-0001"
+  }
+]

@@ -1,0 +1,36 @@
+{
+  "id": "run-0001",
+  "tenant_id": "tenant-test-0001",
+  "assistant_id": null,
+  "thread_id": "thread-0001",
+  "status": "completed",
+  "started_at": "2025-01-01T12:00:00.000Z",
+  "completed_at": "2025-01-01T12:00:10.000Z",
+  "failed_at": null,
+  "cancelled_at": null,
+  "llm_params": null,
+  "usage": {
+    "model_name": "test-model",
+    "model_usage": [
+      {
+        "provider": "test",
+        "model_name": "test-model",
+        "token_usage": {
+          "total_tokens": 500,
+          "prompt_tokens": 400,
+          "completion_tokens": 100,
+          "prompt_tokens_details": {"cached_tokens": 0}
+        }
+      }
+    ],
+    "token_usage": {
+      "total_tokens": 500,
+      "prompt_tokens": 400,
+      "completion_tokens": 100,
+      "prompt_tokens_details": {"cached_tokens": 0}
+    }
+  },
+  "last_error": null,
+  "agent_id": "agent-test",
+  "trace_id": "trace-0001"
+}
