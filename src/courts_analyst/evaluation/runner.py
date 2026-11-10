@@ -25,7 +25,7 @@ from courts_analyst.evaluation.bank import ROOT
 from courts_analyst.evaluation.records import AnswerRecord, ItemScore
 from courts_analyst.evaluation.schema import QuestionItem
 from courts_analyst.evaluation.scoring import RunSummary, score_item, summarize
-from courts_analyst.evaluation.scoring.summary import summary_markdown
+from courts_analyst.evaluation.scoring.summary import SubsetInfo, summary_markdown
 
 DEFAULT_RESULTS = ROOT / "eval" / "results"
 
@@ -68,6 +68,7 @@ def run(
     progress: Callable[[QuestionItem, ItemScore], None] | None = None,
     workers: int = 1,
     repeats: int = 1,
+    subset_info: SubsetInfo | None = None,
 ) -> RunResult:
     """Answer and score ``items``; write JSONL, summary JSON and Markdown.
 
@@ -76,6 +77,9 @@ def run(
 
     ``repeats`` > 1 answers every item K times.  Parallelism (when
     ``workers`` > 1) is over all item × repeat pairs.
+
+    ``subset_info`` is written into the summary JSON ``meta`` when provided
+    (set by ``--agent-tools``).
     """
     run_id = run_id or make_run_id(answerer.name, label)
     results_dir.mkdir(parents=True, exist_ok=True)
@@ -121,7 +125,7 @@ def run(
                 progress(item, score)
 
     summary = summarize(scores, repeats=repeats)
-    meta = {
+    meta: dict[str, object] = {
         "run_id": run_id,
         "answerer": answerer.name,
         "label": label,
@@ -129,13 +133,22 @@ def run(
         "items": [i.id for i in items],
         "finished_at": datetime.now(UTC).isoformat(timespec="seconds"),
     }
+    if subset_info is not None:
+        meta["subset"] = subset_info.model_dump(mode="json")
     summary_path = results_dir / f"{run_id}.summary.json"
     summary_path.write_text(
         json.dumps({**meta, "summary": summary.model_dump(mode="json")}, indent=2)
         + "\n"
     )
     md_path = results_dir / f"{run_id}.md"
-    md_path.write_text(summary_markdown(summary, f"{answerer.name} · {label}"))
+    md_path.write_text(
+        summary_markdown(
+            summary,
+            f"{answerer.name} · {label}",
+            subset_info=subset_info,
+            repeats=repeats,
+        )
+    )
     return RunResult(
         run_id=run_id,
         records=records,
@@ -176,11 +189,11 @@ def rescore(
     # Infer repeats K from the maximum repeat index seen
     inferred_repeats = max(idx for idx, _ in parsed) + 1
 
-    # Build replay map: question_id → list of records in repeat order
-    replay_lists: dict[str, list[AnswerRecord]] = {}
+    # Build replay map: question_id → list of (idx, record) in repeat order
+    replay_lists: dict[str, list[tuple[int, AnswerRecord]]] = {}
     for idx, rec in parsed:
         replay_lists.setdefault(rec.question_id, []).append((idx, rec))
-    # Sort each list by repeat index
+    # Sort each list by repeat index, then drop the index
     replay_ordered: dict[str, list[AnswerRecord]] = {
         qid: [r for _, r in sorted(pairs, key=lambda p: p[0])]
         for qid, pairs in replay_lists.items()

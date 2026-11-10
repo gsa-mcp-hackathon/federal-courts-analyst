@@ -14,6 +14,15 @@ from courts_analyst.evaluation.records import ItemScore
 BEHAVIORS = ("answer", "clarify", "decline")
 
 
+class SubsetInfo(BaseModel):
+    """Metadata about an ``--agent-tools`` subset filter applied to a run."""
+
+    tools: list[str]
+    n_slice: int
+    n_subset: int
+    preset: str | None = None
+
+
 class ClassMetrics(BaseModel):
     precision: float | None
     recall: float | None
@@ -204,16 +213,39 @@ def summarize(
     )
 
 
-def summary_markdown(summary: RunSummary, title: str) -> str:
+def summary_markdown(
+    summary: RunSummary,
+    title: str,
+    *,
+    subset_info: SubsetInfo | None = None,
+    repeats: int = 1,
+) -> str:
     """A small Markdown report for a run."""
 
     def pct(v: float | int | None) -> str:
         return "—" if v is None else f"{100 * float(v):.1f}%"
 
+    # Build the headline correct line
+    if subset_info is not None:
+        if repeats > 1:
+            # mean correct per attempt, 1 decimal
+            mean_correct = summary.correct / repeats
+            correct_str = f"{mean_correct:.1f}"
+        else:
+            correct_str = str(summary.correct)
+        correct_line = (
+            f"**{correct_str}/{summary.n} on the {subset_info.preset} subset "
+            f"({subset_info.n_subset} of {subset_info.n_slice} items in the slice)**"
+        )
+    else:
+        correct_line = (
+            f"**{summary.correct}/{summary.n} correct ({pct(summary.accuracy)})**"
+        )
+
     lines = [
         f"### {title}",
         "",
-        f"**{summary.correct}/{summary.n} correct ({pct(summary.accuracy)})**",
+        correct_line,
         "",
         "| Suite | n | Correct | Accuracy |",
         "| --- | ---: | ---: | ---: |",

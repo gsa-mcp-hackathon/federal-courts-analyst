@@ -22,6 +22,21 @@ import httpx
 from courts_analyst.evaluation.records import AnswerRecord, ToolCall
 from courts_analyst.evaluation.schema import QuestionItem
 
+# Tools attached to agent courts-analyst-syed on 2026-11-10;
+# update when the agent changes.
+WXO_AGENT_TOOLS: frozenset[str] = frozenset(
+    {
+        "get_official_figure",
+        "explain_change",
+        "compare_courts",
+        "judgeship_context",
+        "explain_term",
+        "check_inquiry_eligibility",
+        "keep_answer",
+        "my_requests",
+    }
+)
+
 _IAM_URL = "https://iam.cloud.ibm.com/identity/token"
 _EXPIRE_BUFFER_S = 60  # refresh token this many seconds before it expires
 _POLL_INTERVAL_S = 1.0
