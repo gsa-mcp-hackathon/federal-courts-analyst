@@ -265,3 +265,31 @@ class TestCLISubset:
         summary_file = next(tmp_path.glob("*.summary.json"))
         data = json.loads(summary_file.read_text())
         assert data["label"].endswith("-subset")
+
+    def test_subset_title_with_repeats_uses_item_count(
+        self, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+    ) -> None:
+        """With --repeats 3, the title denominator is the item count (15), not
+        the total attempt count (45), and the numerator is mean correct/run."""
+        args = [
+            "run",
+            "--answerer",
+            "gold",
+            "--agent-tools",
+            "wxo",
+            "--tag",
+            "smoke",
+            "--split",
+            "dev",
+            "--repeats",
+            "3",
+            "--results-dir",
+            str(tmp_path),
+            "--quiet",
+        ]
+        main(args)
+        out = capsys.readouterr().out
+        # Gold is always correct: mean = 15.0 / 1 attempt = 15.0 items correct per run
+        # Denominator must be 15 (items), not 45 (attempts)
+        assert "/15 on the wxo subset" in out
+        assert "15 of 20 items in the slice" in out

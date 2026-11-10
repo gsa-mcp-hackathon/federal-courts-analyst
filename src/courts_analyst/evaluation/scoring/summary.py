@@ -227,14 +227,15 @@ def summary_markdown(
 
     # Build the headline correct line
     if subset_info is not None:
+        n_items = subset_info.n_subset
         if repeats > 1:
-            # mean correct per attempt, 1 decimal
+            # mean items correct per attempt, 1 decimal; denominator is item count
             mean_correct = summary.correct / repeats
             correct_str = f"{mean_correct:.1f}"
         else:
             correct_str = str(summary.correct)
         correct_line = (
-            f"**{correct_str}/{summary.n} on the {subset_info.preset} subset "
+            f"**{correct_str}/{n_items} on the {subset_info.preset} subset "
             f"({subset_info.n_subset} of {subset_info.n_slice} items in the slice)**"
         )
     else:
