@@ -41,6 +41,13 @@ def _parser() -> argparse.ArgumentParser:
     r.add_argument("--quiet", action="store_true")
     r.add_argument("--workers", type=int, default=1, help="answer N items at once")
     r.add_argument(
+        "--repeats",
+        type=int,
+        default=1,
+        metavar="K",
+        help="answer each item K times and report pass@K / pass^K",
+    )
+    r.add_argument(
         "--budget-usd",
         type=float,
         default=1.00,
@@ -144,6 +151,7 @@ def main(argv: list[str] | None = None) -> int:
         run_id=args.run_id,
         progress=progress,
         workers=args.workers,
+        repeats=args.repeats,
     )
     print()
     print(result.paths["markdown"].read_text())

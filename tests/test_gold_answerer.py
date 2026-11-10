@@ -58,7 +58,8 @@ def test_runner_outputs(tmp_path: Path) -> None:
     lines = result.paths["jsonl"].read_text().splitlines()
     assert len(lines) == 3
     first = json.loads(lines[0])
-    assert set(first) == {"question", "record", "score"}
+    assert set(first) == {"question", "record", "score", "repeat"}
+    assert first["repeat"] == 0
     summary = json.loads(result.paths["summary"].read_text())
     assert summary["run_id"] == "r1" and summary["items"] == [i.id for i in items]
     assert "gold · e2e-dev" in result.paths["markdown"].read_text()
