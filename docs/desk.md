@@ -54,6 +54,11 @@ not statistics and are skipped. On top of that:
   (JFF-2024)") must be the edition it's cited from.
 - **No advocacy**, no party names (the IDB scanner), no judge-level
   requests.
+- **No instructions to an AI.** Other people's assistants read saved text,
+  so text that reads like a prompt injection ("ignore your previous
+  instructions", "you are now…", role markers, calls to desk tools) is refused
+  with `instructions_in_text`, and hidden bidi and zero-width characters are
+  stripped. Results label desk text as quoted data, never instructions.
 
 A refusal lists each number with what to write instead, for example:
 "554 comes from JB-2020, but the other … figures come from JFF-2024. Fix: Use
@@ -110,10 +115,11 @@ filesystem is read-only): `make docker-run` sets
 
 ## Evaluation
 
-`make eval-write-safety` runs 19 attempts the desk must refuse or allow
+`make eval-write-safety` runs 22 attempts the desk must refuse or allow
 (mixed editions, uncited and invented numbers, wrong edition labels,
 advocacy, the agent approving its own answer, a public user responding as
 the office, inquiries about explained or unrevised figures, duplicate
 inquiries, judge and party requests, retries, out-of-order publishing,
-someone else's request, writes without confirmation). Results:
+someone else's request, writes without confirmation, instructions to an AI
+in a question or answer, hidden bidi and zero-width characters). Results:
 [eval/results/write-safety.md](../eval/results/write-safety.md).

@@ -19,9 +19,11 @@ from courts_analyst.core.chain import later_revisions, load_chain, revision_stat
 from courts_analyst.core.courts import COURTS
 from courts_analyst.core.db import Database
 from courts_analyst.core.desk import status as status_rules
+from courts_analyst.core.desk import text as desk_text
 from courts_analyst.core.desk.errors import (
     DeskForbiddenError,
     DeskNotFoundError,
+    InstructionsInTextError,
     InvalidTransitionError,
     NotEligibleError,
 )
@@ -312,6 +314,14 @@ def _screen_text(db: Database, text: str) -> None:
     if party_names_in(db, text):
         d = policy_decline("pii")
         raise DeclinedError(d.message, d.reason, decline=d)
+    if phrases := desk_text.instruction_phrases(text):
+        raise InstructionsInTextError(
+            "This text reads like instructions to an AI ("
+            + "; ".join(f'"{p}"' for p in phrases[:3])
+            + "), so it can't be saved: other people's AI assistants may read "
+            "saved text. Rephrase it as a question or an answer about the figures.",
+            ["rephrase without the quoted words"],
+        )
 
 
 def _replay(
@@ -326,7 +336,7 @@ def _replay(
 
 
 def _clean(text: str, limit: int, what: str) -> str:
-    text = re.sub(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]", "", text).strip()
+    text = desk_text.clean(text).strip()
     if not text:
         raise NotEligibleError(f"The {what} is empty.")
     if len(text) > limit:

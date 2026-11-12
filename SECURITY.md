@@ -47,7 +47,9 @@ See the [threat model](docs/security/threat-model.md) and
   write path, and it writes only to its own sandbox store; the official data
   stays read-only. Its staff routes need `DESK_STAFF_TOKEN` (off when
   unset), writes are rate limited, question and answer text is screened for
-  judge-level requests and party names before it's stored, every write is
+  judge-level requests, party names and instructions aimed at an AI (prompt
+  injection), with hidden bidi and zero-width characters stripped, before
+  it's stored; results label desk text as quoted data; every write is
   in an append-only audit log, and the agent is never offered a desk tool.
 - Secrets come only from the environment and are redacted from logs. CI runs
   `pip-audit`, `bandit` and `detect-secrets` (`make security` locally).

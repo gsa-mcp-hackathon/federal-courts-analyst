@@ -162,7 +162,7 @@ The proposal page for the team:
 - Eligibility is decided by the server for each cited figure, not by the
   citation's `revised` flag: figures cited from `explain_change` carry
   `revised: false` (issue #37), which hid the FY2020 inquiry in testing.
-- Write-safety suite: 19 cases, all passing
+- Write-safety suite: 22 cases, all passing
   ([eval/results/write-safety.md](../../eval/results/write-safety.md)).
 - FastMCP 4's server-wide cache hint (ADR 0001) also covers desk tools. A
   client honouring it could reuse a library search for up to an hour; write

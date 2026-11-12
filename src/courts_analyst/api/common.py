@@ -48,6 +48,7 @@ STATUS_BY_CODE: dict[str, int] = {
     "not_found": 404,
     "invalid_transition": 409,
     "not_eligible": 422,
+    "instructions_in_text": 422,
 }
 CACHE_SECONDS = 3600
 

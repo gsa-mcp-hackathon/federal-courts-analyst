@@ -187,7 +187,8 @@ Prettier, `types:check`, **44** Vitest tests and **16** Playwright journeys
 (5 new for the desk, against responses captured from the real backend) pass,
 with axe checks. `make docker-test`: **9 passed**, including the desk in the
 hardened container (store in `/tmp`; root filesystem and catalog mount
-refuse writes). Write-safety suite: **19 of 19**
+refuse writes). Write-safety suite: **19 of 19** (22 of 22 after the
+prompt-injection fix of 2026-11-12)
 ([results](../eval/results/write-safety.md)).
 
 **Browser walkthrough, against the hardened container** (fixture catalog,

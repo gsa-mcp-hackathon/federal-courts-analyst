@@ -29,3 +29,10 @@ class NotEligibleError(CoreError):
     inquiry about a revision that a published note already explains)."""
 
     code = "not_eligible"
+
+
+class InstructionsInTextError(CoreError):
+    """Text to be stored reads like instructions to an AI (prompt injection):
+    refused before it's stored, because another person's AI could read it."""
+
+    code = "instructions_in_text"
