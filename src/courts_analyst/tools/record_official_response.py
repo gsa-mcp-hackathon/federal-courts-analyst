@@ -10,7 +10,7 @@ from fastmcp import Context, FastMCP
 from pydantic import Field
 
 from courts_analyst.core.desk.models import DeskOutcome, Outcome
-from courts_analyst.core.desk.service import record_official_response
+from courts_analyst.core.desk.service import check_text, record_official_response
 from courts_analyst.core.results import Result
 from courts_analyst.tools._common import WRITE, confirmed, core_errors, get_db, get_desk
 from courts_analyst.tools._desk import OFFICE, Confirm, IdempotencyKey
@@ -46,6 +46,7 @@ def register(mcp: FastMCP) -> None:
         confirm: Confirm = False,
         ctx: Context | None = None,
     ) -> Result[DeskOutcome] | mcp_types.InputRequiredResult:
+        check_text(get_db(), response=text)
         ok = await confirmed(
             ctx, confirm, f"Record this response to inquiry #{inquiry_id}?"
         )

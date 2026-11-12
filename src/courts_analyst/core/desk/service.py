@@ -316,12 +316,31 @@ def _screen_text(db: Database, text: str) -> None:
         raise DeclinedError(d.message, d.reason, decline=d)
     if phrases := desk_text.instruction_phrases(text):
         raise InstructionsInTextError(
-            "This text reads like instructions to an AI ("
+            "This text can't be saved: other people's AI assistants may read it, "
+            "and it contains something they could take as instructions or use to "
+            "send data elsewhere ("
             + "; ".join(f'"{p}"' for p in phrases[:3])
-            + "), so it can't be saved: other people's AI assistants may read "
-            "saved text. Rephrase it as a question or an answer about the figures.",
+            + "). Rephrase it as a question or an answer about the figures; link "
+            "only to official sites such as uscourts.gov or fjc.gov.",
             ["rephrase without the quoted words"],
         )
+
+
+def check_text(
+    db: Database,
+    question: str | None = None,
+    answer: str | None = None,
+    response: str | None = None,
+) -> None:
+    """Clean and screen text before a write is previewed or confirmed, so a
+    user is never asked to confirm something that will be refused."""
+    for what, text, limit in (
+        ("question", question, MAX_QUESTION),
+        ("answer", answer, MAX_ANSWER),
+        ("response", response, MAX_ANSWER),
+    ):
+        if text is not None:
+            _screen_text(db, _clean(text, limit, what))
 
 
 def _replay(

@@ -9,7 +9,7 @@ from fastmcp import Context, FastMCP
 from pydantic import Field
 
 from courts_analyst.core.desk.models import CitationIn, DeskOutcome
-from courts_analyst.core.desk.service import save_verified_answer
+from courts_analyst.core.desk.service import check_text, save_verified_answer
 from courts_analyst.core.results import Result
 from courts_analyst.tools._common import WRITE, confirmed, core_errors, get_db, get_desk
 from courts_analyst.tools._desk import AskerName, Confirm, IdempotencyKey, public_actor
@@ -63,6 +63,7 @@ def register(mcp: FastMCP) -> None:
         confirm: Confirm = False,
         ctx: Context | None = None,
     ) -> Result[DeskOutcome] | mcp_types.InputRequiredResult:
+        check_text(get_db(), answer=text)
         ok = await confirmed(
             ctx, confirm, f"Save this answer to request #{request_id} if it passes?"
         )

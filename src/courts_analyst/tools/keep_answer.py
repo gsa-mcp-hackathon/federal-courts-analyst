@@ -16,7 +16,7 @@ from courts_analyst.core.desk.models import (
     InquiryTarget,
     Option,
 )
-from courts_analyst.core.desk.service import submit_option
+from courts_analyst.core.desk.service import check_text, submit_option
 from courts_analyst.core.results import Result
 from courts_analyst.tools._common import WRITE, confirmed, core_errors, get_db, get_desk
 from courts_analyst.tools._desk import (
@@ -88,6 +88,7 @@ def register(mcp: FastMCP) -> None:
         confirm: Confirm = False,
         ctx: Context | None = None,
     ) -> Result[DeskOutcome] | mcp_types.InputRequiredResult:
+        check_text(get_db(), question=question, answer=answer_text)
         ok = await confirmed(
             ctx, confirm, f'"{OPTION_LABELS[option]}": check and save this answer?'
         )

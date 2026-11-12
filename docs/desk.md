@@ -54,11 +54,15 @@ not statistics and are skipped. On top of that:
   (JFF-2024)") must be the edition it's cited from.
 - **No advocacy**, no party names (the IDB scanner), no judge-level
   requests.
-- **No instructions to an AI.** Other people's assistants read saved text,
-  so text that reads like a prompt injection ("ignore your previous
-  instructions", "you are now…", role markers, calls to desk tools) is refused
-  with `instructions_in_text`, and hidden bidi and zero-width characters are
-  stripped. Results label desk text as quoted data, never instructions.
+- **No instructions to an AI, and nothing that carries data out.** Other
+  people's assistants read saved text, so text that reads like a prompt
+  injection ("ignore your previous instructions", "you are now…", role
+  markers, desk tool names), links to anything but official sites, images,
+  HTML and long encoded strings are refused with `instructions_in_text`,
+  before the user is asked to confirm. Hidden bidi and zero-width characters
+  are stripped. Results label desk text as quoted data, never instructions.
+  The screen is patterns and misses rewordings (see the threat model), so
+  staff review before publishing stays the main control.
 
 A refusal lists each number with what to write instead, for example:
 "554 comes from JB-2020, but the other … figures come from JFF-2024. Fix: Use
