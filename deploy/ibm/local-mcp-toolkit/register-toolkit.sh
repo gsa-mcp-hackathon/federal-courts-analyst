@@ -60,7 +60,7 @@ fi
 
 # --- Point the ADK at the instance and activate it ----------------------------
 echo "=== Configuring ADK environment '${WXO_ENV_NAME}' ==="
-if orchestrate env list 2>/dev/null | grep -q "${WXO_ENV_NAME}"; then
+if grep -qw -- "${WXO_ENV_NAME}" <<<"$(orchestrate env list 2>/dev/null)"; then
   echo "  env exists — reusing."
 else
   orchestrate env add --name "${WXO_ENV_NAME}" --url "${WXO_INSTANCE_URL}" --type ibm_iam
@@ -104,7 +104,7 @@ sed -E -e "s#^package_root:.*#package_root: ${STAGE_DIR}#" \
 
 # --- Import (or re-import) the local MCP toolkit ------------------------------
 echo "=== Importing local MCP toolkit '${TOOLKIT_NAME}' ==="
-if orchestrate toolkits list 2>/dev/null | grep -q "${TOOLKIT_NAME}"; then
+if grep -qw -- "${TOOLKIT_NAME}" <<<"$(orchestrate toolkits list 2>/dev/null)"; then
   echo "  toolkit exists — removing before re-import."
   orchestrate toolkits remove --name "${TOOLKIT_NAME}" || true
 fi
