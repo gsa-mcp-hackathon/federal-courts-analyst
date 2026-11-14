@@ -18,6 +18,7 @@ from courts_analyst.evaluation.bank import (
     select,
 )
 from courts_analyst.evaluation.schema import SUITES, QuestionItem, assign_split
+from courts_analyst.evaluation.wxo_agent import WXO_AGENT_TOOLS
 
 ITEMS = load_bank()
 TOOLS = {
@@ -35,18 +36,19 @@ TOOLS = {
 
 
 def test_bank_size_and_balance() -> None:
-    assert len(ITEMS) >= 150
-    counts = {s: len(select(ITEMS, suite=s)) for s in SUITES}
+    non_test2 = [i for i in ITEMS if i.resolved_split != "test2"]
+    assert len(non_test2) >= 150
+    counts = {s: len(select(non_test2, suite=s)) for s in SUITES}
     assert counts["engine"] >= 30
     assert counts["e2e"] >= 50
     assert counts["explanation"] >= 20
     assert counts["tool_selection"] >= 25
     assert counts["adversarial"] >= 25
-    held = sum(i.resolved_split == "test" for i in ITEMS) / len(ITEMS)
+    held = sum(i.resolved_split == "test" for i in non_test2) / len(non_test2)
     assert 0.25 <= held <= 0.35, held
     # Every suite has both splits, so dev tuning can't see everything.
     for s in SUITES:
-        splits = {i.resolved_split for i in select(ITEMS, suite=s)}
+        splits = {i.resolved_split for i in select(non_test2, suite=s)}
         assert splits == {"dev", "test"}, s
 
 
@@ -244,6 +246,54 @@ def test_suite_rules(suite: str, extra: dict[str, object], message: str) -> None
 def test_default_bank_path() -> None:
     assert DEFAULT_BANK.is_dir()
     assert {p.stem for p in DEFAULT_BANK.glob("*.yaml")} == set(SUITES)
+
+
+def test_test2_split() -> None:
+    """The ``test2`` held-out split: 40-50 items, all model-facing suites,
+    all behaviours, no smoke tag, every item answerable by the WXO agent."""
+    t2 = select(ITEMS, split="test2")
+    if not t2:
+        pytest.skip("no test2 items in the bank yet")
+    assert 40 <= len(t2) <= 50, len(t2)
+    assert {i.suite for i in t2} == set(SUITES) - {"engine"}, (
+        "test2 must cover every model-facing suite"
+    )
+    assert {i.expected.behavior for i in t2} == {"answer", "clarify", "decline"}, (
+        "test2 must cover every behaviour"
+    )
+    assert not any("smoke" in i.tags for i in t2), (
+        "test2 items must not be tagged smoke"
+    )
+    for i in t2:
+        assert set(i.expected_tools) <= WXO_AGENT_TOOLS, (
+            f"{i.id}: expected_tools not a subset of WXO_AGENT_TOOLS"
+        )
+
+
+def test_test2_explicit_split_validates() -> None:
+    """An item with an explicit split='test2' must pass validation for any id."""
+    item = QuestionItem.model_validate(
+        {
+            "id": "x-one",
+            "suite": "e2e",
+            "question": "What were filings in FY2020?",
+            "claims": [{"id": "c", "kind": "mentions", "any": ["x"]}],
+            "split": "test2",
+        }
+    )
+    assert item.resolved_split == "test2"
+
+
+def test_select_default_excludes_test2() -> None:
+    """select(items) with no split argument never returns test2 items."""
+    result = select(ITEMS)
+    assert all(i.resolved_split != "test2" for i in result)
+
+
+def test_select_split_test2_returns_only_test2() -> None:
+    """select(items, split='test2') returns only test2 items."""
+    result = select(ITEMS, split="test2")
+    assert all(i.resolved_split == "test2" for i in result)
 
 
 def test_smoke_subset() -> None:

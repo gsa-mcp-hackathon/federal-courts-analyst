@@ -38,7 +38,7 @@ def _parser() -> argparse.ArgumentParser:
     r = sub.add_parser("run", help="Answer and score a slice of the bank")
     r.add_argument("--answerer", required=True, help=f"one of {sorted(ANSWERERS)}")
     r.add_argument("--suite", choices=SUITES)
-    r.add_argument("--split", choices=["dev", "test"])
+    r.add_argument("--split", choices=["dev", "test", "test2"])
     r.add_argument("--tag", action="append", dest="tags")
     r.add_argument("--id", action="append", dest="ids")
     r.add_argument("--limit", type=int)
@@ -108,17 +108,27 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     if args.cmd == "validate":
         held = sum(i.resolved_split == "test" for i in items)
+        t2 = sum(i.resolved_split == "test2" for i in items)
+        base = len(items) - t2
         print(
             f"{len(items)} questions valid; {held} held out "
-            f"({100 * held / len(items):.0f}%, target {HELD_OUT_PERCENT}%)"
+            f"({100 * held / base:.0f}% of dev+test, target {HELD_OUT_PERCENT}%); "
+            f"{t2} test2"
         )
         return 0
     if args.cmd == "stats":
         by = Counter((i.suite, i.resolved_split) for i in items)
-        print("| Suite | dev | test | total |\n| --- | ---: | ---: | ---: |")
+        print(
+            "| Suite | dev | test | test2 | total |\n"
+            "| --- | ---: | ---: | ---: | ---: |"
+        )
         for suite in SUITES:
-            d, t = by[(suite, "dev")], by[(suite, "test")]
-            print(f"| {suite} | {d} | {t} | {d + t} |")
+            d, t, t2 = (
+                by[(suite, "dev")],
+                by[(suite, "test")],
+                by[(suite, "test2")],
+            )
+            print(f"| {suite} | {d} | {t} | {t2} | {d + t + t2} |")
         tags = Counter(t for i in items for t in i.tags)
         print("\nTags: " + ", ".join(f"{t} ({n})" for t, n in tags.most_common()))
         return 0
