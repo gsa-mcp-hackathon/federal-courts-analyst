@@ -13,7 +13,7 @@
       any: [MDL, multidistrict]
     - id: notes_direct_filing
       kind: mentions
-      any: [directly filed, direct filing, filed directly, direct-filed, direct filed]
+      any: [directly filed, direct filing, filed directly, direct-filed, direct filed, directly-filed]
     - id: names_earplug_or_3m
       kind: mentions
       any: [3M, earplug, Combat Arms]

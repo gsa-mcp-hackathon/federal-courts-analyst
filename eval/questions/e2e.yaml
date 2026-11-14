@@ -1083,3 +1083,14 @@
   - cohort
   - time
   notes: 'IDB civil release of 2026-08-26: 845 cases, all terminated, median 166 days (FILEDATE to TERMDATE).'
+
+# Contrast for the appeals declines: "Fifth Circuit" district courts are in scope.
+- id: fy2024-cir05-civil-filed
+  question: How many civil cases were filed in the Fifth Circuit's district courts in FY2024?
+  expected:
+    figures:
+      - value: 28798
+        edition: JB-2024
+        ref: {measure: civil_cases_filed, court: CIR-05, fiscal_year: 2024, edition: JB-2024}
+  expected_tools: [get_official_figure]
+  tags: [circuit]
