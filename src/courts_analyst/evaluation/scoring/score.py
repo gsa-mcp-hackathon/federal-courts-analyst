@@ -21,8 +21,11 @@ diagnostic. Failures get one MCP-Atlas style error category.
 
 from __future__ import annotations
 
+import json
+
 from courts_analyst.core.numbers import round_half_up
-from courts_analyst.evaluation.records import AnswerRecord, ItemScore
+from courts_analyst.evaluation.infra import is_infra_error
+from courts_analyst.evaluation.records import AnswerRecord, ItemScore, ToolCall
 from courts_analyst.evaluation.schema import QuestionItem
 from courts_analyst.evaluation.scoring.behavior import infer_behavior
 from courts_analyst.evaluation.scoring.claims import (
@@ -35,6 +38,20 @@ from courts_analyst.evaluation.scoring.numeric import (
     check_figures,
     printed_decimals,
 )
+
+
+def _tc_is_infra(tc: ToolCall) -> bool:
+    """Return True when *tc* looks like a wxO infra error.
+
+    Two sources are checked:
+    1. ``tc.error`` starts with ``'infra:'`` (set by the extractor on live runs).
+    2. ``tc.output``, serialised to JSON, matches the infra-error patterns
+       (catches older records rescored after the fact, where the error text
+       ended up in the structured output rather than in ``tc.error``).
+    """
+    if tc.error is not None and tc.error.startswith("infra:"):
+        return True
+    return tc.output is not None and is_infra_error(json.dumps(tc.output))
 
 
 def _numeric_leaves(obj: object) -> list[float]:
@@ -131,6 +148,7 @@ def score_item(item: QuestionItem, record: AnswerRecord) -> ItemScore:
         if item.suite == "tool_selection":
             graded["tools"] = checks["tools"]
     correct = not record.error and all(graded.values())
+    has_infra_error = any(_tc_is_infra(tc) for tc in record.tool_calls)
     return ItemScore(
         question_id=item.id,
         suite=item.suite,
@@ -141,6 +159,7 @@ def score_item(item: QuestionItem, record: AnswerRecord) -> ItemScore:
         expected_behavior=exp.behavior,
         actual_behavior=actual,
         error_category=None if correct else _category(item, record, checks),
+        infra_error=has_infra_error,
         notes=notes,
         latency_s=record.latency_s,
         cost_usd=record.cost_usd,

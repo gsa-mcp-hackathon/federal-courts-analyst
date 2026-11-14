@@ -30,6 +30,23 @@ from courts_analyst.evaluation.scoring.summary import SubsetInfo, summary_markdo
 DEFAULT_RESULTS = ROOT / "eval" / "results"
 
 
+def _git_head() -> str | None:
+    """Return the current git HEAD SHA of the repo, or None if git fails."""
+    import subprocess
+
+    try:
+        result = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        return result.stdout.strip()
+    except Exception:
+        return None
+
+
 @dataclass
 class RunResult:
     run_id: str
@@ -69,6 +86,8 @@ def run(
     workers: int = 1,
     repeats: int = 1,
     subset_info: SubsetInfo | None = None,
+    provenance: dict[str, object] | None = None,
+    split: str | None = None,
 ) -> RunResult:
     """Answer and score ``items``; write JSONL, summary JSON and Markdown.
 
@@ -142,13 +161,14 @@ def run(
         preview_confirms += pr.confirm_calls
         preview_violations += len(pr.violations)
 
+    run_date = datetime.now(UTC).isoformat(timespec="seconds")
     meta: dict[str, object] = {
         "run_id": run_id,
         "answerer": answerer.name,
         "label": label,
         "repeats": repeats,
         "items": [i.id for i in items],
-        "finished_at": datetime.now(UTC).isoformat(timespec="seconds"),
+        "finished_at": run_date,
         "preview_rule": {
             "confirm_calls": preview_confirms,
             "violations": preview_violations,
@@ -156,12 +176,24 @@ def run(
     }
     if subset_info is not None:
         meta["subset"] = subset_info.model_dump(mode="json")
+    if provenance is not None:
+        bank_commit: str | None = _git_head()
+        meta["provenance"] = {
+            **provenance,
+            "bank_commit": bank_commit,
+            "split": split,
+            "repeats": repeats,
+            "run_date": run_date,
+        }
     summary_path = results_dir / f"{run_id}.summary.json"
     summary_path.write_text(
         json.dumps({**meta, "summary": summary.model_dump(mode="json")}, indent=2)
         + "\n"
     )
     md_path = results_dir / f"{run_id}.md"
+    # Provenance dict written into the markdown is the enriched version (with
+    # bank_commit etc.) if provenance was provided, else None.
+    md_provenance: dict[str, object] | None = meta.get("provenance")  # type: ignore[assignment]
     md_path.write_text(
         summary_markdown(
             summary,
@@ -170,6 +202,7 @@ def run(
             repeats=repeats,
             preview_confirms=preview_confirms,
             preview_violations=preview_violations,
+            provenance=md_provenance,
         )
     )
     return RunResult(

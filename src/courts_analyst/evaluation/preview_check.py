@@ -4,8 +4,9 @@ Rule: every ``keep_answer`` tool call whose arguments have ``confirm`` set to
 ``True`` (or the string ``'true'``) must be preceded – after the previous
 confirmed ``keep_answer`` – by:
 
-1. An **assistant** text turn that contains ``'Shall I go ahead?'``
-   (case-insensitive, after :func:`normalize_quotes`).
+1. An **assistant** text turn that contains a question starting with
+   ``'Shall I go ahead'`` (case-insensitive, after :func:`normalize_quotes`),
+   matched by the regex ``r'shall i go ahead[^.!?]*\\?'``.
 2. A **user** text turn that starts with one of the affirmative words:
    ``yes``, ``yeah``, ``yep``, ``sure``, ``ok``, ``okay``, ``go ahead``,
    ``please do``, ``do it``, ``confirm`` (case-insensitive).
@@ -17,6 +18,7 @@ across two confirmed calls.
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 from typing import Any, Literal
 
@@ -74,8 +76,11 @@ def _is_confirmed(args: dict[str, Any]) -> bool:
     return False
 
 
+_PREVIEW_RE = re.compile(r"shall i go ahead[^.!?]*\?", re.IGNORECASE)
+
+
 def _has_preview(text: str) -> bool:
-    return "shall i go ahead?" in normalize_quotes(text).lower()
+    return bool(_PREVIEW_RE.search(normalize_quotes(text)))
 
 
 def _is_yes(text: str) -> bool:

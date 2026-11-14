@@ -19,6 +19,7 @@ from typing import Any
 
 import httpx
 
+from courts_analyst.evaluation.infra import is_infra_error
 from courts_analyst.evaluation.records import AnswerRecord, ToolCall
 from courts_analyst.evaluation.schema import QuestionItem
 
@@ -297,27 +298,34 @@ def _extract_tool_calls(step_history: list[dict[str, Any]]) -> list[ToolCall]:
 
     for call in calls_info:
         matched_output: dict[str, Any] | None = None
+        matched_raw: str = ""
         # Try to match by tool_call_id first
         if call["id"]:
             for i, resp in enumerate(responses):
                 call_id_matches = resp["tool_call_id"] == call["id"]
                 if i not in used_response_indices and call_id_matches:
-                    matched_output = _parse_tool_output(resp["content"])
+                    matched_raw = str(resp["content"])
+                    matched_output = _parse_tool_output(matched_raw)
                     used_response_indices.add(i)
                     break
         # Fallback: match by name order
         if matched_output is None:
             for i, resp in enumerate(responses):
                 if i not in used_response_indices and resp["name"] == call["name"]:
-                    matched_output = _parse_tool_output(resp["content"])
+                    matched_raw = str(resp["content"])
+                    matched_output = _parse_tool_output(matched_raw)
                     used_response_indices.add(i)
                     break
 
+        error: str | None = (
+            "infra: wxO tool runtime error" if is_infra_error(matched_raw) else None
+        )
         result.append(
             ToolCall(
                 name=call["name"],
                 arguments=call["args"],
                 output=matched_output,
+                error=error,
             )
         )
 

@@ -341,3 +341,35 @@ def test_l1_tool_response_ignored() -> None:
     ]
     evs = events_from_l1_messages(messages)
     assert evs == []
+
+
+# ---------------------------------------------------------------------------
+# Regex-based preview: 'Shall I go ahead...' variants
+# ---------------------------------------------------------------------------
+
+
+def test_shall_i_go_ahead_with_qualifier_passes() -> None:
+    """'Shall I go ahead and keep this answer ...' counts as a preview."""
+    evs = [
+        _asst(
+            "Shall I go ahead and keep this answer and ask the office why it was revised?"
+        ),
+        _user("Yes"),
+        _keep(confirm=True),
+    ]
+    result = check_events(evs)
+    assert result.confirm_calls == 1
+    assert result.violations == []
+
+
+def test_i_shall_go_ahead_does_not_count() -> None:
+    """'I shall go ahead.' does not match the regex (wrong word order)."""
+    evs = [
+        _asst("I shall go ahead."),
+        _user("Yes"),
+        _keep(confirm=True),
+    ]
+    result = check_events(evs)
+    assert result.confirm_calls == 1
+    assert len(result.violations) == 1
+    assert "no 'Shall I go ahead?' preview" in result.violations[0]

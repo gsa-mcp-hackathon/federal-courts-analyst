@@ -65,6 +65,12 @@ def _parser() -> argparse.ArgumentParser:
         help="paid answerers: allow runs beyond the smoke set",
     )
     r.add_argument(
+        "--provenance",
+        type=Path,
+        metavar="PATH",
+        help="JSON object file; written into the summary under meta['provenance']",
+    )
+    r.add_argument(
         "--agent-tools",
         metavar="VALUE",
         help=(
@@ -236,6 +242,10 @@ def main(argv: list[str] | None = None) -> int:
 
         answerer.budget = Budget(args.budget_usd)  # type: ignore[attr-defined]
         print(f"budget: ${args.budget_usd:.2f} for {len(chosen)} questions")
+    provenance: dict[str, object] | None = None
+    if getattr(args, "provenance", None) is not None:
+        provenance = json.loads(args.provenance.read_text())
+
     result = run(
         answerer,
         chosen,
@@ -246,6 +256,8 @@ def main(argv: list[str] | None = None) -> int:
         workers=args.workers,
         repeats=args.repeats,
         subset_info=subset_info,
+        provenance=provenance,
+        split=args.split,
     )
     print()
     print(result.paths["markdown"].read_text())

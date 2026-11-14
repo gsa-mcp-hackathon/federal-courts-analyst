@@ -73,6 +73,10 @@ class RunSummary(BaseModel):
         default_factory=dict,
         description="question_id → number of correct attempts (repeats runs only).",
     )
+    # Infra-error fields
+    infra_error_attempts: int = 0
+    accuracy_excl_infra: float | None = None
+    ci95_excl_infra: WilsonCI | None = None
 
 
 # ---------------------------------------------------------------------------
@@ -180,6 +184,18 @@ def summarize(
             else None
         )
 
+    # --- infra-error fields ---
+    infra_scores = [s for s in scores if s.infra_error]
+    n_infra = len(infra_scores)
+    clean_scores = [s for s in scores if not s.infra_error]
+    clean_head = _acc(clean_scores)
+    accuracy_excl_infra: float | None = clean_head["accuracy"] if n_infra else None
+    ci95_excl_infra: WilsonCI | None = (
+        wilson_ci95(int(clean_head["correct"] or 0), len(clean_scores))
+        if n_infra
+        else None
+    )
+
     return RunSummary(
         n=len(scores),
         correct=int(head["correct"] or 0),
@@ -210,6 +226,9 @@ def summarize(
         pass_at_k=pass_at_k,
         pass_hat_k=pass_hat_k,
         per_item=per_item,
+        infra_error_attempts=n_infra,
+        accuracy_excl_infra=accuracy_excl_infra,
+        ci95_excl_infra=ci95_excl_infra,
     )
 
 
@@ -221,6 +240,7 @@ def summary_markdown(
     repeats: int = 1,
     preview_confirms: int | None = None,
     preview_violations: int | None = None,
+    provenance: dict[str, object] | None = None,
 ) -> str:
     """A small Markdown report for a run."""
 
@@ -281,6 +301,23 @@ def summary_markdown(
             f"(${summary.cost_per_question_usd:.4f} per question).",
         ]
 
+    # --- Infra error line ---
+    if summary.infra_error_attempts:
+        n_m = summary.n
+        n_infra = summary.infra_error_attempts
+        excl_pct = pct(summary.accuracy_excl_infra)
+        ci_excl = summary.ci95_excl_infra
+        ci_str = (
+            f" (95% CI {pct(ci_excl.low)}–{pct(ci_excl.high)})"
+            if ci_excl is not None
+            else ""
+        )
+        lines += [
+            "",
+            f"Infra (wxO tool-runtime errors): {n_infra} of {n_m} attempts; "
+            f"excluding them: {excl_pct}{ci_str}",
+        ]
+
     # --- Preview rule line ---
     if preview_confirms is not None and preview_violations is not None:
         lines += [
@@ -310,5 +347,11 @@ def summary_markdown(
             ]
             for qid, c in sorted(partial.items()):
                 lines.append(f"| {qid} | {c}/{summary.repeats} |")
+
+    # --- Provenance section ---
+    if provenance:
+        lines += ["", "**Provenance**", ""]
+        for k, v in provenance.items():
+            lines.append(f"- {k}: {v}")
 
     return "\n".join(lines) + "\n"
