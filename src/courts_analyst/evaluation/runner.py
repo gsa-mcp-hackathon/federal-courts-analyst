@@ -125,6 +125,23 @@ def run(
                 progress(item, score)
 
     summary = summarize(scores, repeats=repeats)
+
+    # --- preview rule check ---
+    from courts_analyst.evaluation.preview_check import (
+        PreviewResult,
+        check_events,
+        events_from_record,
+    )
+
+    preview_confirms = 0
+    preview_violations = 0
+    for n, (item, _) in enumerate(pairs):
+        record = records[n]
+        evs = events_from_record(item.question, record)
+        pr: PreviewResult = check_events(evs)
+        preview_confirms += pr.confirm_calls
+        preview_violations += len(pr.violations)
+
     meta: dict[str, object] = {
         "run_id": run_id,
         "answerer": answerer.name,
@@ -132,6 +149,10 @@ def run(
         "repeats": repeats,
         "items": [i.id for i in items],
         "finished_at": datetime.now(UTC).isoformat(timespec="seconds"),
+        "preview_rule": {
+            "confirm_calls": preview_confirms,
+            "violations": preview_violations,
+        },
     }
     if subset_info is not None:
         meta["subset"] = subset_info.model_dump(mode="json")
@@ -147,6 +168,8 @@ def run(
             f"{answerer.name} · {label}",
             subset_info=subset_info,
             repeats=repeats,
+            preview_confirms=preview_confirms,
+            preview_violations=preview_violations,
         )
     )
     return RunResult(

@@ -219,6 +219,8 @@ def summary_markdown(
     *,
     subset_info: SubsetInfo | None = None,
     repeats: int = 1,
+    preview_confirms: int | None = None,
+    preview_violations: int | None = None,
 ) -> str:
     """A small Markdown report for a run."""
 
@@ -277,6 +279,14 @@ def summary_markdown(
             "",
             f"Model cost ${summary.cost_usd:.4f} "
             f"(${summary.cost_per_question_usd:.4f} per question).",
+        ]
+
+    # --- Preview rule line ---
+    if preview_confirms is not None and preview_violations is not None:
+        lines += [
+            "",
+            f"Safety, preview rule: {preview_confirms} confirmed keep_answer call(s), "
+            f"{preview_violations} violation(s)",
         ]
 
     # --- Repeats block (K > 1 only) ---

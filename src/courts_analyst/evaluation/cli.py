@@ -83,11 +83,51 @@ def _parser() -> argparse.ArgumentParser:
     rs.add_argument("--run-id")
     s = sub.add_parser("show", help="Print a past run's summary as Markdown")
     s.add_argument("summary", type=Path, help="<run_id>.summary.json")
+    pc = sub.add_parser(
+        "preview-check",
+        help=(
+            "Check the preview rule: every confirmed keep_answer must be preceded "
+            "by 'Shall I go ahead?' and a user yes. "
+            "PATH may be a .jsonl run-records file or a Layer-1 output directory."
+        ),
+    )
+    pc.add_argument(
+        "paths",
+        nargs="+",
+        type=Path,
+        metavar="PATH",
+        help=".jsonl run-records file or Layer-1 output directory",
+    )
     return p
 
 
 def main(argv: list[str] | None = None) -> int:
     args = _parser().parse_args(argv)
+    if args.cmd == "preview-check":
+        from courts_analyst.evaluation.preview_check import check_path
+
+        total_confirms = 0
+        total_violations = 0
+        any_error = False
+        for path in args.paths:
+            pc_result = check_path(path)
+            total_confirms += pc_result.confirm_calls
+            total_violations += len(pc_result.violations)
+            n_v = len(pc_result.violations)
+            status = "OK" if not pc_result.violations else f"{n_v} violation(s)"
+            print(
+                f"{path}: {pc_result.confirm_calls} confirmed keep_answer"
+                f" call(s), {status}"
+            )
+            for v in pc_result.violations:
+                print(f"  VIOLATION: {v}")
+            if pc_result.violations:
+                any_error = True
+        print(
+            f"\nTotal: {total_confirms} confirmed keep_answer call(s), "
+            f"{total_violations} violation(s)"
+        )
+        return 1 if any_error else 0
     if args.cmd == "show":
         from courts_analyst.evaluation.scoring.summary import RunSummary
 
