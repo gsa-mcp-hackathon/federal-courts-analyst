@@ -70,7 +70,8 @@ The proposal page for the team:
    returns the first result instead of a second record. Each write is
    confirmed first, by MCP elicitation where the client supports it and
    otherwise in two steps (`confirm=false` returns a preview of what would be
-   written; `confirm=true` writes it). No generic tools such as
+   written; `confirm=true` writes it). For `keep_answer` the second call must
+   carry the preview's `preview_id` (see *As built*). No generic tools such as
    `update_status`: statuses change only inside these tools.
 5. **The verification gate.** An answer is saved only if:
    - every number in the text is a cited value (measure, court, fiscal year,
@@ -168,6 +169,27 @@ The proposal page for the team:
   client honouring it could reuse a library search for up to an hour; write
   results are keyed by idempotency key, so a reused write result is the
   same as a replay.
+
+- **`keep_answer` checks the preview (2026-11-15).** In watsonx
+  Orchestrate transcripts, after a save came back `written: false` and the
+  user restated the text, the agent called `keep_answer` with
+  `confirm=true` again without a new "Shall I go ahead?" (3 of 10 desk
+  transcripts); instruction changes didn't stop it. Now a `confirm=false`
+  call returns a `preview_id` bound to a SHA-256 digest of the answer text
+  (whitespace collapsed), option, asker (account and role), citations
+  (sorted) and inquiry target, kept in the desk store's `preview` table so
+  it survives a stdio server restarted between calls. A `confirm=true`
+  call without a matching id returns `written: false` with a message
+  telling the agent to show a preview and ask "Shall I go ahead?" first.
+  Each id is used up by its first `confirm=true` call, whatever the
+  outcome, so a retry after a refused save needs a new preview. Two
+  exceptions: a retry with an `idempotency_key` that already wrote replays
+  the first result, and a client that confirms by elicitation needs no id
+  (the client asked the user itself). The id proves a preview call was
+  made for exactly what is written; it can't prove the user saw it, so the
+  agent instructions' preview rule and the transcript checker
+  (`courts-eval preview-check`) stay. `core/desk/previews.py`,
+  `tests/test_keep_answer_preview.py`.
 
 ## Alternatives considered
 

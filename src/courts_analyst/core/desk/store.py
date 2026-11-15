@@ -114,6 +114,12 @@ CREATE TABLE IF NOT EXISTS idempotency (
     outcome TEXT NOT NULL,
     PRIMARY KEY (account_id, tool, key)
 );
+CREATE TABLE IF NOT EXISTS preview (
+    id TEXT PRIMARY KEY,
+    account_id TEXT NOT NULL,
+    digest TEXT NOT NULL,
+    created_at TEXT NOT NULL
+);
 CREATE TABLE IF NOT EXISTS audit_event (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     at TEXT NOT NULL,
@@ -263,6 +269,27 @@ class DeskStore:
                 [account_id, tool, key, outcome],
             )
 
+    # ── previews (keep_answer: confirm=true needs a matching preview) ───────
+
+    def add_preview(self, preview_id: str, account_id: str, digest: str) -> None:
+        with self.transaction() as con:
+            con.execute(
+                "INSERT INTO preview (id, account_id, digest, created_at) "
+                "VALUES (?, ?, ?, ?)",
+                [preview_id, account_id, digest, now()],
+            )
+
+    def take_preview(self, preview_id: str) -> tuple[str, str] | None:
+        """The preview's (account_id, digest), removed so it works once."""
+        with self.transaction() as con:
+            row = con.execute(
+                "SELECT account_id, digest FROM preview WHERE id = ?", [preview_id]
+            ).fetchone()
+            if row is None:
+                return None
+            con.execute("DELETE FROM preview WHERE id = ?", [preview_id])
+            return str(row[0]), str(row[1])
+
     # ── accounts ──────────────────────────────────────────────────────────────
 
     def ensure_account(
@@ -282,6 +309,7 @@ class DeskStore:
         with self._lock:
             self._con.executescript(
                 "DROP TABLE IF EXISTS audit_event; DROP TABLE IF EXISTS idempotency;"
+                "DROP TABLE IF EXISTS preview;"
                 "DROP TABLE IF EXISTS request_update;"
                 "DROP TABLE IF EXISTS library_entry;"
                 "DROP TABLE IF EXISTS response; DROP TABLE IF EXISTS inquiry_request;"

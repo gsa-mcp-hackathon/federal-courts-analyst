@@ -1188,6 +1188,10 @@ export interface ResultDeskOutcome {
 export interface DeskOutcome {
   written: boolean;
   preview: boolean;
+  /**
+   * keep_answer previews: pass it back with confirm=true once the user has said yes.
+   */
+  preview_id: string | null;
   message: string;
   request: RequestView | null;
   inquiry: InquiryView | null;

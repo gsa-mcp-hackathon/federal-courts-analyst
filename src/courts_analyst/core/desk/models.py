@@ -217,6 +217,11 @@ class DeskOutcome(BaseModel):
 
     written: bool
     preview: bool = False
+    preview_id: str | None = Field(
+        default=None,
+        description="keep_answer previews: pass it back with confirm=true once "
+        "the user has said yes.",
+    )
     message: str
     request: RequestView | None = None
     inquiry: InquiryView | None = None

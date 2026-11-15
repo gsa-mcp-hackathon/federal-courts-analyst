@@ -311,6 +311,19 @@
           "title": "Preview",
           "type": "boolean"
         },
+        "preview_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "keep_answer previews: pass it back with confirm=true once the user has said yes.",
+          "title": "Preview Id"
+        },
         "message": {
           "title": "Message",
           "type": "string"
