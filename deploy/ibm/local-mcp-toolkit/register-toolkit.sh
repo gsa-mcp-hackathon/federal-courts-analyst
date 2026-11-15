@@ -93,10 +93,11 @@ cp "${CATALOG}" "${STAGE_DIR}/data/courts.duckdb"
 # tools (find_cases, analyze_cohort, sample_dockets, reconcile) work. It has no
 # party names; the hashed name index next to it lets the output scanner block
 # any name that slips through. data/private/ (the party names) is never shipped.
-# INCLUDE_IDB=0 leaves it out, e.g. if the upload is refused as too large (413);
-# those tools then say case-level data isn't loaded.
+# Off by default: the IDB is ~440 MB and watsonx Orchestrate SaaS refuses an
+# upload that size (413 Request Entity Too Large). INCLUDE_IDB=1 turns it on for
+# an instance that accepts it; otherwise those tools say case data isn't loaded.
 IDB="${IDB_DUCKDB_PATH:-${REPO_ROOT}/data/build/idb.duckdb}"
-if [[ "${INCLUDE_IDB:-1}" == "1" && -f "${IDB}" ]]; then
+if [[ "${INCLUDE_IDB:-0}" == "1" && -f "${IDB}" ]]; then
   cp "${IDB}" "${STAGE_DIR}/data/idb.duckdb"
   PII_INDEX="$(dirname "${IDB}")/pii_index.bin"
   if [[ -f "${PII_INDEX}" ]]; then
@@ -107,13 +108,26 @@ if [[ "${INCLUDE_IDB:-1}" == "1" && -f "${IDB}" ]]; then
   fi
   echo "  including the civil IDB ($(du -sh "${IDB}" | cut -f1))"
 else
-  echo "  civil IDB not included (build it with 'make data-idb'); case-level tools"
+  echo "  civil IDB not included (INCLUDE_IDB=1 to ship it); case-level tools"
   echo "  will say case data isn't loaded."
 fi
 # Drop caches that may have been copied from src/.
 find "${STAGE_DIR}" -type d -name '__pycache__' -prune -exec rm -rf {} + 2>/dev/null || true
 STAGE_SIZE="$(du -sh "${STAGE_DIR}" | cut -f1)"
 echo "  staged package_root size: ${STAGE_SIZE}"
+# Stop before touching the existing toolkit if the upload is too large to be
+# accepted: the import below removes the old toolkit first (which also takes
+# its tools off every agent), so a refused upload would leave nothing behind.
+# 454 MB was refused with a 413; ~10 MB is accepted. MAX_STAGE_MB overrides.
+STAGE_MB="$(du -sm "${STAGE_DIR}" | cut -f1)"
+if (( STAGE_MB > ${MAX_STAGE_MB:-100} )); then
+  echo "FATAL: staged package is ${STAGE_MB} MB, over MAX_STAGE_MB=${MAX_STAGE_MB:-100}." >&2
+  echo "       watsonx Orchestrate refuses large uploads (413). Nothing was changed." >&2
+  echo "       Leave out the IDB (INCLUDE_IDB=0) or raise MAX_STAGE_MB if your" >&2
+  echo "       instance accepts it." >&2
+  rm -rf "${STAGE_DIR}"
+  exit 1
+fi
 
 # --- Generate the toolkit spec pointing at the staging dir --------------------
 # The toolkit is registered under TOOLKIT_NAME (several participants share one
@@ -125,7 +139,8 @@ sed -E -e "s#^package_root:.*#package_root: ${STAGE_DIR}#" \
 # --- Import (or re-import) the local MCP toolkit ------------------------------
 echo "=== Importing local MCP toolkit '${TOOLKIT_NAME}' ==="
 if orchestrate toolkits list 2>/dev/null | grep -q "${TOOLKIT_NAME}"; then
-  echo "  toolkit exists — removing before re-import."
+  echo "  toolkit exists — removing before re-import. Agents lose these tools;"
+  echo "  re-add them in the UI (Tools → Add Tool → Local instance) afterwards."
   orchestrate toolkits remove --name "${TOOLKIT_NAME}" || true
 fi
 
