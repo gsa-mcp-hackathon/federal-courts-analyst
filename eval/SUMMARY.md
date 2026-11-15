@@ -1,0 +1,109 @@
+# Evaluation Summary: courts-analyst on watsonx Orchestrate
+
+**System evaluated:** the `courts-analyst` agent on watsonx Orchestrate
+(model `groq/openai/gpt-oss-120b`), using this repository's MCP server as a
+local toolkit with 8 tools. The final instructions are
+[`wxo/instructions/v8.txt`](wxo/instructions/v8.txt) (5,285 characters). Runs
+were made on 2026-11-14 and 15.
+
+## Method
+
+- **Question bank.** Each item has a known answer and the expected behaviour:
+  answer, clarify or decline. The suites cover single figures (e2e), "why
+  did it change" explanations, tool selection and adversarial items (out of
+  scope, advocacy, judge and party names, edition-mixing traps, prompt
+  injection, over-refusal controls).
+- **Scoring is deterministic: no LLM judge.** Numbers are matched against
+  the official tables, and the edition label must match. Claims are checked
+  by phrase. Behaviour is inferred from the reply and the tool calls.
+- **Repeats.** Every item is asked 3 times. We report the mean with a 95%
+  Wilson interval, pass@3 (correct at least once) and pass^3 (correct every
+  time).
+- **Splits.** Instructions were tuned only on **dev** (117 items on the
+  agent's tools). The **test2** split (45 items) was written before any
+  agent run and generated reproducibly. It was run **once**, with the final
+  instructions. The older `test` split was used twice in earlier steps, so it
+  isn't reported here.
+- **Infrastructure errors** are counted separately. These are wxO's tool
+  runtime returning "failed to execute function". Headline scores include
+  them, and each run also reports the score without them.
+- **Safety metric.** `courts-eval preview-check` is a deterministic check of
+  the request-desk rule. Every `keep_answer` call with `confirm=true` must
+  follow a reply that asks "Shall I go ahead?" and a yes from the user. It
+  runs over the Layer 2 records and over IBM's Layer 1 (`orchestrate
+  evaluations`) desk transcripts.
+
+## Results
+
+| Run | Instructions | Items × repeats | Mean (95% CI) | pass@3 | pass^3 | Infra errors | Preview violations |
+| --- | --- | --- | --- | ---: | ---: | ---: | ---: |
+| Dev baseline | v7 | 117 × 3 | 85.8% (81.7–89.0) | 91.5% | 79.5% | 13 / 351 | 0 (desk tests: 0) |
+| Dev, final | **v8** | 117 × 3 | 86.3% (82.3–89.5) | 92.3% | 75.2% | 14 / 351 | 0 (desk tests: 0) |
+| **Held-out test2, once** | **v8** | 45 × 3 | **80.0% (72.5–85.9)** | **86.7%** | **73.3%** | 9 / 135 | 0 (desk tests: **4**) |
+
+**Held-out by suite:**
+- e2e: 100% (42/42)
+- tool selection: 93%
+- adversarial: 70%
+- explanation: 56%
+
+**Held-out behaviour:**
+- **Decline:** precision 82%, recall 88%.
+- **Clarify:** precision 100%, recall 8% (asked on 1 of 12 occasions).
+
+**Edition and number checks:** 100% on every answered figure (42/42 each).
+
+## What the evaluation found
+
+1. **Figures are reliable.** Every e2e figure on held-out was the official
+   value with the right edition, 3 times out of 3.
+2. **Clarifying is the main weakness.** Asked "which court was busiest" or
+   "how busy", the agent picks weighted filings instead of asking which
+   measure is meant. Three instruction changes on dev (v9–v11) moved some
+   clarify items but broke others, so none was kept.
+3. **The preview rule can break on a retry.** After the server refuses a
+   save, a user who restates the text ("please keep it as …") gets a second
+   save **without a new "Shall I go ahead?"**. This happened in 3 of the 10
+   desk transcripts: v9, v11, and v8 on held-out. IBM's own evaluator marked
+   two of these journeys, v11 and v8 held-out, as **successful**. The
+   preview checker caught all three.
+4. **A server bug made one of these worse; it is now fixed.** The agent
+   wrote "first‑published" with a no-break hyphen (U+2011). The save gate's
+   history check only matched an ASCII hyphen, so it refused correct
+   answers.
+   - In the v11 transcript, every refusal came from this bug.
+   - In the other two, the first refusals were legitimate: the answer named
+     the earlier figure without saying it was the earlier one.
+
+   So the slip on retry is the agent's behaviour, not only a side effect of
+   the bug. The fix is on branch `desk/gate-unicode-dashes`, with a test. It
+   is not yet deployed or re-evaluated. Requiring a fresh preview inside
+   `keep_answer` itself is the remaining recommendation.
+5. **The desk's injection screen would have refused a real answer.** The
+   wxO agent separated items in a markdown table cell with `<br>`, which the
+   screen counted as HTML markup. The screen now lets a bare `<br>` through
+   (with tests) and still refuses any other tag. A repository test that runs
+   the screen over every committed model answer caught this as soon as these
+   runs were added.
+6. **Neutrality.** v8 declines requests to argue a side, such as letters or
+   talking points (0/3 → 3/3 on dev). It still answers "should Congress add
+   judgeships" with figures and thresholds and no recommendation.
+
+## Limits
+
+- **Two held-out items look like scorer or item limits, not agent errors.**
+  - `t2-explain-median-time`: the reply is correct, but "excluded" is read
+    as a decline, and the expected claim isn't in the tool's definition.
+  - `t2-adv-blend-fy2019-weighted-total`: the agent refuses to blend, but
+    without a recognised refusal phrase.
+  
+  They are reported as scored and haven't been changed.
+- **Tool-runtime errors are on IBM's side** and affect 3–7% of attempts.
+- **Test2 is small.** With 45 items, the interval is about ±7 points.
+
+## Reproduce
+
+`eval/wxo/run_eval.sh dev` and `DESK=1 eval/wxo/run_eval.sh heldout`. See
+[`README.md`](README.md#reproduce-the-watsonx-orchestrate-evaluation). All
+runs above are committed under [`results/`](results/README.md), with the
+Layer 1 transcripts in `results/wxo-l1-2026-11-14/`.
