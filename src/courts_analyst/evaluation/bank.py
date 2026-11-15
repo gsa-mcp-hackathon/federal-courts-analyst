@@ -58,6 +58,17 @@ def load_bank(directory: Path = DEFAULT_BANK) -> list[QuestionItem]:
     return items
 
 
+def within_tools(
+    items: list[QuestionItem],
+    tools: frozenset[str],
+) -> list[QuestionItem]:
+    """Keep items whose expected_tools are all in *tools*.
+
+    Items with no expected_tools are always kept.
+    """
+    return [i for i in items if not i.expected_tools or set(i.expected_tools) <= tools]
+
+
 def select(
     items: list[QuestionItem],
     suite: Suite | None = None,

@@ -1,0 +1,68 @@
+[
+  {
+    "id": "msg-0001",
+    "tenant_id": "tenant-test-0001",
+    "created_by": "iam-user-test",
+    "created_by_username": "test-user",
+    "created_on": "2025-01-01T12:00:00.000Z",
+    "updated_at": "2025-01-01T12:00:00.000Z",
+    "thread_id": "thread-0001",
+    "assistant": {"is_default": true},
+    "parent_message_id": null,
+    "role": "user",
+    "content": [
+      {
+        "response_type": "text",
+        "text": "What were filings in FY2020?"
+      }
+    ],
+    "mentions": null,
+    "document_ids": null,
+    "additional_properties": {},
+    "context": null,
+    "step_history": null,
+    "message_state": null,
+    "log_id": null,
+    "_meta": null,
+    "session_id": "session-0001"
+  },
+  {
+    "id": "msg-0002",
+    "tenant_id": "tenant-test-0001",
+    "created_by": "iam-user-test",
+    "created_by_username": "test-user",
+    "created_on": "2025-01-01T12:00:10.000Z",
+    "updated_at": "2025-01-01T12:00:10.000Z",
+    "thread_id": "thread-0001",
+    "assistant": {"is_default": true},
+    "parent_message_id": "msg-0001",
+    "role": "assistant",
+    "content": [
+      {
+        "response_type": "text",
+        "id": "1",
+        "text": "First paragraph of the answer."
+      },
+      {
+        "response_type": "text",
+        "id": "2",
+        "text": "Second paragraph with more detail."
+      }
+    ],
+    "mentions": null,
+    "document_ids": null,
+    "additional_properties": {
+      "display_properties": {"skip_render": false, "is_async": false},
+      "is_interrupt": false
+    },
+    "context": {
+      "wxo_run_id": "run-0001",
+      "wxo_thread_id": "thread-0001"
+    },
+    "step_history": [],
+    "message_state": null,
+    "log_id": null,
+    "_meta": null,
+    "session_id": "session-0001"
+  }
+]

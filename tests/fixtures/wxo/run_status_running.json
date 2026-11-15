@@ -1,0 +1,16 @@
+{
+  "id": "run-0001",
+  "tenant_id": "tenant-test-0001",
+  "assistant_id": null,
+  "thread_id": "thread-0001",
+  "status": "running",
+  "started_at": "2025-01-01T12:00:00.000Z",
+  "completed_at": null,
+  "failed_at": null,
+  "cancelled_at": null,
+  "llm_params": null,
+  "usage": null,
+  "last_error": null,
+  "agent_id": "agent-test",
+  "trace_id": "trace-0001"
+}

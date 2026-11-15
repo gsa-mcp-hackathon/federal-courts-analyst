@@ -17,10 +17,16 @@ from collections import Counter
 from pathlib import Path
 
 from courts_analyst.evaluation.answerers import ANSWERERS, PAID
-from courts_analyst.evaluation.bank import DEFAULT_BANK, BankError, load_bank, select
+from courts_analyst.evaluation.bank import (
+    DEFAULT_BANK,
+    BankError,
+    load_bank,
+    select,
+    within_tools,
+)
 from courts_analyst.evaluation.runner import DEFAULT_RESULTS, run
 from courts_analyst.evaluation.schema import HELD_OUT_PERCENT, SUITES
-from courts_analyst.evaluation.scoring.summary import summary_markdown
+from courts_analyst.evaluation.scoring.summary import SubsetInfo, summary_markdown
 
 
 def _parser() -> argparse.ArgumentParser:
@@ -41,6 +47,13 @@ def _parser() -> argparse.ArgumentParser:
     r.add_argument("--quiet", action="store_true")
     r.add_argument("--workers", type=int, default=1, help="answer N items at once")
     r.add_argument(
+        "--repeats",
+        type=int,
+        default=1,
+        metavar="K",
+        help="answer each item K times and report pass@K / pass^K",
+    )
+    r.add_argument(
         "--budget-usd",
         type=float,
         default=1.00,
@@ -50,6 +63,14 @@ def _parser() -> argparse.ArgumentParser:
         "--allow-full-bank",
         action="store_true",
         help="paid answerers: allow runs beyond the smoke set",
+    )
+    r.add_argument(
+        "--agent-tools",
+        metavar="VALUE",
+        help=(
+            "only score items answerable by the agent: 'wxo' (WXO_AGENT_TOOLS preset) "
+            "or a comma-separated list of tool names"
+        ),
     )
     r.add_argument(
         "--expect-accuracy",
@@ -117,12 +138,41 @@ def main(argv: list[str] | None = None) -> int:
         )
         return 2
     chosen = select(items, args.suite, args.split, args.tags, args.ids)
+
+    # --agent-tools subset filter (applied after select, before --limit)
+    subset_info: SubsetInfo | None = None
+    if args.agent_tools:
+        raw = args.agent_tools
+        if raw == "wxo":
+            from courts_analyst.evaluation.wxo_agent import WXO_AGENT_TOOLS
+
+            tools: frozenset[str] = WXO_AGENT_TOOLS
+            preset_name: str = "wxo"
+        else:
+            tools = frozenset(t.strip() for t in raw.split(",") if t.strip())
+            preset_name = raw
+        n_slice = len(chosen)
+        chosen = within_tools(chosen, tools)
+        n_subset = len(chosen)
+        print(
+            f"subset: {n_subset} of {n_slice} items have all expected tools"
+            " on the agent"
+        )
+        subset_info = SubsetInfo(
+            tools=sorted(tools),
+            n_slice=n_slice,
+            n_subset=n_subset,
+            preset=preset_name,
+        )
+
     if args.limit:
         chosen = chosen[: args.limit]
     if not chosen:
         print("no questions match those filters", file=sys.stderr)
         return 1
     label = "-".join(x for x in [args.suite or "all", args.split or "both"] if x)
+    if args.agent_tools:
+        label = f"{label}-subset"
 
     def progress(item, score):  # type: ignore[no-untyped-def]
         if not args.quiet:
@@ -144,6 +194,8 @@ def main(argv: list[str] | None = None) -> int:
         run_id=args.run_id,
         progress=progress,
         workers=args.workers,
+        repeats=args.repeats,
+        subset_info=subset_info,
     )
     print()
     print(result.paths["markdown"].read_text())

@@ -90,11 +90,47 @@ _CLARIFY = re.compile(
 )
 
 
-_QUOTES = str.maketrans({"\u2019": "'", "\u2018": "'", "\u201c": '"', "\u201d": '"'})
+_QUOTES = str.maketrans(
+    {
+        # Curly / typographic quotes → straight equivalents
+        "\u2018": "'",
+        "\u2019": "'",
+        "\u201c": '"',
+        "\u201d": '"',
+        # Unicode hyphens and dashes → ASCII hyphen-minus
+        "\u2010": "-",  # hyphen
+        "\u2011": "-",  # non-breaking hyphen
+        "\u2012": "-",  # figure dash
+        "\u2013": "-",  # en dash
+        "\u2014": "-",  # em dash
+        "\u2015": "-",  # horizontal bar
+        "\u2212": "-",  # minus sign
+        # Non-breaking / narrow spaces → plain space
+        "\u00a0": " ",  # no-break space
+        "\u2007": " ",  # figure space
+        "\u2009": " ",  # thin space
+        "\u202f": " ",  # narrow no-break space
+        # Zero-width characters → deleted (map to empty string)
+        "\u200b": None,  # zero-width space
+        "\u200c": None,  # zero-width non-joiner
+        "\u200d": None,  # zero-width joiner
+        "\u2060": None,  # word joiner
+        "\ufeff": None,  # zero-width no-break space / BOM
+    }
+)
 
 
 def normalize_quotes(text: str) -> str:
-    """Curly quotes to straight ones ("can’t" → "can't"): models use both."""
+    """Normalise typography for claim matching.
+
+    Converts curly quotes to straight equivalents, Unicode hyphens and dashes
+    (U+2010–U+2015, U+2212) to ASCII hyphen-minus, non-breaking/narrow spaces
+    (U+00A0, U+2007, U+2009, U+202F) to plain space, and deletes zero-width
+    characters (U+200B, U+200C, U+200D, U+2060, U+FEFF).
+
+    Models and PDF extractors use all of these interchangeably, so claim checks
+    should be insensitive to these distinctions.
+    """
     return text.translate(_QUOTES)
 
 
