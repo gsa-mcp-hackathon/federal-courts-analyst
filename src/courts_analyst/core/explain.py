@@ -557,13 +557,69 @@ def _explain_count(
             "FJC IDB civil records."
         )
     else:
-        warnings.append(
-            Caveat(
-                code="out_of_scope",
-                message="The IDB isn't loaded, so the change can't be broken down.",
+        districts = expand_courts([court])
+        if len(districts) > 1:
+            w: dict[str, dict[str, float]] = {"a": {}, "b": {}}
+            for fy, ed, slot in (
+                (a, first.edition, "a"),
+                (b, second.edition, "b"),
+            ):
+                for code, val in db.rows(
+                    "SELECT v.court, v.value FROM cat.observation v "
+                    "WHERE v.measure_id = ? AND v.fiscal_year = ? "
+                    "AND v.edition = ? AND list_contains(?, v.court)",
+                    [m.id, fy, ed, districts],
+                ):
+                    w[slot][code] = float(val)
+            if w["a"] and w["b"]:
+                district_sum_change = sum(w["b"].values()) - sum(w["a"].values())
+                remainder = official_change - district_sum_change
+                if abs(remainder) > 1e-9:
+                    w["b"]["__rounding__"] = w["b"].get("__rounding__", 0.0) + remainder
+                labels: dict[str, str] = {d: _name(d) for d in districts} | {
+                    "__rounding__": "Unallocated (rounding in published values)"
+                }
+                by_district = contributions(w["a"], w["b"], labels)
+                data["by_district"] = by_district
+                tops = [c for c in by_district if c.key_contributor][:3]
+                if tops:
+                    lead = (
+                        "Largest contributors (official district rows): "
+                        + "; ".join(f"{c.label} {c.change:+,.0f}" for c in tops)
+                        + "."
+                    )
+                series = (
+                    f"Table C-1 ({first.edition}, {second.edition}), district rows; "
+                    "no case-type breakdown."
+                )
+                warnings.append(
+                    Caveat(
+                        code="out_of_scope",
+                        message=(
+                            "The IDB isn't loaded: the district split comes from the "
+                            "official tables; a case-type or MDL breakdown needs "
+                            "the IDB."
+                        ),
+                    )
+                )
+            else:
+                series = f"Table C-1 ({first.edition}, {second.edition}); no breakdown."
+                warnings.append(
+                    Caveat(
+                        code="out_of_scope",
+                        message=(
+                            "The IDB isn't loaded, so the change can't be broken down."
+                        ),
+                    )
+                )
+        else:
+            series = f"Table C-1 ({first.edition}, {second.edition}); no breakdown."
+            warnings.append(
+                Caveat(
+                    code="out_of_scope",
+                    message="The IDB isn't loaded, so the change can't be broken down.",
+                )
             )
-        )
-        series = f"Table C-1 ({first.edition}, {second.edition}); no breakdown."
     if (p := _pandemic(a, b)) is not None:
         drivers.append(p)
     rev, rev_warn = _revision_drivers(db, m, court, a, b)
