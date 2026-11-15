@@ -1,0 +1,21 @@
+{
+    "Runs": 1.0,
+    "Orchestrate Agent Routing F1": 1.0,
+    "Total Steps": 40.0,
+    "LLM Steps": 20.0,
+    "Average Agent Response Time (s)": 5.02,
+    "Total Tool Calls": 8.0,
+    "Expected Tool Calls": 3.0,
+    "Correct Tool Calls": 3.0,
+    "Missed Tool Calls": 0.0,
+    "Relevant Tool Calls": 8.0,
+    "Tool Calls with Incorrect Parameters": 3.0,
+    "Tool Call Recall": 1.0,
+    "Tool Call Precision": 0.38,
+    "Tool Match Success": 1.0,
+    "Tool Parameter F1": 0.5,
+    "Keyword Match": 1.0,
+    "Semantic Match": 1.0,
+    "Text Match": 1.0,
+    "Journey Success": 1.0
+}
