@@ -38,7 +38,9 @@ held-out run with the same instructions stops unless `HELDOUT_AGAIN=1`.
 
 ## Test cases
 
-`tests/l1/`, `tests/l1desk/`, and `tests/l1desk2/` (save, then my_requests status) are **orchestrate evaluations** test cases.
+`tests/l1/`, `tests/l1desk/`, `tests/l1desk2/` (save, then my_requests status) and `tests/l1desk3/` (the first save is refused for mixed editions, the user restates the text, and the agent must preview again before the second save) are **orchestrate evaluations** test cases.
+
+`keep_answer` takes a `preview_id`: the `confirm=false` call returns one, and the `confirm=true` call must pass it for the same answer, option, asker and citations (ADR 0013). Each id works once, so `l1desk3` expects two preview calls and two confirmed calls. Journey Success doesn't check the preview rule; run `uv run courts-eval preview-check <outdir>` on every desk run.
 
 **Run:**
 ```

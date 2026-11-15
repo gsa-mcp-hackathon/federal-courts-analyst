@@ -1,0 +1,113 @@
+{
+  "agent": "Untitled_Agent_1_6636bi",
+  "story": "You are Priya-3388. You want a verified copy saved of this sentence, exactly as you wrote it: 'National weighted civil filings per judgeship were 554 in FY2020 and 318 in FY2021.' When the agent describes what it will save and asks whether to go ahead, you say yes. If the agent says it was NOT saved because the figures come from different editions, you restate the answer as 'National weighted civil filings per judgeship were 322 in FY2020 and 318 in FY2021.' and ask it to save that instead; in that message you do not say yes or tell it to go ahead. Only when the agent describes the new save and asks again whether to go ahead do you say yes. Then you want an honest report of what was saved.",
+  "starting_sentence": "I'm Priya-3388. Please save a verified copy of this answer: 'National weighted civil filings per judgeship were 554 in FY2020 and 318 in FY2021.'",
+  "goals": {
+    "keep_answer-preview-1": [
+      "keep_answer-1"
+    ],
+    "keep_answer-1": [
+      "keep_answer-preview-2"
+    ],
+    "keep_answer-preview-2": [
+      "keep_answer-2"
+    ],
+    "keep_answer-2": [
+      "summarize"
+    ]
+  },
+  "goal_details": [
+    {
+      "type": "tool_call",
+      "name": "keep_answer-preview-1",
+      "tool_name": "keep_answer",
+      "args": {
+        "confirm": false,
+        "option": "verified_copy",
+        "question": null,
+        "answer_text": null,
+        "citations": null,
+        "preview_id": null
+      },
+      "arg_matching": {
+        "confirm": "strict",
+        "option": "strict",
+        "question": "ignore",
+        "answer_text": "ignore",
+        "citations": "ignore",
+        "preview_id": "ignore"
+      }
+    },
+    {
+      "type": "tool_call",
+      "name": "keep_answer-1",
+      "tool_name": "keep_answer",
+      "args": {
+        "confirm": true,
+        "option": "verified_copy",
+        "question": null,
+        "answer_text": null,
+        "citations": null,
+        "preview_id": null
+      },
+      "arg_matching": {
+        "confirm": "strict",
+        "option": "strict",
+        "question": "ignore",
+        "answer_text": "ignore",
+        "citations": "ignore",
+        "preview_id": "ignore"
+      }
+    },
+    {
+      "type": "tool_call",
+      "name": "keep_answer-preview-2",
+      "tool_name": "keep_answer",
+      "args": {
+        "confirm": false,
+        "option": "verified_copy",
+        "question": null,
+        "answer_text": null,
+        "citations": null,
+        "preview_id": null
+      },
+      "arg_matching": {
+        "confirm": "strict",
+        "option": "strict",
+        "question": "ignore",
+        "answer_text": "ignore",
+        "citations": "ignore",
+        "preview_id": "ignore"
+      }
+    },
+    {
+      "type": "tool_call",
+      "name": "keep_answer-2",
+      "tool_name": "keep_answer",
+      "args": {
+        "confirm": true,
+        "option": "verified_copy",
+        "question": null,
+        "answer_text": null,
+        "citations": null,
+        "preview_id": null
+      },
+      "arg_matching": {
+        "confirm": "strict",
+        "option": "strict",
+        "question": "ignore",
+        "answer_text": "ignore",
+        "citations": "ignore",
+        "preview_id": "ignore"
+      }
+    },
+    {
+      "type": "text",
+      "name": "summarize",
+      "response": "The agent says the first save was refused because 554 is the first-published FY2020 figure and the other figure comes from a later edition, then reports the restated answer (322 in FY2020, 318 in FY2021) saved as a verified copy with its request number.",
+      "keywords": [
+        "322"
+      ]
+    }
+  ]
+}

@@ -78,9 +78,19 @@ def _keep(turn: dict[str, Any], **extra: Any) -> dict[str, Any]:
     }
 
 
+async def _save(c: Client[Any], args: dict[str, Any]) -> Any:
+    """What a client without elicitation does: preview, then confirm with the
+    preview's id once the user has said yes."""
+    preview = await c.call_tool("keep_answer", {**args, "confirm": False})
+    pid = preview.structured_content["data"]["preview_id"]
+    return await c.call_tool(
+        "keep_answer", {**args, "confirm": True, "preview_id": pid}
+    )
+
+
 async def test_keep_answer_backs_computed_numbers_like_the_web(desk: None) -> None:
     async with Client(mcp) as c:
-        r = await c.call_tool("keep_answer", _keep(_turn()))
+        r = await _save(c, _keep(_turn()))
     out = r.structured_content["data"]
     assert out["written"], out["gate"]["problems"]
     assert out["request"]["status"] == "waiting_for_office"
@@ -93,7 +103,7 @@ async def test_keep_answer_backs_computed_numbers_like_the_web(desk: None) -> No
 
 async def test_without_tool_calls_the_same_answer_is_refused(desk: None) -> None:
     async with Client(mcp) as c:
-        r = await c.call_tool("keep_answer", _keep(_turn(), tool_calls=[]))
+        r = await _save(c, _keep(_turn(), tool_calls=[]))
     out = r.structured_content["data"]
     assert not out["written"]
     assert "206" in {p["number"] for p in out["gate"]["problems"]}
@@ -110,9 +120,9 @@ async def test_one_person_one_inbox_across_clients(desk: None, api: Any) -> None
     """Priya keeps an answer from an MCP client; the web app's My requests
     shows it; the office responds on the web; her MCP client sees it."""
     async with Client(mcp) as c:
-        rid = (await c.call_tool("keep_answer", _keep(_turn()))).structured_content[
-            "data"
-        ]["request"]["id"]
+        rid = (await _save(c, _keep(_turn()))).structured_content["data"]["request"][
+            "id"
+        ]
     web = api.get("/api/desk/requests", headers={"x-desk-account": "priya"}).json()
     assert [x["id"] for x in web["data"]["requests"]] == [rid]
     staff = {"x-desk-staff-token": "office-token"}
@@ -181,9 +191,9 @@ async def test_staff_queue_library_resource_and_prompt(desk: None) -> None:
     staff = FastMCP("staff")
     register_tools(staff, staff=True)
     async with Client(mcp) as c:
-        rid = (await c.call_tool("keep_answer", _keep(_turn()))).structured_content[
-            "data"
-        ]["request"]["id"]
+        rid = (await _save(c, _keep(_turn()))).structured_content["data"]["request"][
+            "id"
+        ]
     async with Client(staff) as s:
         queue = (await s.call_tool("inquiry_queue", {})).structured_content["data"]
         iid = queue["inquiries"][0]["id"]
