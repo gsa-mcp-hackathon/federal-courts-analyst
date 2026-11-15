@@ -122,6 +122,34 @@ async def test_whitespace_and_citation_order_dont_matter(desk_path: Path) -> Non
         assert out["written"], out
 
 
+async def test_typographic_spaces_dashes_and_quotes_dont_matter(
+    desk_path: Path,
+) -> None:
+    """wxO run 2026-11-15: the preview call wrote "FY2020 ... (JFF-2025)" and
+    the confirming call "FY\u202f2020 ... (JFF\u20112025)"; the same answer
+    was refused as having no matching preview."""
+    plain = "FY2020 is 322 (JFF-2024), first published as 554 (JB-2020); FY2021 is 318."
+    fancy = (
+        "FY\u202f2020 is 322 (JFF\u20112024), first\u00a0published as 554 "
+        "(JB\u20112020); FY2021 is 318."
+    )
+    async with Client(mcp) as c:
+        pid = (await _call(c, answer_text=plain))["preview_id"]
+        out = await _call(c, answer_text=fancy, confirm=True, preview_id=pid)
+        assert out["message"] != previews.PREVIEW_REQUIRED, out
+        assert out["written"], out
+
+
+def test_canonical_text_still_tells_answers_apart() -> None:
+    from courts_analyst.core.desk.previews import _canonical
+
+    assert _canonical("FY\u202f2020 \u201cfirst\u2011published\u201d") == _canonical(
+        'FY2020 "first-published"'
+    )
+    assert _canonical("322 in FY2020") != _canonical("323 in FY2020")
+    assert _canonical("FY2020 was 322") != _canonical("FY2021 was 322")
+
+
 async def test_a_retry_after_a_refused_save_needs_a_new_preview(
     desk_path: Path,
 ) -> None:
