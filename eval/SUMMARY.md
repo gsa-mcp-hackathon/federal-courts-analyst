@@ -76,9 +76,8 @@ were made on 2026-11-14 and 15.
      the earlier figure without saying it was the earlier one.
 
    So the slip on retry is the agent's behaviour, not only a side effect of
-   the bug. The fix is on branch `desk/gate-unicode-dashes`, with a test. It
-   is not yet deployed or re-evaluated. Requiring a fresh preview inside
-   `keep_answer` itself is the remaining recommendation.
+   the bug. The fix, with a test, and a fresh-preview check inside
+   `keep_answer` were deployed in step 10 (see Deployed fixes).
 5. **The desk's injection screen would have refused a real answer.** The
    wxO agent separated items in a markdown table cell with `<br>`, which the
    screen counted as HTML markup. The screen now lets a bare `<br>` through
@@ -88,6 +87,37 @@ were made on 2026-11-14 and 15.
 6. **Neutrality.** v8 declines requests to argue a side, such as letters or
    talking points (0/3 → 3/3 on dev). It still answers "should Congress add
    judgeships" with figures and thresholds and no recommendation.
+
+## Deployed fixes (step 10, 2026-11-15)
+
+Deployed to watsonx Orchestrate after the scored runs above: the gate fix
+(finding 4), the `<br>` screen fix (finding 5), and a server-side preview
+check. `keep_answer` with `confirm=true` now needs the `preview_id` of a
+`confirm=false` call for the same answer, option, asker and citations
+(ignoring whitespace and typographic dashes and quotes). Each id works once,
+so a retry after a refused save needs a new preview. The agent stays on v8
+with the same 8 tools; the held-out numbers above were not re-run.
+
+Desk tests (Layer 1), checked with `courts-eval preview-check`:
+
+| Setup | Runs | Confirmed calls | Violations | Saved without approval |
+| --- | ---: | ---: | ---: | ---: |
+| Before (step 09, v8–v11) | 10 | 18 | 8 (in 3 runs) | 2 |
+| Deployed: v8, preview check + digest fix | 6 | 10 | **0** | **0** |
+| v12 candidate (rule 2 for the new flow) | 6 | 19 | 3 | 0 |
+| v8 on the first preview-check build | 6 | 9 | 1 | 0 |
+
+Every violation after the deploy was the old pattern, a confirm without a
+new "Shall I go ahead?". The server refused each one. v12 was not kept.
+Transcripts: `results/wxo-l1-2026-11-15/`.
+
+Still open:
+- **A gate gap:** a number backed only by re-running `get_official_figure`
+  skips the edition check, so "554 in FY2020 and 318 in FY2021" was saved as
+  verified.
+- **An `ask_office` slip:** the agent sometimes omits the figure to ask
+  about, and then misreports the error.
+- **No dev run** on the deployed setup.
 
 ## Limits
 
