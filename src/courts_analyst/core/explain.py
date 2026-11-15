@@ -32,9 +32,12 @@ others that none can be recovered), so the breakdowns still add up exactly.
 
 from __future__ import annotations
 
+import csv
+import functools
 from collections import defaultdict
 from collections.abc import Iterable
 from datetime import date
+from importlib.resources import files
 from typing import Any, Literal
 
 from pydantic import BaseModel, Field
@@ -60,6 +63,28 @@ Basis = Literal["official", "idb_derived", "inferred", "context"]
 
 PANDEMIC_START = date(2020, 3, 13)
 PANDEMIC_FYS = frozenset({2020, 2021})
+
+MDL_NAMES: dict[str, str] = {
+    "2885": "3M Combat Arms earplugs",
+    "2738": "Johnson & Johnson talcum powder",
+}
+
+_MDL_CELLS_NOTE = (
+    " (precomputed from the FJC civil IDB, June 30, 2026 release;"
+    " cells under 25 cases omitted)"
+)
+
+
+@functools.cache
+def _load_mdl_cells() -> list[dict[str, str]]:
+    """Load mdl_cells.csv from the package data directory (cached)."""
+    pkg_data = files("courts_analyst.core") / "data" / "mdl_cells.csv"
+    rows: list[dict[str, str]] = []
+    with pkg_data.open("r", encoding="utf-8") as fh:
+        reader = csv.DictReader(fh)
+        for row in reader:
+            rows.append(row)
+    return rows
 
 
 class Contribution(BaseModel):
@@ -372,10 +397,41 @@ def _revision_drivers(
     return drivers, warnings
 
 
+def _mdl_name_suffix(docket: str) -> str:
+    name = MDL_NAMES.get(docket)
+    return f" ({name})" if name else ""
+
+
+def _mdl_cells_from_csv(
+    rule: str, districts: list[str], a: int, b: int
+) -> tuple[Cells, Cells]:
+    """Build before/after Cells from mdl_cells.csv (no-IDB fallback)."""
+    district_set = set(districts)
+    before: Cells = defaultdict(float)
+    after: Cells = defaultdict(float)
+    for row in _load_mdl_cells():
+        if row["rule"] != rule:
+            continue
+        court = row["court"]
+        if court not in district_set:
+            continue
+        fy = int(row["fiscal_year"])
+        if fy == a:
+            before[(court, row["mdl_docket"])] += int(row["cases"])
+        elif fy == b:
+            after[(court, row["mdl_docket"])] += int(row["cases"])
+    return before, after
+
+
 def _mdl_driver(
     db: Database, rule: str, districts: list[str], a: int, b: int, total: float
 ) -> Driver | None:
-    before, after = _idb_cells(db, rule, districts, a, b, mdl=True)
+    if db.has_idb:
+        before, after = _idb_cells(db, rule, districts, a, b, mdl=True)
+        fallback = False
+    else:
+        before, after = _mdl_cells_from_csv(rule, districts, a, b)
+        fallback = True
     delta = sum(after.values()) - sum(before.values())
     if not before and not after:
         return None
@@ -389,27 +445,31 @@ def _mdl_driver(
         small_cells=True,
     )
     top = [
-        f"{_name(k[0])} MDL {k[1]} {c.change:+,.0f}"
+        f"{_name(_split(c.key)[0])} MDL {_split(c.key)[1]}"
+        f"{_mdl_name_suffix(_split(c.key)[1])} {c.change:+,.0f}"
         for c in cells
         if c.key != "__other__"
-        for k in [_split(c.key)]
     ]
     what = {
         "filed": "directly filed MDL cases",
         "terminated": "terminations of MDL cases (direct-filed or transferred)",
         "pending": "pending MDL cases (direct-filed or transferred)",
     }[rule]
+    evidence = (
+        f"{what[0].upper() + what[1:]} changed by {delta:+,.0f}"
+        + ("" if share is None or abs(share) > 3 else f" ({share:.0%} of the change)")
+        + "; largest: "
+        + "; ".join(top)
+        + "."
+        + (_MDL_CELLS_NOTE if fallback else "")
+    )
     return Driver(
         code="mdl_direct_filed" if rule == "filed" else "mdl_cases",
         title="Multidistrict litigation"
         if rule != "filed"
         else "Directly filed MDL cases",
         basis="idb_derived",
-        evidence=f"{what[0].upper() + what[1:]} changed by {delta:+,.0f}"
-        + ("" if share is None or abs(share) > 3 else f" ({share:.0%} of the change)")
-        + "; largest: "
-        + "; ".join(top)
-        + ".",
+        evidence=evidence,
         magnitude=delta,
         share_of_change=share,
     )
@@ -557,13 +617,73 @@ def _explain_count(
             "FJC IDB civil records."
         )
     else:
-        warnings.append(
-            Caveat(
-                code="out_of_scope",
-                message="The IDB isn't loaded, so the change can't be broken down.",
+        districts = expand_courts([court])
+        if len(districts) > 1:
+            w: dict[str, dict[str, float]] = {"a": {}, "b": {}}
+            for fy, ed, slot in (
+                (a, first.edition, "a"),
+                (b, second.edition, "b"),
+            ):
+                for code, val in db.rows(
+                    "SELECT v.court, v.value FROM cat.observation v "
+                    "WHERE v.measure_id = ? AND v.fiscal_year = ? "
+                    "AND v.edition = ? AND list_contains(?, v.court)",
+                    [m.id, fy, ed, districts],
+                ):
+                    w[slot][code] = float(val)
+            if w["a"] and w["b"]:
+                district_sum_change = sum(w["b"].values()) - sum(w["a"].values())
+                remainder = official_change - district_sum_change
+                if abs(remainder) > 1e-9:
+                    w["b"]["__rounding__"] = w["b"].get("__rounding__", 0.0) + remainder
+                labels: dict[str, str] = {d: _name(d) for d in districts} | {
+                    "__rounding__": "Unallocated (rounding in published values)"
+                }
+                by_district = contributions(w["a"], w["b"], labels)
+                data["by_district"] = by_district
+                tops = [c for c in by_district if c.key_contributor][:3]
+                if tops:
+                    lead = (
+                        "Largest contributors (official district rows): "
+                        + "; ".join(f"{c.label} {c.change:+,.0f}" for c in tops)
+                        + "."
+                    )
+                series = (
+                    f"Table C-1 ({first.edition}, {second.edition}), district rows; "
+                    "no case-type breakdown."
+                )
+                warnings.append(
+                    Caveat(
+                        code="out_of_scope",
+                        message=(
+                            "The IDB isn't loaded: the district split comes from the "
+                            "official tables; a case-type or MDL breakdown needs "
+                            "the IDB."
+                        ),
+                    )
+                )
+            else:
+                series = f"Table C-1 ({first.edition}, {second.edition}); no breakdown."
+                warnings.append(
+                    Caveat(
+                        code="out_of_scope",
+                        message=(
+                            "The IDB isn't loaded, so the change can't be broken down."
+                        ),
+                    )
+                )
+        else:
+            series = f"Table C-1 ({first.edition}, {second.edition}); no breakdown."
+            warnings.append(
+                Caveat(
+                    code="out_of_scope",
+                    message="The IDB isn't loaded, so the change can't be broken down.",
+                )
             )
-        )
-        series = f"Table C-1 ({first.edition}, {second.edition}); no breakdown."
+        assert m.idb is not None
+        mdl = _mdl_driver(db, m.idb, districts, a, b, official_change)
+        if mdl:
+            drivers.append(mdl)
     if (p := _pandemic(a, b)) is not None:
         drivers.append(p)
     rev, rev_warn = _revision_drivers(db, m, court, a, b)
@@ -676,7 +796,7 @@ def _explain_per_judgeship(
                 share_of_change=judge_eff / change if change else None,
             )
         )
-    if (m.id.startswith("civil") or m.id.startswith("weighted_civil")) and db.has_idb:
+    if m.id.startswith("civil") or m.id.startswith("weighted_civil"):
         districts = expand_courts([court])
         # Shares only make sense against case counts, not weighted filings.
         mdl = _mdl_driver(db, "filed", districts, a, b, 0 if m.weighted else f2 - f1)

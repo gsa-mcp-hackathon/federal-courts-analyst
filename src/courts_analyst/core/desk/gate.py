@@ -71,6 +71,18 @@ NOT_STATISTICS = re.compile(
 HISTORY_WORDS = re.compile(rf"{REVISION_WORDS.pattern}|\bupdat", re.I)
 """Wording that marks an earlier edition's value as history."""
 
+_PLAIN = str.maketrans(
+    {
+        **dict.fromkeys(
+            "\u2010\u2011\u2012\u2013\u2014\u2015\u2212\ufe58\ufe63\uff0d", "-"
+        ),
+        **dict.fromkeys("\u00a0\u2007\u202f", " "),
+    }
+)
+"""Typographic dashes to "-" and no-break spaces to " ", one character each, so
+"first\u2011published" and "JB\u20112020" read like their ASCII forms and text
+positions don't move."""
+
 
 def _same(a: float, b: float) -> bool:
     return abs(a - b) < TOLERANCE
@@ -292,6 +304,7 @@ def verify(
     when the caller re-ran the turn's tools on the server (never values a
     client supplied)."""
     problems: list[GateProblem] = []
+    text = text.translate(_PLAIN)
     if not text.strip():
         return GateReport(
             passed=False,

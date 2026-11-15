@@ -43,6 +43,17 @@ deploy/ibm/local-mcp-toolkit/
 > `requirements.txt` — and points `package_root` at it. This avoids a 413
 > (uploading the whole repo), a `ModuleNotFoundError` (src-layout not importable
 > at runtime), and a missing-deps error (the ADK reads `requirements.txt`).
+>
+> **Data it ships:** `data/courts.duckdb` (the official tables, required; build
+> with `make data-tables`). The FJC civil IDB (`data/idb.duckdb`, ~440 MB, no
+> party names, with its hashed party-name index `pii_index.bin`) is left out by
+> default: watsonx Orchestrate SaaS refused a 454 MB upload with a 413, so the
+> case-level tools (`find_cases`, `analyze_cohort`, `sample_dockets`,
+> `reconcile`) say case data isn't loaded. `INCLUDE_IDB=1` ships it for an
+> instance that accepts large uploads; `data/private/` (party names) is never
+> shipped. The script stops before removing the old toolkit if the package is
+> over `MAX_STAGE_MB` (100), because re-importing removes the toolkit first and
+> takes its tools off every agent.
 
 ---
 

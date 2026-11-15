@@ -73,10 +73,32 @@ def test_district_count_and_errors(core_db: Database) -> None:
         explain_change(core_db, "civil_cases_filed", "US", 2010, 2020)
 
 
-def test_without_idb_totals_still_come_back(tables_only_db: Database) -> None:
+def test_without_idb_national_gets_official_district_breakdown(
+    tables_only_db: Database,
+) -> None:
+    """US (multi-district) gets a by_district breakdown from the official tables."""
     r = explain_change(tables_only_db, "civil_cases_filed", "US", 2019, 2020)
-    assert r.data is not None and r.data.official_change == 172704
-    assert r.data.by_district == [] and r.data.idb_change is None
+    x = r.data
+    assert x is not None and x.official_change == 172704
+    assert x.idb_change is None
+    # Official district rows sum to official_change (possibly via rounding row).
+    assert sum(c.change for c in x.by_district) == pytest.approx(x.official_change)
+    # The top row(s) are marked key_contributor in order.
+    key_contribs = [c for c in x.by_district if c.key_contributor]
+    assert len(key_contribs) >= 1
+    assert key_contribs == sorted(key_contribs, key=lambda c: -abs(c.change))
+    # Decomposition series and caveat reflect official-only mode.
+    assert "district rows" in x.decomposition_series
+    assert "no case-type breakdown" in x.decomposition_series
+    assert any(w.code == "out_of_scope" and "IDB" in w.message for w in r.warnings)
+
+
+def test_without_idb_single_district_no_breakdown(tables_only_db: Database) -> None:
+    """A single-district court gets no by_district breakdown without the IDB."""
+    r = explain_change(tables_only_db, "civil_cases_filed", "FL-N", 2019, 2020)
+    x = r.data
+    assert x is not None
+    assert x.by_district == []
     assert any(w.code == "out_of_scope" for w in r.warnings)
 
 
