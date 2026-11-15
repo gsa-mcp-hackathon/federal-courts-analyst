@@ -9,7 +9,7 @@
 # 3. runs Layer 2: courts-eval over the dev split or the test2 held-out split,
 #    tools on the agent only, REPEATS runs per item, with that provenance,
 # 4. checks the request-desk preview rule over the run records,
-# 5. with DESK=1, runs both Layer 1 desk tests (orchestrate evaluations) and
+# 5. with DESK=1, runs the three Layer 1 desk tests (orchestrate evaluations) and
 #    checks the preview rule over their transcripts.
 #
 # The held-out split is meant to be scored once per configuration: a second
@@ -91,7 +91,7 @@ $COURTS_EVAL preview-check "$records" || status=1
 # --- 5. Layer 1 desk tests ---------------------------------------------------
 if [[ "${DESK:-}" == 1 ]]; then
   : "${AGENT_NAME:?set AGENT_NAME, the internal agent name, for DESK=1}"
-  for t in l1desk l1desk2; do
+  for t in l1desk l1desk2 l1desk3; do
     touch "$stamp"
     orchestrate evaluations evaluate -p "eval/wxo/tests/$t" -o eval/wxo/out
     out=$(find eval/wxo/out -mindepth 1 -maxdepth 1 -type d -newer "$stamp" | sort | tail -1)

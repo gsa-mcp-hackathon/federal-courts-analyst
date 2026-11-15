@@ -2,7 +2,7 @@
 
 ## Agent instruction versions
 
-`instructions/v0.txt`–`v11.txt` are the **courts-analyst-syed** agent instruction versions used in the tuning rounds:
+`instructions/v0.txt`–`v12.txt` are the **courts-analyst-syed** agent instruction versions used in the tuning rounds:
 
 | File | Description |
 |------|-------------|
@@ -18,6 +18,8 @@
 | `v9.txt` | v8 + a clarify rule placed last in the list (rejected: one preview violation, clarify items barely moved) |
 | `v10.txt` | v8 + clarify check first in the list, and a new preview on a retry after a refused save (not kept: `adv-defendant-names-sample` 2/3 → 0/3) |
 | `v11.txt` | v10 + "which court was busiest" names no measure, refusals must give the reason (rejected: mean 84.3%, three preview violations) |
+| `v12.txt` | v8 with rule 2 rewritten for the `preview_id` check (step 10): in the preview turn call keep_answer with confirm=false, then confirm with that preview_id after the yes; a refused save or changed text needs a new preview call and a new yes |
+| `found-live-2026-11-15.txt` | Not a tuning round: what was live on the agent on 2026-11-15 before the step 10 deploy (v8 + rules 5–7: preview for every desk write tool, no "judicial emergency" label for 600, no 【…】 tool fields), with 13 tools attached. Author unknown; replaced by v8 + the evaluated 8 tools (step 10) |
 
 ## Reproduce a run
 
@@ -26,7 +28,8 @@ set -a; source deploy/ibm/local-mcp-toolkit/.env; set +a      # WXO_INSTANCE_URL
 read -rs -p 'key: ' WXO_API_KEY; export WXO_API_KEY            # never echo it
 export WXO_AGENT_ID=<agent id>  AGENT_NAME=<internal agent name>
 eval/wxo/run_eval.sh dev                                      # dev split, v8, 3 repeats
-DESK=1 eval/wxo/run_eval.sh heldout                           # test2 once, plus both desk tests
+DESK=1 eval/wxo/run_eval.sh heldout                           # test2 once, plus the desk tests
+DESK=1 eval/wxo/run_eval.sh dev                               # dev, plus the three desk tests
 ```
 
 `run_eval.sh` checks the live agent against the instruction file with
