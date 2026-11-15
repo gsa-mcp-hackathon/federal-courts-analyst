@@ -240,7 +240,7 @@
         dict({
           'basis': 'idb_derived',
           'code': 'mdl_direct_filed',
-          'evidence': 'Directly filed MDL cases changed by +146 (120% of the change); largest: N.D. Fla. MDL 2885 +150.',
+          'evidence': 'Directly filed MDL cases changed by +146 (120% of the change); largest: N.D. Fla. MDL 2885 (3M Combat Arms earplugs) +150.',
           'magnitude': 146.0,
           'share_of_change': 1.1967213114754098,
           'title': 'Directly filed MDL cases',
