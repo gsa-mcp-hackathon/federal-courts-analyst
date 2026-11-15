@@ -176,7 +176,8 @@ The proposal page for the team:
   `confirm=true` again without a new "Shall I go ahead?" (3 of 10 desk
   transcripts); instruction changes didn't stop it. Now a `confirm=false`
   call returns a `preview_id` bound to a SHA-256 digest of the answer text
-  (whitespace collapsed), option, asker (account and role), citations
+  (ignoring whitespace and typographic dashes and quotes, which models
+  swap when they re-emit an answer), option, asker (account and role), citations
   (sorted) and inquiry target, kept in the desk store's `preview` table so
   it survives a stdio server restarted between calls. A `confirm=true`
   call without a matching id returns `written: false` with a message

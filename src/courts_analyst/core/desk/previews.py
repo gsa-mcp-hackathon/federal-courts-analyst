@@ -19,6 +19,7 @@ import secrets
 from collections.abc import Sequence
 
 from courts_analyst.core.desk import text as desk_text
+from courts_analyst.core.desk.gate import _PLAIN
 from courts_analyst.core.desk.models import Actor, CitationIn, InquiryTarget, Option
 from courts_analyst.core.desk.store import DeskStore
 
@@ -32,6 +33,21 @@ PREVIEW_REQUIRED = (
 )
 
 
+_QUOTES = str.maketrans(
+    dict.fromkeys("\u2018\u2019\u201a\u201b", "'")
+    | dict.fromkeys("\u201c\u201d\u201e\u201f", '"')
+)
+
+
+def _canonical(text: str) -> str:
+    """The answer as compared: NFKC, typographic dashes and quotes made plain,
+    and no whitespace at all. A model re-emitting the same answer may write
+    "FY\u202f2020" for "FY2020" or "JFF\u20112025" for "JFF-2025" (seen in
+    the wxO desk runs); every word and number still has to match."""
+    plain = desk_text.clean(text).translate(_PLAIN).translate(_QUOTES)
+    return "".join(plain.split())
+
+
 def digest(
     actor: Actor,
     option: Option,
@@ -39,12 +55,13 @@ def digest(
     citations: Sequence[CitationIn],
     inquiry: InquiryTarget | None,
 ) -> str:
-    """What the user is asked to confirm. Whitespace and citation order don't
-    matter; any other change to the text or a figure does."""
+    """What the user is asked to confirm. Whitespace, typographic dashes and
+    quotes, and citation order don't matter; any other change to the text or
+    a figure does."""
     payload = {
         "asker": [actor.account_id, actor.role],
         "option": option,
-        "answer": " ".join(desk_text.clean(answer_text).split()),
+        "answer": _canonical(answer_text),
         "citations": sorted(
             [c.measure, c.court, c.fiscal_year, c.edition, float(c.value)]
             for c in citations
