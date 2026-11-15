@@ -8,6 +8,8 @@ and a runner that works with any system that can answer a question.
 | --- | --- |
 | [`questions/`](questions/) | The bank: one YAML file per suite |
 | `results/` | Run outputs (gitignored; phase baselines are committed on purpose) |
+| [`wxo/`](wxo/) | The watsonx Orchestrate agent: instruction versions, Layer 1 desk tests, `run_eval.sh` |
+| [`SUMMARY.md`](SUMMARY.md) | One-page evaluation summary for the submission |
 | [`databricks/`](databricks/) | The GSA template's Databricks MLflow kit (Phase 10) |
 | [`src/courts_analyst/evaluation/`](../src/courts_analyst/evaluation/) | Schema, scorers, answerers, runner, CLI |
 
@@ -26,6 +28,26 @@ uv run courts-eval rescore eval/results/<run_id>.jsonl   # re-score saved answer
 
 A run writes `<run_id>.jsonl` (each answer record and its score),
 `<run_id>.summary.json` and `<run_id>.md` to `eval/results/`.
+
+## Reproduce the watsonx Orchestrate evaluation
+
+The submitted agent is `courts-analyst` on watsonx Orchestrate with this
+server registered as a local MCP toolkit (8 tools). One script reproduces
+each published number (see [`wxo/README.md`](wxo/README.md) for setup):
+
+```bash
+eval/wxo/run_eval.sh dev                  # dev split: 117 items x 3 repeats
+DESK=1 eval/wxo/run_eval.sh heldout       # test2 held-out split, once, plus both desk tests
+```
+
+It checks the live agent's instructions and tools against
+`eval/wxo/instructions/v8.txt`, writes provenance into the run summary,
+scores the run, and fails on any request-desk preview violation. The runs
+behind [`SUMMARY.md`](SUMMARY.md) are committed under `results/` (listed in
+[`results/README.md`](results/README.md)); `uv run courts-eval show
+results/<run_id>.summary.json` and `uv run courts-eval preview-check
+results/<run_id>.jsonl results/wxo-l1-2026-11-14/<dir>` re-derive them
+without the agent.
 
 ## The bank
 
@@ -165,3 +187,8 @@ runs both.
 - **Changing an item.** Fixing a wrong expected answer is allowed at any time
   (and recorded in the commit message). Rewording a `test` question to make a
   system pass isn't. Renaming an id moves it between splits, so don't rename.
+- **test2.** The `test` split was scored twice during the IBM track (steps 06
+  and 08), so a fresh held-out set, `split: test2` (45 items, written before
+  any agent run and generated reproducibly by `eval/wxo/gen_test2.py`), was
+  added for the final run. `courts-eval` never selects it unless asked
+  (`--split test2`); it was run once, with the final instructions (v8).

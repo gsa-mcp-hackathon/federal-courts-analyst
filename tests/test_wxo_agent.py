@@ -557,3 +557,80 @@ class TestAnswerersRegistry:
 
         assert "wxo" not in PAID
         assert "wxo" in ANSWERERS
+
+
+# ---------------------------------------------------------------------------
+# Infra error detection
+# ---------------------------------------------------------------------------
+
+
+class TestInfraErrorExtraction:
+    """_extract_tool_calls sets error='infra: wxO tool runtime error' on matching responses."""
+
+    def _step_history(self, content: str) -> list[dict]:  # type: ignore[type-arg]
+        """Build a minimal step_history with one tool call and one response."""
+        return [
+            {
+                "role": "assistant",
+                "step_details": [
+                    {
+                        "type": "tool_calls",
+                        "tool_calls": [
+                            {
+                                "id": "tc-001",
+                                "name": "get_official_figure",
+                                "args": {"fiscal_year": 2020},
+                            },
+                        ],
+                    }
+                ],
+            },
+            {
+                "role": "assistant",
+                "step_details": [
+                    {
+                        "type": "tool_response",
+                        "name": "get_official_figure",
+                        "tool_call_id": "tc-001",
+                        "content": content,
+                    }
+                ],
+            },
+        ]
+
+    def test_failed_to_execute_function_sets_infra_error(self) -> None:
+        from courts_analyst.evaluation.wxo_agent import _extract_tool_calls
+
+        step_history = self._step_history("Failed to execute function: timeout")
+        calls = _extract_tool_calls(step_history)
+        assert len(calls) == 1
+        assert calls[0].error == "infra: wxO tool runtime error"
+
+    def test_connection_refused_sets_infra_error(self) -> None:
+        from courts_analyst.evaluation.wxo_agent import _extract_tool_calls
+
+        step_history = self._step_history("Error: Connection refused by host")
+        calls = _extract_tool_calls(step_history)
+        assert len(calls) == 1
+        assert calls[0].error == "infra: wxO tool runtime error"
+
+    def test_case_insensitive_matching(self) -> None:
+        from courts_analyst.evaluation.wxo_agent import _extract_tool_calls
+
+        step_history = self._step_history("FAILED TO EXECUTE FUNCTION foo")
+        calls = _extract_tool_calls(step_history)
+        assert calls[0].error == "infra: wxO tool runtime error"
+
+    def test_normal_response_has_no_error(self) -> None:
+        from courts_analyst.evaluation.wxo_agent import _extract_tool_calls
+
+        step_history = self._step_history('{"status": "ok", "data": {"value": 322}}')
+        calls = _extract_tool_calls(step_history)
+        assert calls[0].error is None
+
+    def test_empty_response_has_no_error(self) -> None:
+        from courts_analyst.evaluation.wxo_agent import _extract_tool_calls
+
+        step_history = self._step_history("")
+        calls = _extract_tool_calls(step_history)
+        assert calls[0].error is None

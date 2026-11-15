@@ -76,12 +76,19 @@ def select(
     tags: list[str] | None = None,
     ids: list[str] | None = None,
 ) -> list[QuestionItem]:
-    """Filter items. ``tags`` keeps items carrying any of them."""
+    """Filter items.  ``tags`` keeps items carrying any of them.
+
+    When *split* is ``None`` (the default), ``test2`` items are **excluded**:
+    default runs, ``--tag`` runs, and ``--id`` runs never see them.  Pass
+    ``split='test2'`` explicitly to retrieve only the fresh held-out set.
+    """
     out = items
     if suite:
         out = [i for i in out if i.suite == suite]
     if split:
         out = [i for i in out if i.resolved_split == split]
+    else:
+        out = [i for i in out if i.resolved_split != "test2"]
     if tags:
         out = [i for i in out if set(tags) & set(i.tags)]
     if ids:

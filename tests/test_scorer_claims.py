@@ -51,3 +51,14 @@ def test_mentions_nbsp_in_claim_passes() -> None:
         _mentions("Northern\u00a0District\u00a0of\u00a0Florida"),
         _rec("Filed in Northern District of Florida."),
     )
+
+
+def test_direct_filing_claim_accepts_hyphenated_directly() -> None:
+    """wxO runs 20261113T200423Z and 20261113T201533Z wrote "Directly-filed MDL
+    cases" (also with U+2011); the bank's claim must accept that spelling."""
+    from courts_analyst.evaluation.bank import load_bank
+
+    item = next(i for i in load_bank() if i.id == "why-fy2020-civil-filings-jump")
+    claim = next(c for c in item.claims if c.id == "notes_direct_filing")
+    for text in ("**Directly-filed** MDL cases", "Directly‑filed MDL cases"):
+        assert check_claim(claim, _rec(text))

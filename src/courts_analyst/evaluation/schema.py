@@ -17,7 +17,7 @@ from typing import Any, Literal
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 Suite = Literal["engine", "e2e", "explanation", "tool_selection", "adversarial"]
-Split = Literal["dev", "test"]
+Split = Literal["dev", "test", "test2"]
 Behavior = Literal["answer", "clarify", "decline"]
 
 SUITES: tuple[Suite, ...] = (
@@ -199,14 +199,22 @@ class QuestionItem(_Strict):
     notes: str | None = None
     split: Split | None = Field(
         default=None,
-        description="Leave unset: derived from the id. If set it must match.",
+        description=(
+            "Leave unset (dev/test assigned by hash). "
+            "'test2' may be set explicitly for any id to mark it as the fresh "
+            "held-out split; any other explicit value must still match assign_split."
+        ),
     )
 
     @model_validator(mode="after")
     def _consistent(self) -> QuestionItem:
         if not _ID.match(self.id):
             raise ValueError(f"id must be lowercase-kebab: {self.id!r}")
-        if self.split is not None and self.split != assign_split(self.id):
+        if (
+            self.split is not None
+            and self.split != "test2"
+            and self.split != assign_split(self.id)
+        ):
             raise ValueError(
                 f"{self.id}: split {self.split!r} doesn't match the hash assignment"
             )

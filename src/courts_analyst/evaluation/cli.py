@@ -38,7 +38,7 @@ def _parser() -> argparse.ArgumentParser:
     r = sub.add_parser("run", help="Answer and score a slice of the bank")
     r.add_argument("--answerer", required=True, help=f"one of {sorted(ANSWERERS)}")
     r.add_argument("--suite", choices=SUITES)
-    r.add_argument("--split", choices=["dev", "test"])
+    r.add_argument("--split", choices=["dev", "test", "test2"])
     r.add_argument("--tag", action="append", dest="tags")
     r.add_argument("--id", action="append", dest="ids")
     r.add_argument("--limit", type=int)
@@ -65,6 +65,12 @@ def _parser() -> argparse.ArgumentParser:
         help="paid answerers: allow runs beyond the smoke set",
     )
     r.add_argument(
+        "--provenance",
+        type=Path,
+        metavar="PATH",
+        help="JSON object file; written into the summary under meta['provenance']",
+    )
+    r.add_argument(
         "--agent-tools",
         metavar="VALUE",
         help=(
@@ -83,11 +89,51 @@ def _parser() -> argparse.ArgumentParser:
     rs.add_argument("--run-id")
     s = sub.add_parser("show", help="Print a past run's summary as Markdown")
     s.add_argument("summary", type=Path, help="<run_id>.summary.json")
+    pc = sub.add_parser(
+        "preview-check",
+        help=(
+            "Check the preview rule: every confirmed keep_answer must be preceded "
+            "by 'Shall I go ahead?' and a user yes. "
+            "PATH may be a .jsonl run-records file or a Layer-1 output directory."
+        ),
+    )
+    pc.add_argument(
+        "paths",
+        nargs="+",
+        type=Path,
+        metavar="PATH",
+        help=".jsonl run-records file or Layer-1 output directory",
+    )
     return p
 
 
 def main(argv: list[str] | None = None) -> int:
     args = _parser().parse_args(argv)
+    if args.cmd == "preview-check":
+        from courts_analyst.evaluation.preview_check import check_path
+
+        total_confirms = 0
+        total_violations = 0
+        any_error = False
+        for path in args.paths:
+            pc_result = check_path(path)
+            total_confirms += pc_result.confirm_calls
+            total_violations += len(pc_result.violations)
+            n_v = len(pc_result.violations)
+            status = "OK" if not pc_result.violations else f"{n_v} violation(s)"
+            print(
+                f"{path}: {pc_result.confirm_calls} confirmed keep_answer"
+                f" call(s), {status}"
+            )
+            for v in pc_result.violations:
+                print(f"  VIOLATION: {v}")
+            if pc_result.violations:
+                any_error = True
+        print(
+            f"\nTotal: {total_confirms} confirmed keep_answer call(s), "
+            f"{total_violations} violation(s)"
+        )
+        return 1 if any_error else 0
     if args.cmd == "show":
         from courts_analyst.evaluation.scoring.summary import RunSummary
 
@@ -108,17 +154,27 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     if args.cmd == "validate":
         held = sum(i.resolved_split == "test" for i in items)
+        t2 = sum(i.resolved_split == "test2" for i in items)
+        base = len(items) - t2
         print(
             f"{len(items)} questions valid; {held} held out "
-            f"({100 * held / len(items):.0f}%, target {HELD_OUT_PERCENT}%)"
+            f"({100 * held / base:.0f}% of dev+test, target {HELD_OUT_PERCENT}%); "
+            f"{t2} test2"
         )
         return 0
     if args.cmd == "stats":
         by = Counter((i.suite, i.resolved_split) for i in items)
-        print("| Suite | dev | test | total |\n| --- | ---: | ---: | ---: |")
+        print(
+            "| Suite | dev | test | test2 | total |\n"
+            "| --- | ---: | ---: | ---: | ---: |"
+        )
         for suite in SUITES:
-            d, t = by[(suite, "dev")], by[(suite, "test")]
-            print(f"| {suite} | {d} | {t} | {d + t} |")
+            d, t, t2 = (
+                by[(suite, "dev")],
+                by[(suite, "test")],
+                by[(suite, "test2")],
+            )
+            print(f"| {suite} | {d} | {t} | {t2} | {d + t + t2} |")
         tags = Counter(t for i in items for t in i.tags)
         print("\nTags: " + ", ".join(f"{t} ({n})" for t, n in tags.most_common()))
         return 0
@@ -186,6 +242,10 @@ def main(argv: list[str] | None = None) -> int:
 
         answerer.budget = Budget(args.budget_usd)  # type: ignore[attr-defined]
         print(f"budget: ${args.budget_usd:.2f} for {len(chosen)} questions")
+    provenance: dict[str, object] | None = None
+    if getattr(args, "provenance", None) is not None:
+        provenance = json.loads(args.provenance.read_text())
+
     result = run(
         answerer,
         chosen,
@@ -196,6 +256,8 @@ def main(argv: list[str] | None = None) -> int:
         workers=args.workers,
         repeats=args.repeats,
         subset_info=subset_info,
+        provenance=provenance,
+        split=args.split,
     )
     print()
     print(result.paths["markdown"].read_text())

@@ -91,6 +91,7 @@ class ItemScore(BaseModel):
     expected_behavior: Behavior
     actual_behavior: Behavior
     error_category: ErrorCategory | None = None
+    infra_error: bool = False
     notes: list[str] = Field(default_factory=list)
     latency_s: float | None = None
     cost_usd: float | None = None
