@@ -106,6 +106,24 @@ def test_earlier_value_beside_a_change_passes(core_db: Any, text: str) -> None:
     assert {c.value: c.historical for c in r.citations} == {554: True, 322: False}
 
 
+@pytest.mark.parametrize(
+    ("hyphen", "space"), [("\u2011", "\u202f"), ("\u2010", "\u00a0"), ("-", " ")]
+)
+def test_typographic_dashes_and_spaces_read_as_ascii(
+    core_db: Any, hyphen: str, space: str
+) -> None:
+    # The wxO agent's retries after a refusal (2026-11-14 desk tests) wrote
+    # "first\u2011published" with a no-break hyphen and were refused as mixed editions.
+    text = (
+        f"Weighted civil filings per judgeship nationally in FY{space}2020 was "
+        f"322 (JFF{hyphen}2025). The figure had previously been 554 (JB{hyphen}2020), "
+        f"the first{hyphen}published value."
+    )
+    r = verify(core_db, text, [cite(2020, "JFF-2025", 322), cite(2020, "JB-2020", 554)])
+    assert r.passed, r.problems
+    assert {c.value: c.historical for c in r.citations} == {554: True, 322: False}
+
+
 def test_earlier_value_alone_in_a_sentence_is_refused(core_db: Any) -> None:
     r = verify(
         core_db,
