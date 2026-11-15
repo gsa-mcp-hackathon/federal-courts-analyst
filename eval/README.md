@@ -50,12 +50,14 @@ domain expert's review** (issue [#17](https://github.com/syedaun-techsur/federal
 
 ### Smoke set
 
-Model runs cost money, so the default is a fixed **smoke set** of 20
+Model runs cost money, so the default is a fixed **smoke set** of 25
 questions tagged `smoke` (`--tag smoke`, `make eval-claude`): 6 factual, 4
-explanation, 5 tool-selection and 5 adversarial, all from the `dev` split,
+explanation, 5 tool-selection and 10 adversarial, all from the `dev` split,
 together calling every tool and covering the main traps (554 vs 322, the
 FY2017 pending restatement, judge rankings, party names, prompt injection,
-policy framing, small cells). `tests/test_question_schema.py` keeps it small,
+policy framing, small cells). The five additional adversarial items cover
+out-of-scope declines (years before the tables, bankruptcy, calendar periods)
+and over-refusal controls. `tests/test_question_schema.py` keeps it small,
 dev-only and covering every tool. Run the full bank only at the end of a
 phase and for the final evaluation.
 

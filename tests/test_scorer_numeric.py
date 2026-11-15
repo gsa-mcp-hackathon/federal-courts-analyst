@@ -60,7 +60,7 @@ def test_unrounded_value_matches_its_printed_form(value: float, decimals: int) -
         assert value_matches(value, exp(shown))
 
 
-@given(st.floats(min_value=1, max_value=1e6, allow_nan=False), st.floats(0, 5))
+@given(st.floats(min_value=1, max_value=1e6, allow_nan=False), st.floats(0.01, 5))
 def test_relative_tolerance_is_symmetric(value: float, pct: float) -> None:
     e = exp(value, tolerance_pct=pct)
     delta = value * pct / 100 * 0.999

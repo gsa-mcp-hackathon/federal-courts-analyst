@@ -130,9 +130,9 @@ class TestPresetAndCustom:
     def test_within_tools_with_wxo_preset(self) -> None:
         smoke_dev = select(ITEMS, split="dev", tags=["smoke"])
         subset = within_tools(smoke_dev, WXO_AGENT_TOOLS)
-        # Known result from the bank: 15 of 20 smoke-dev items have all tools on wxo
-        assert len(smoke_dev) == 20
-        assert len(subset) == 15
+        # Known result from the bank: 20 of 25 smoke-dev items have all tools on wxo
+        assert len(smoke_dev) == 25
+        assert len(subset) == 20
 
     def test_unknown_tool_names_are_fine(self) -> None:
         """Custom list with tool names not in the bank is not an error."""
@@ -196,7 +196,7 @@ class TestCLISubset:
         rc = main(args)
         assert rc == 0
         out = capsys.readouterr().out
-        assert "subset: 15 of 20 items have all expected tools on the agent" in out
+        assert "subset: 20 of 25 items have all expected tools on the agent" in out
 
     def test_markdown_title_shows_subset(
         self, tmp_path: Path, capsys: pytest.CaptureFixture[str]
@@ -219,7 +219,7 @@ class TestCLISubset:
         out = capsys.readouterr().out
         # Title line uses the new format: X/N on the wxo subset (N of M items in the slice)
         assert "on the wxo subset" in out
-        assert "15 of 20 items in the slice" in out
+        assert "20 of 25 items in the slice" in out
 
     def test_summary_json_has_subset_meta(self, tmp_path: Path) -> None:
         args = [
@@ -241,8 +241,8 @@ class TestCLISubset:
         data = json.loads(summary_file.read_text())
         assert "subset" in data
         subset = data["subset"]
-        assert subset["n_slice"] == 20
-        assert subset["n_subset"] == 15
+        assert subset["n_slice"] == 25
+        assert subset["n_subset"] == 20
         assert subset["preset"] == "wxo"
         assert "get_official_figure" in subset["tools"]
 
@@ -269,8 +269,8 @@ class TestCLISubset:
     def test_subset_title_with_repeats_uses_item_count(
         self, tmp_path: Path, capsys: pytest.CaptureFixture[str]
     ) -> None:
-        """With --repeats 3, the title denominator is the item count (15), not
-        the total attempt count (45), and the numerator is mean correct/run."""
+        """With --repeats 3, the title denominator is the item count (20), not
+        the total attempt count (60), and the numerator is mean correct/run."""
         args = [
             "run",
             "--answerer",
@@ -289,7 +289,7 @@ class TestCLISubset:
         ]
         main(args)
         out = capsys.readouterr().out
-        # Gold is always correct: mean = 15.0 / 1 attempt = 15.0 items correct per run
-        # Denominator must be 15 (items), not 45 (attempts)
-        assert "/15 on the wxo subset" in out
-        assert "15 of 20 items in the slice" in out
+        # Gold is always correct: mean = 20.0 / 1 attempt = 20.0 items correct per run
+        # Denominator must be 20 (items), not 60 (attempts)
+        assert "/20 on the wxo subset" in out
+        assert "20 of 25 items in the slice" in out
