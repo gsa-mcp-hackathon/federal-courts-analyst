@@ -236,7 +236,12 @@ _OFFICIAL_HOSTS = (
 _URL = re.compile(r"\b(?:https?://|www\.)([^\s/?#)\]>\"']+)", re.I)
 _STRUCTURE = [
     (re.compile(r"!\[[^\]]*\]\s*\("), "an embedded image"),
-    (re.compile(r"<!--|<\s*/?\s*[a-z][a-z0-9-]*(?:\s[^<>]*)?>", re.I), "HTML markup"),
+    # A bare line break (<br>, <br/>, <br />) is table formatting, not markup:
+    # the wxO agent puts it in markdown table cells.
+    (
+        re.compile(r"<!--|<\s*/?\s*(?!br\s*/?\s*>)[a-z][a-z0-9-]*(?:\s[^<>]*)?>", re.I),
+        "HTML markup",
+    ),
     (
         re.compile(
             r"(?=[A-Za-z0-9+/_-]{24,})(?=\S*\d)(?=\S*[a-z])(?=\S*[A-Z])"
