@@ -43,6 +43,14 @@ deploy/ibm/local-mcp-toolkit/
 > `requirements.txt` — and points `package_root` at it. This avoids a 413
 > (uploading the whole repo), a `ModuleNotFoundError` (src-layout not importable
 > at runtime), and a missing-deps error (the ADK reads `requirements.txt`).
+>
+> **Data it ships:** `data/courts.duckdb` (the official tables, required; build
+> with `make data-tables`) and, when built with `make data-idb`,
+> `data/idb.duckdb` (the FJC civil IDB, no party names) with its hashed
+> party-name index `pii_index.bin`, so the case-level tools (`find_cases`,
+> `analyze_cohort`, `sample_dockets`, `reconcile`) work. `data/private/` (party
+> names) is never shipped. If the upload is refused as too large, run with
+> `INCLUDE_IDB=0`: the case-level tools then say case data isn't loaded.
 
 ---
 

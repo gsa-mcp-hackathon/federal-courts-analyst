@@ -80,8 +80,7 @@ cp -R "${REPO_ROOT}/src/${PACKAGE_NAME}" "${STAGE_DIR}/${PACKAGE_NAME}"
 cp "${SCRIPT_DIR}/server.py" "${STAGE_DIR}/server.py"
 cp "${SCRIPT_DIR}/requirements.txt" "${STAGE_DIR}/requirements.txt"
 # Ship the official tables catalog (~7 MB): without it every tool answers
-# "data not built". The IDB is left out (too large to upload); tools that need
-# case-level data say so.
+# "data not built".
 CATALOG="${DUCKDB_PATH:-${REPO_ROOT}/data/build/courts.duckdb}"
 if [[ ! -f "${CATALOG}" ]]; then
   echo "FATAL: no catalog at ${CATALOG}. Build it first:" >&2
@@ -90,6 +89,27 @@ if [[ ! -f "${CATALOG}" ]]; then
 fi
 mkdir -p "${STAGE_DIR}/data"
 cp "${CATALOG}" "${STAGE_DIR}/data/courts.duckdb"
+# Ship the civil IDB too when it's built (`make data-idb`), so the case-level
+# tools (find_cases, analyze_cohort, sample_dockets, reconcile) work. It has no
+# party names; the hashed name index next to it lets the output scanner block
+# any name that slips through. data/private/ (the party names) is never shipped.
+# INCLUDE_IDB=0 leaves it out, e.g. if the upload is refused as too large (413);
+# those tools then say case-level data isn't loaded.
+IDB="${IDB_DUCKDB_PATH:-${REPO_ROOT}/data/build/idb.duckdb}"
+if [[ "${INCLUDE_IDB:-1}" == "1" && -f "${IDB}" ]]; then
+  cp "${IDB}" "${STAGE_DIR}/data/idb.duckdb"
+  PII_INDEX="$(dirname "${IDB}")/pii_index.bin"
+  if [[ -f "${PII_INDEX}" ]]; then
+    cp "${PII_INDEX}" "${STAGE_DIR}/data/pii_index.bin"
+  else
+    echo "  WARNING: no ${PII_INDEX}; run 'make data-pii-index' so the output" >&2
+    echo "           scanner can block party names." >&2
+  fi
+  echo "  including the civil IDB ($(du -sh "${IDB}" | cut -f1))"
+else
+  echo "  civil IDB not included (build it with 'make data-idb'); case-level tools"
+  echo "  will say case data isn't loaded."
+fi
 # Drop caches that may have been copied from src/.
 find "${STAGE_DIR}" -type d -name '__pycache__' -prune -exec rm -rf {} + 2>/dev/null || true
 STAGE_SIZE="$(du -sh "${STAGE_DIR}" | cut -f1)"

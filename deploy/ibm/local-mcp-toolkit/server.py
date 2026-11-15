@@ -26,6 +26,9 @@ sys.path.insert(0, HERE)
 # (data/courts.duckdb). Settings are read at import, so set the paths first;
 # an explicit environment variable still wins.
 os.environ.setdefault("DUCKDB_PATH", os.path.join(HERE, "data", "courts.duckdb"))
+# The civil IDB, when the register script shipped it (its hashed party-name
+# index sits next to it). If it's absent the case-level tools say so.
+os.environ.setdefault("IDB_DUCKDB_PATH", os.path.join(HERE, "data", "idb.duckdb"))
 # The request desk (ADR 0013) needs a writable file; the toolkit's own folder
 # may not be writable, /tmp is.
 os.environ.setdefault("DESK_STORE_PATH", "/tmp/courts-analyst/desk.sqlite")
