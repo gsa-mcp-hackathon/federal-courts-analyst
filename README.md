@@ -175,6 +175,11 @@ container. The full runbook is
 `eval/wxo/agent_check.py` checks that a live agent matches an instruction
 file and tool count before an evaluation run.
 
+**The submitted agent** is deployed to Live on our instance as version 1.0.0,
+"v8 evaluated, submission", and is available in Orchestrate Chat. Its
+**Evaluate** page holds six showcase tests run by IBM's built-in evaluator
+(6 of 6 pass): see [`eval/EVALUATION.md`](eval/EVALUATION.md), section 3.7.
+
 ## Running locally
 
 Needs [uv](https://docs.astral.sh/uv/) and `make`. Docker is optional.

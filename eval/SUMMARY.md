@@ -165,6 +165,20 @@ on this setup and not kept. Dev was 89.5% (85.8–92.3%; first scored 87.5%),
 but one item that passed, `explain-direct-filed-mdl`, fell from 3/3 to 0/3.
 The agent stays on v8. Runs: `results/wxo-l1-2026-11-16/`.
 
+## On the watsonx Orchestrate instance (2026-11-16)
+
+- **Live.** The evaluated configuration (v8, the 8 tools, toolkit from
+  159f529) was saved as agent version 1.0.0, "v8 evaluated, submission",
+  and deployed to Live. The agent is available in Orchestrate Chat.
+- **Checked against the code.** Before deploying, the instructions, the
+  tool list and every tool description on the instance were compared with
+  `main` and matched exactly.
+- **IBM's Evaluate page** holds six showcase tests: a figure, an
+  explanation, two declines, a threshold question and the desk preview. The
+  latest run passed 6 of 6. They use IBM's Journey Success metric, so they
+  show the agent working on IBM's tooling; they are not the evidence for
+  accuracy or safety. Details: [`EVALUATION.md`](EVALUATION.md), section 3.7.
+
 ## Limits
 
 - **Two held-out items look like scorer or item limits, not agent errors.**
