@@ -141,6 +141,14 @@ As first scored: dev baseline 85.8% (pass^3 79.5%), dev final 86.3%
   no IDB, so the agent quotes Table C-1, which is within the items' 1%
   tolerance. Dev without the engine items is 86.1% (81.6–89.6).
 
+- **The tools kept off the agent.** In scripted request-desk conversations
+  (Claude Sonnet, full server, 5 scenarios × 3 runs per arm), the
+  step-by-step save tools passed 9 of 15: every save conversation (6 of 6)
+  wrote before the user saw a preview or said yes. `keep_answer`, with its
+  server-checked preview, passed 15 of 15 with no early write.
+  `find_published_answers` worked in 6 of 6. Where each of the 17 tools is
+  evaluated: [`EVALUATION.md`](EVALUATION.md) 3.11 and 3.12.
+
 ## Deployed fixes (step 10, 2026-11-15)
 
 Deployed to watsonx Orchestrate after the scored runs above: the gate fix

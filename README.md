@@ -63,6 +63,13 @@ tables (no LLM judge). Full detail in [`eval/SUMMARY.md`](eval/SUMMARY.md).
 - **Saving is safe.** In 30 desk test runs on the deployed server, no answer
   was saved without the user's approval. Before the server-side check, 2 of
   10 runs did.
+- **Every tool is evaluated, and the evidence picks the agent's 8.** The 4
+  case-level tools need the IDB, which doesn't fit wxO's upload limit; Claude
+  runs on the full server cover them. Three step-by-step save tools trust
+  the model's `confirm`: in scripted desk conversations Claude Sonnet saved
+  before asking in 6 of 6 save conversations with them, and 0 of 15 with
+  `keep_answer`'s server-checked preview. Table:
+  [`eval/EVALUATION.md`](eval/EVALUATION.md), section 3.12.
 - **Main weakness: clarifying.** Asked a vague question ("which court was
   busiest?"), the agent usually picks a measure instead of asking which one
   is meant (1 of 12 times on held-out).
