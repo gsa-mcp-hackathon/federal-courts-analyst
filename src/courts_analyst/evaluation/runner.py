@@ -32,10 +32,11 @@ DEFAULT_RESULTS = ROOT / "eval" / "results"
 
 def _git_head() -> str | None:
     """Return the current git HEAD SHA of the repo, or None if git fails."""
-    import subprocess
+    import subprocess  # nosec B404
 
     try:
-        result = subprocess.run(
+        # A fixed argument list with no user input, run without a shell.
+        result = subprocess.run(  # nosec B603 B607
             ["git", "rev-parse", "HEAD"],
             cwd=ROOT,
             capture_output=True,
