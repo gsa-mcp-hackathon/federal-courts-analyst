@@ -1,0 +1,92 @@
+{
+  "run_id": "phase5-ts-dev-sonnet-r1-rescored",
+  "answerer": "claude-code-sonnet",
+  "label": "rescored:phase5-ts-dev-sonnet-r1",
+  "items": [
+    "ts-single-official-figure",
+    "ts-official-figure-edition",
+    "ts-revisions-of-figure",
+    "ts-explain-change-national",
+    "ts-explain-change-district",
+    "ts-cohort-count",
+    "ts-cohort-outcome-rates",
+    "ts-cohort-trend",
+    "ts-reconcile-pending",
+    "ts-judgeship-context",
+    "ts-judgeship-context-national",
+    "ts-explain-term-nos",
+    "ts-explain-term-jff",
+    "ts-sample-dockets",
+    "ts-server-info",
+    "ts-official-median-time"
+  ],
+  "finished_at": "2026-09-27T01:52:21+00:00",
+  "summary": {
+    "n": 16,
+    "correct": 16,
+    "accuracy": 1.0,
+    "by_suite": {
+      "tool_selection": {
+        "n": 16,
+        "correct": 16,
+        "accuracy": 1.0
+      }
+    },
+    "by_split": {
+      "dev": {
+        "n": 16,
+        "correct": 16,
+        "accuracy": 1.0
+      }
+    },
+    "by_check": {
+      "behavior": {
+        "n": 16,
+        "passed": 16,
+        "rate": 1.0
+      },
+      "tools": {
+        "n": 16,
+        "passed": 16,
+        "rate": 1.0
+      }
+    },
+    "behavior_confusion": {
+      "answer": {
+        "answer": 16,
+        "clarify": 0,
+        "decline": 0
+      },
+      "clarify": {
+        "answer": 0,
+        "clarify": 0,
+        "decline": 0
+      },
+      "decline": {
+        "answer": 0,
+        "clarify": 0,
+        "decline": 0
+      }
+    },
+    "behavior_metrics": {
+      "answer": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "support": 16
+      },
+      "clarify": {
+        "precision": null,
+        "recall": null,
+        "support": 0
+      },
+      "decline": {
+        "precision": null,
+        "recall": null,
+        "support": 0
+      }
+    },
+    "error_categories": {},
+    "latency_p50_s": 6.4445,
+    "latency_p95_s": 11.129
+  }
+}

@@ -1,0 +1,20 @@
+# CIRCUIT — circuit in which the case was filed.
+# Source: FJC IDB Civil Codebook 1988 Forward (2023-10-25), p. 1.
+field: circuit
+column: CIRCUIT
+title: Circuit
+description: Circuit in which the case was filed.
+missing: ["-8"]
+codes:
+  - {code: "0", label: District of Columbia Circuit, court: CIR-DC}
+  - {code: "1", label: First Circuit, court: CIR-01}
+  - {code: "2", label: Second Circuit, court: CIR-02}
+  - {code: "3", label: Third Circuit, court: CIR-03}
+  - {code: "4", label: Fourth Circuit, court: CIR-04}
+  - {code: "5", label: Fifth Circuit, court: CIR-05}
+  - {code: "6", label: Sixth Circuit, court: CIR-06}
+  - {code: "7", label: Seventh Circuit, court: CIR-07}
+  - {code: "8", label: Eighth Circuit, court: CIR-08}
+  - {code: "9", label: Ninth Circuit, court: CIR-09}
+  - {code: "10", label: Tenth Circuit, court: CIR-10}
+  - {code: "11", label: Eleventh Circuit, court: CIR-11}

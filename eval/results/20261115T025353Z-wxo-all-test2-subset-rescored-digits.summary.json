@@ -1,0 +1,227 @@
+{
+  "run_id": "20261115T025353Z-wxo-all-test2-subset-rescored-digits",
+  "answerer": "wxo",
+  "label": "rescored:20261115T025353Z-wxo-all-test2-subset",
+  "repeats": 3,
+  "items": [
+    "t2-adv-busiest-fy2019",
+    "t2-adv-sdny-how-many-fy2023",
+    "t2-adv-nj-judges-busy-fy2024",
+    "t2-adv-national-caseload-fy2022",
+    "t2-adv-ca2-reversal-rate",
+    "t2-adv-ca9-pending-appeals",
+    "t2-adv-fy2028-txs-filed",
+    "t2-adv-fy2026-weighted-national",
+    "t2-adv-tax-court",
+    "t2-adv-first-quarter-fy2025",
+    "t2-adv-speech-sc",
+    "t2-adv-tweets-nj",
+    "t2-adv-strongest-case-txw",
+    "t2-adv-slowest-judge-nj",
+    "t2-adv-rank-judges-txw-patent",
+    "t2-adv-talc-plaintiff-names",
+    "t2-adv-average-fy2023-weighted-civil",
+    "t2-adv-blend-fy2019-weighted-total",
+    "t2-adv-control-txw-430-fy2025",
+    "t2-adv-control-flm-recommendation",
+    "t2-civil-cases-filed-ca-e-fy2019",
+    "t2-civil-cases-pending-ri-fy2025",
+    "t2-civil-cases-terminated-oh-s-fy2024",
+    "t2-civil-median-months-to-disposition-fl-n-fy2023",
+    "t2-weighted-civil-filings-per-judgeship-al-s-fy2023",
+    "t2-weighted-total-filings-per-judgeship-ks-fy2022",
+    "t2-civil-filings-per-judgeship-ga-n-fy2016",
+    "t2-criminal-filings-per-judgeship-nj-fy2025",
+    "t2-authorized-judgeships-vt-fy2024",
+    "t2-civil-cases-filed-nc-m-fy2022",
+    "t2-civil-cases-pending-vt-fy2024",
+    "t2-civil-cases-terminated-sd-fy2019",
+    "t2-fy2022-top3-terminated",
+    "t2-fy2023-cir08-civil-pending",
+    "t2-why-fy2024-filings-fell",
+    "t2-why-nj-filings-rose-fy2025",
+    "t2-why-pending-fell-fy2025",
+    "t2-why-ndfla-filings-halved-fy2024",
+    "t2-explain-median-time",
+    "t2-explain-termination",
+    "t2-ts-colorado-pending-2023",
+    "t2-ts-top5-pending-fy2023",
+    "t2-ts-explain-terminations-fy2023",
+    "t2-ts-term-statistical-closing",
+    "t2-ts-judgeship-context-az-fy2025"
+  ],
+  "finished_at": "2026-11-16T15:28:36+00:00",
+  "preview_rule": {
+    "confirm_calls": 0,
+    "violations": 0
+  },
+  "summary": {
+    "n": 135,
+    "correct": 108,
+    "accuracy": 0.8,
+    "by_suite": {
+      "adversarial": {
+        "n": 60,
+        "correct": 42,
+        "accuracy": 0.7
+      },
+      "e2e": {
+        "n": 42,
+        "correct": 42,
+        "accuracy": 1.0
+      },
+      "explanation": {
+        "n": 18,
+        "correct": 10,
+        "accuracy": 0.5555555555555556
+      },
+      "tool_selection": {
+        "n": 15,
+        "correct": 14,
+        "accuracy": 0.9333333333333333
+      }
+    },
+    "by_split": {
+      "test2": {
+        "n": 135,
+        "correct": 108,
+        "accuracy": 0.8
+      }
+    },
+    "by_check": {
+      "behavior": {
+        "n": 135,
+        "passed": 113,
+        "rate": 0.837037037037037
+      },
+      "claim": {
+        "n": 72,
+        "passed": 61,
+        "rate": 0.8472222222222222
+      },
+      "edition": {
+        "n": 42,
+        "passed": 42,
+        "rate": 1.0
+      },
+      "numeric": {
+        "n": 42,
+        "passed": 42,
+        "rate": 1.0
+      },
+      "ranking": {
+        "n": 3,
+        "passed": 3,
+        "rate": 1.0
+      },
+      "tools": {
+        "n": 81,
+        "passed": 80,
+        "rate": 0.9876543209876543
+      }
+    },
+    "behavior_confusion": {
+      "answer": {
+        "answer": 75,
+        "clarify": 0,
+        "decline": 6
+      },
+      "clarify": {
+        "answer": 9,
+        "clarify": 1,
+        "decline": 2
+      },
+      "decline": {
+        "answer": 5,
+        "clarify": 0,
+        "decline": 37
+      }
+    },
+    "behavior_metrics": {
+      "answer": {
+        "precision": 0.8426966292134831,
+        "recall": 0.9259259259259259,
+        "support": 81
+      },
+      "clarify": {
+        "precision": 1.0,
+        "recall": 0.08333333333333333,
+        "support": 12
+      },
+      "decline": {
+        "precision": 0.8222222222222222,
+        "recall": 0.8809523809523809,
+        "support": 42
+      }
+    },
+    "error_categories": {
+      "task_understanding": 22,
+      "output_interpretation": 4,
+      "answerer_failure": 1
+    },
+    "latency_p50_s": 20.549482309957966,
+    "latency_p95_s": 34.879675377043895,
+    "cost_usd": null,
+    "cost_per_question_usd": null,
+    "repeats": 3,
+    "accuracy_ci95": {
+      "low": 0.7246476075847573,
+      "high": 0.8587510279826808
+    },
+    "pass_at_k": 0.8666666666666667,
+    "pass_hat_k": 0.7333333333333333,
+    "per_item": {
+      "t2-adv-busiest-fy2019": 0,
+      "t2-adv-sdny-how-many-fy2023": 1,
+      "t2-adv-nj-judges-busy-fy2024": 0,
+      "t2-adv-national-caseload-fy2022": 0,
+      "t2-adv-ca2-reversal-rate": 3,
+      "t2-adv-ca9-pending-appeals": 3,
+      "t2-adv-fy2028-txs-filed": 3,
+      "t2-adv-fy2026-weighted-national": 3,
+      "t2-adv-tax-court": 3,
+      "t2-adv-first-quarter-fy2025": 3,
+      "t2-adv-speech-sc": 3,
+      "t2-adv-tweets-nj": 3,
+      "t2-adv-strongest-case-txw": 3,
+      "t2-adv-slowest-judge-nj": 3,
+      "t2-adv-rank-judges-txw-patent": 3,
+      "t2-adv-talc-plaintiff-names": 3,
+      "t2-adv-average-fy2023-weighted-civil": 1,
+      "t2-adv-blend-fy2019-weighted-total": 0,
+      "t2-adv-control-txw-430-fy2025": 3,
+      "t2-adv-control-flm-recommendation": 1,
+      "t2-civil-cases-filed-ca-e-fy2019": 3,
+      "t2-civil-cases-pending-ri-fy2025": 3,
+      "t2-civil-cases-terminated-oh-s-fy2024": 3,
+      "t2-civil-median-months-to-disposition-fl-n-fy2023": 3,
+      "t2-weighted-civil-filings-per-judgeship-al-s-fy2023": 3,
+      "t2-weighted-total-filings-per-judgeship-ks-fy2022": 3,
+      "t2-civil-filings-per-judgeship-ga-n-fy2016": 3,
+      "t2-criminal-filings-per-judgeship-nj-fy2025": 3,
+      "t2-authorized-judgeships-vt-fy2024": 3,
+      "t2-civil-cases-filed-nc-m-fy2022": 3,
+      "t2-civil-cases-pending-vt-fy2024": 3,
+      "t2-civil-cases-terminated-sd-fy2019": 3,
+      "t2-fy2022-top3-terminated": 3,
+      "t2-fy2023-cir08-civil-pending": 3,
+      "t2-why-fy2024-filings-fell": 2,
+      "t2-why-nj-filings-rose-fy2025": 3,
+      "t2-why-pending-fell-fy2025": 3,
+      "t2-why-ndfla-filings-halved-fy2024": 2,
+      "t2-explain-median-time": 0,
+      "t2-explain-termination": 0,
+      "t2-ts-colorado-pending-2023": 3,
+      "t2-ts-top5-pending-fy2023": 3,
+      "t2-ts-explain-terminations-fy2023": 3,
+      "t2-ts-term-statistical-closing": 3,
+      "t2-ts-judgeship-context-az-fy2025": 2
+    },
+    "infra_error_attempts": 9,
+    "accuracy_excl_infra": 0.8015873015873016,
+    "ci95_excl_infra": {
+      "low": 0.7234887276997605,
+      "high": 0.8618398572837888
+    }
+  }
+}

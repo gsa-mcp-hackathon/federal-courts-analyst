@@ -1,0 +1,15 @@
+id: 0
+event: turn_start
+data: {"seq":0,"type":"turn_start","turn_id":"b5c040baed264028","model":"no model call","provider":"none","prompt_version":"2026-09-27.2"}
+
+id: 1
+event: warning
+data: {"seq":1,"type":"warning","code":"judge_level","message":"This server can't rank, compare, name or profile individual judges: the data has no judge identifiers, by Judicial Conference policy, partly to prevent judge-shopping.","severity":"block","source":"guardrail"}
+
+id: 2
+event: text_delta
+data: {"seq":2,"type":"text_delta","text":"This server can't rank, compare, name or profile individual judges: the data has no judge identifiers, by Judicial Conference policy, partly to prevent judge-shopping. Compare districts instead, for example median time to disposition by court (compare_courts or analyze_cohort with group_by='court')."}
+
+id: 3
+event: turn_end
+data: {"seq":3,"type":"turn_end","usage":{"input_tokens":0,"output_tokens":0,"cost_usd":0.0,"model_requests":0,"tool_calls":0},"latency_ms":0.29580800037365407,"stop_reason":"declined"}

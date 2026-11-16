@@ -1,0 +1,581 @@
+# engine suite — drafted from the official tables catalog; see eval/README.md
+- id: engine-us-filed-fy2016
+  question: IDB-derived national civil cases filed in FY2016 vs Table C-1.
+  expected:
+    figures:
+    - value: 291851
+      ref:
+        measure: civil_cases_filed
+        court: US
+        fiscal_year: 2016
+        edition: JB-2016
+      tolerance_pct: 0.5
+    engine:
+      measure: civil_cases_filed
+      court: US
+      fiscal_year: 2016
+  tags:
+  - engine
+  - c1
+  - filed
+- id: engine-us-terminated-fy2016
+  question: IDB-derived national civil cases terminated in FY2016 vs Table C-1.
+  expected:
+    figures:
+    - value: 271649
+      ref:
+        measure: civil_cases_terminated
+        court: US
+        fiscal_year: 2016
+        edition: JB-2016
+      tolerance_pct: 0.1
+    engine:
+      measure: civil_cases_terminated
+      court: US
+      fiscal_year: 2016
+  tags:
+  - engine
+  - c1
+  - terminated
+- id: engine-us-filed-fy2017
+  question: IDB-derived national civil cases filed in FY2017 vs Table C-1.
+  expected:
+    figures:
+    - value: 267769
+      ref:
+        measure: civil_cases_filed
+        court: US
+        fiscal_year: 2017
+        edition: JB-2017
+      tolerance_pct: 0.5
+    engine:
+      measure: civil_cases_filed
+      court: US
+      fiscal_year: 2017
+  tags:
+  - engine
+  - c1
+  - filed
+- id: engine-us-terminated-fy2017
+  question: IDB-derived national civil cases terminated in FY2017 vs Table C-1.
+  expected:
+    figures:
+    - value: 289901
+      ref:
+        measure: civil_cases_terminated
+        court: US
+        fiscal_year: 2017
+        edition: JB-2017
+      tolerance_pct: 0.1
+    engine:
+      measure: civil_cases_terminated
+      court: US
+      fiscal_year: 2017
+  tags:
+  - engine
+  - c1
+  - terminated
+- id: engine-us-filed-fy2018
+  question: IDB-derived national civil cases filed in FY2018 vs Table C-1.
+  expected:
+    figures:
+    - value: 282936
+      ref:
+        measure: civil_cases_filed
+        court: US
+        fiscal_year: 2018
+        edition: JB-2018
+      tolerance_pct: 0.5
+    engine:
+      measure: civil_cases_filed
+      court: US
+      fiscal_year: 2018
+  tags:
+  - engine
+  - c1
+  - filed
+- id: engine-us-terminated-fy2018
+  question: IDB-derived national civil cases terminated in FY2018 vs Table C-1.
+  expected:
+    figures:
+    - value: 276311
+      ref:
+        measure: civil_cases_terminated
+        court: US
+        fiscal_year: 2018
+        edition: JB-2018
+      tolerance_pct: 0.1
+    engine:
+      measure: civil_cases_terminated
+      court: US
+      fiscal_year: 2018
+  tags:
+  - engine
+  - c1
+  - terminated
+- id: engine-us-filed-fy2019
+  question: IDB-derived national civil cases filed in FY2019 vs Table C-1.
+  expected:
+    figures:
+    - value: 297877
+      ref:
+        measure: civil_cases_filed
+        court: US
+        fiscal_year: 2019
+        edition: JB-2019
+      tolerance_pct: 0.5
+    engine:
+      measure: civil_cases_filed
+      court: US
+      fiscal_year: 2019
+  tags:
+  - engine
+  - c1
+  - filed
+- id: engine-us-terminated-fy2019
+  question: IDB-derived national civil cases terminated in FY2019 vs Table C-1.
+  expected:
+    figures:
+    - value: 311900
+      ref:
+        measure: civil_cases_terminated
+        court: US
+        fiscal_year: 2019
+        edition: JB-2019
+      tolerance_pct: 0.1
+    engine:
+      measure: civil_cases_terminated
+      court: US
+      fiscal_year: 2019
+  tags:
+  - engine
+  - c1
+  - terminated
+- id: engine-us-filed-fy2020
+  question: IDB-derived national civil cases filed in FY2020 vs Table C-1.
+  expected:
+    figures:
+    - value: 470581
+      ref:
+        measure: civil_cases_filed
+        court: US
+        fiscal_year: 2020
+        edition: JB-2020
+      tolerance_pct: 0.5
+    engine:
+      measure: civil_cases_filed
+      court: US
+      fiscal_year: 2020
+  tags:
+  - engine
+  - c1
+  - filed
+- id: engine-us-terminated-fy2020
+  question: IDB-derived national civil cases terminated in FY2020 vs Table C-1.
+  expected:
+    figures:
+    - value: 271256
+      ref:
+        measure: civil_cases_terminated
+        court: US
+        fiscal_year: 2020
+        edition: JB-2020
+      tolerance_pct: 0.1
+    engine:
+      measure: civil_cases_terminated
+      court: US
+      fiscal_year: 2020
+  tags:
+  - engine
+  - c1
+  - terminated
+- id: engine-us-filed-fy2021
+  question: IDB-derived national civil cases filed in FY2021 vs Table C-1.
+  expected:
+    figures:
+    - value: 344567
+      ref:
+        measure: civil_cases_filed
+        court: US
+        fiscal_year: 2021
+        edition: JB-2021
+      tolerance_pct: 0.5
+    engine:
+      measure: civil_cases_filed
+      court: US
+      fiscal_year: 2021
+  tags:
+  - engine
+  - c1
+  - filed
+- id: engine-us-terminated-fy2021
+  question: IDB-derived national civil cases terminated in FY2021 vs Table C-1.
+  expected:
+    figures:
+    - value: 271625
+      ref:
+        measure: civil_cases_terminated
+        court: US
+        fiscal_year: 2021
+        edition: JB-2021
+      tolerance_pct: 0.1
+    engine:
+      measure: civil_cases_terminated
+      court: US
+      fiscal_year: 2021
+  tags:
+  - engine
+  - c1
+  - terminated
+- id: engine-us-filed-fy2022
+  question: IDB-derived national civil cases filed in FY2022 vs Table C-1.
+  expected:
+    figures:
+    - value: 274771
+      ref:
+        measure: civil_cases_filed
+        court: US
+        fiscal_year: 2022
+        edition: JB-2022
+      tolerance_pct: 0.5
+    engine:
+      measure: civil_cases_filed
+      court: US
+      fiscal_year: 2022
+  tags:
+  - engine
+  - c1
+  - filed
+- id: engine-us-terminated-fy2022
+  question: IDB-derived national civil cases terminated in FY2022 vs Table C-1.
+  expected:
+    figures:
+    - value: 308326
+      ref:
+        measure: civil_cases_terminated
+        court: US
+        fiscal_year: 2022
+        edition: JB-2022
+      tolerance_pct: 0.1
+    engine:
+      measure: civil_cases_terminated
+      court: US
+      fiscal_year: 2022
+  tags:
+  - engine
+  - c1
+  - terminated
+- id: engine-us-filed-fy2023
+  question: IDB-derived national civil cases filed in FY2023 vs Table C-1.
+  expected:
+    figures:
+    - value: 339731
+      ref:
+        measure: civil_cases_filed
+        court: US
+        fiscal_year: 2023
+        edition: JB-2023
+      tolerance_pct: 0.5
+    engine:
+      measure: civil_cases_filed
+      court: US
+      fiscal_year: 2023
+  tags:
+  - engine
+  - c1
+  - filed
+- id: engine-us-terminated-fy2023
+  question: IDB-derived national civil cases terminated in FY2023 vs Table C-1.
+  expected:
+    figures:
+    - value: 293677
+      ref:
+        measure: civil_cases_terminated
+        court: US
+        fiscal_year: 2023
+        edition: JB-2023
+      tolerance_pct: 0.1
+    engine:
+      measure: civil_cases_terminated
+      court: US
+      fiscal_year: 2023
+  tags:
+  - engine
+  - c1
+  - terminated
+- id: engine-us-filed-fy2024
+  question: IDB-derived national civil cases filed in FY2024 vs Table C-1.
+  expected:
+    figures:
+    - value: 290896
+      ref:
+        measure: civil_cases_filed
+        court: US
+        fiscal_year: 2024
+        edition: JB-2024
+      tolerance_pct: 0.5
+    engine:
+      measure: civil_cases_filed
+      court: US
+      fiscal_year: 2024
+  tags:
+  - engine
+  - c1
+  - filed
+- id: engine-us-terminated-fy2024
+  question: IDB-derived national civil cases terminated in FY2024 vs Table C-1.
+  expected:
+    figures:
+    - value: 396635
+      ref:
+        measure: civil_cases_terminated
+        court: US
+        fiscal_year: 2024
+        edition: JB-2024
+      tolerance_pct: 0.1
+    engine:
+      measure: civil_cases_terminated
+      court: US
+      fiscal_year: 2024
+  tags:
+  - engine
+  - c1
+  - terminated
+- id: engine-us-filed-fy2025
+  question: IDB-derived national civil cases filed in FY2025 vs Table C-1.
+  expected:
+    figures:
+    - value: 303563
+      ref:
+        measure: civil_cases_filed
+        court: US
+        fiscal_year: 2025
+        edition: JB-2025
+      tolerance_pct: 0.5
+    engine:
+      measure: civil_cases_filed
+      court: US
+      fiscal_year: 2025
+  tags:
+  - engine
+  - c1
+  - filed
+- id: engine-us-terminated-fy2025
+  question: IDB-derived national civil cases terminated in FY2025 vs Table C-1.
+  expected:
+    figures:
+    - value: 407539
+      ref:
+        measure: civil_cases_terminated
+        court: US
+        fiscal_year: 2025
+        edition: JB-2025
+      tolerance_pct: 0.1
+    engine:
+      measure: civil_cases_terminated
+      court: US
+      fiscal_year: 2025
+  tags:
+  - engine
+  - c1
+  - terminated
+- id: engine-us-pending-fy2017
+  question: IDB-reconstructed national civil cases pending on September 30, 2017 vs Table C-1 (latest
+    edition).
+  expected:
+    figures:
+    - value: 366195
+      ref:
+        measure: civil_cases_pending
+        court: US
+        fiscal_year: 2017
+        edition: JB-2018
+      tolerance_pct: 1.0
+    engine:
+      measure: civil_cases_pending
+      court: US
+      fiscal_year: 2017
+  tags:
+  - engine
+  - c1
+  - pending
+- id: engine-us-pending-fy2019
+  question: IDB-reconstructed national civil cases pending on September 30, 2019 vs Table C-1 (latest
+    edition).
+  expected:
+    figures:
+    - value: 357041
+      ref:
+        measure: civil_cases_pending
+        court: US
+        fiscal_year: 2019
+        edition: JB-2020
+      tolerance_pct: 1.0
+    engine:
+      measure: civil_cases_pending
+      court: US
+      fiscal_year: 2019
+  tags:
+  - engine
+  - c1
+  - pending
+- id: engine-us-pending-fy2021
+  question: IDB-reconstructed national civil cases pending on September 30, 2021 vs Table C-1 (latest
+    edition).
+  expected:
+    figures:
+    - value: 629588
+      ref:
+        measure: civil_cases_pending
+        court: US
+        fiscal_year: 2021
+        edition: JB-2021
+      tolerance_pct: 1.0
+    engine:
+      measure: civil_cases_pending
+      court: US
+      fiscal_year: 2021
+  tags:
+  - engine
+  - c1
+  - pending
+- id: engine-us-pending-fy2023
+  question: IDB-reconstructed national civil cases pending on September 30, 2023 vs Table C-1 (latest
+    edition).
+  expected:
+    figures:
+    - value: 642013
+      ref:
+        measure: civil_cases_pending
+        court: US
+        fiscal_year: 2023
+        edition: JB-2023
+      tolerance_pct: 1.0
+    engine:
+      measure: civil_cases_pending
+      court: US
+      fiscal_year: 2023
+  tags:
+  - engine
+  - c1
+  - pending
+- id: engine-us-pending-fy2025
+  question: IDB-reconstructed national civil cases pending on September 30, 2025 vs Table C-1 (latest
+    edition).
+  expected:
+    figures:
+    - value: 432923
+      ref:
+        measure: civil_cases_pending
+        court: US
+        fiscal_year: 2025
+        edition: JB-2025
+      tolerance_pct: 1.0
+    engine:
+      measure: civil_cases_pending
+      court: US
+      fiscal_year: 2025
+  tags:
+  - engine
+  - c1
+  - pending
+- id: engine-fl-n-filed-fy2020
+  question: IDB-derived civil cases filed in FL-N in FY2020 vs Table C-1.
+  expected:
+    figures:
+    - value: 204994
+      ref:
+        measure: civil_cases_filed
+        court: FL-N
+        fiscal_year: 2020
+        edition: JB-2020
+      tolerance_pct: 2.0
+    engine:
+      measure: civil_cases_filed
+      court: FL-N
+      fiscal_year: 2020
+  tags:
+  - engine
+  - c1
+  - district
+  - filed
+- id: engine-nj-filed-fy2024
+  question: IDB-derived civil cases filed in NJ in FY2024 vs Table C-1.
+  expected:
+    figures:
+    - value: 13589
+      ref:
+        measure: civil_cases_filed
+        court: NJ
+        fiscal_year: 2024
+        edition: JB-2024
+      tolerance_pct: 2.0
+    engine:
+      measure: civil_cases_filed
+      court: NJ
+      fiscal_year: 2024
+  tags:
+  - engine
+  - c1
+  - district
+  - filed
+- id: engine-ny-s-filed-fy2025
+  question: IDB-derived civil cases filed in NY-S in FY2025 vs Table C-1.
+  expected:
+    figures:
+    - value: 11109
+      ref:
+        measure: civil_cases_filed
+        court: NY-S
+        fiscal_year: 2025
+        edition: JB-2025
+      tolerance_pct: 2.0
+    engine:
+      measure: civil_cases_filed
+      court: NY-S
+      fiscal_year: 2025
+  tags:
+  - engine
+  - c1
+  - district
+  - filed
+- id: engine-tx-w-filed-fy2024
+  question: IDB-derived civil cases filed in TX-W in FY2024 vs Table C-1.
+  expected:
+    figures:
+    - value: 4434
+      ref:
+        measure: civil_cases_filed
+        court: TX-W
+        fiscal_year: 2024
+        edition: JB-2024
+      tolerance_pct: 2.0
+    engine:
+      measure: civil_cases_filed
+      court: TX-W
+      fiscal_year: 2024
+  tags:
+  - engine
+  - c1
+  - district
+  - filed
+- id: engine-ca-c-filed-fy2020
+  question: IDB-derived civil cases filed in CA-C in FY2020 vs Table C-1.
+  expected:
+    figures:
+    - value: 16461
+      ref:
+        measure: civil_cases_filed
+        court: CA-C
+        fiscal_year: 2020
+        edition: JB-2020
+      tolerance_pct: 2.0
+    engine:
+      measure: civil_cases_filed
+      court: CA-C
+      fiscal_year: 2020
+  tags:
+  - engine
+  - c1
+  - district
+  - filed

@@ -1,0 +1,924 @@
+{
+  "$defs": {
+    "ChartEvent": {
+      "properties": {
+        "seq": {
+          "default": 0,
+          "description": "Position in the turn, from 0.",
+          "title": "Seq",
+          "type": "integer"
+        },
+        "type": {
+          "const": "chart",
+          "default": "chart",
+          "title": "Type",
+          "type": "string"
+        },
+        "spec": {
+          "$ref": "#/$defs/ChartSpec"
+        }
+      },
+      "required": [
+        "spec"
+      ],
+      "title": "ChartEvent",
+      "type": "object"
+    },
+    "ChartPoint": {
+      "properties": {
+        "x": {
+          "title": "X",
+          "type": "string"
+        },
+        "y": {
+          "title": "Y",
+          "type": "number"
+        },
+        "label": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Label"
+        }
+      },
+      "required": [
+        "x",
+        "y"
+      ],
+      "title": "ChartPoint",
+      "type": "object"
+    },
+    "ChartSeries": {
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "points": {
+          "items": {
+            "$ref": "#/$defs/ChartPoint"
+          },
+          "title": "Points",
+          "type": "array"
+        }
+      },
+      "required": [
+        "name",
+        "points"
+      ],
+      "title": "ChartSeries",
+      "type": "object"
+    },
+    "ChartSpec": {
+      "description": "A chart derived from one tool result (the MCP App uses the same spec).",
+      "properties": {
+        "kind": {
+          "enum": [
+            "bar",
+            "line",
+            "waterfall",
+            "editions"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "x_label": {
+          "title": "X Label",
+          "type": "string"
+        },
+        "y_label": {
+          "title": "Y Label",
+          "type": "string"
+        },
+        "unit": {
+          "title": "Unit",
+          "type": "string"
+        },
+        "series": {
+          "items": {
+            "$ref": "#/$defs/ChartSeries"
+          },
+          "title": "Series",
+          "type": "array"
+        },
+        "source": {
+          "description": "Edition, table or dataset the values are from.",
+          "title": "Source",
+          "type": "string"
+        },
+        "call_id": {
+          "title": "Call Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "title",
+        "x_label",
+        "y_label",
+        "unit",
+        "series",
+        "source",
+        "call_id"
+      ],
+      "title": "ChartSpec",
+      "type": "object"
+    },
+    "Choice": {
+      "properties": {
+        "value": {
+          "title": "Value",
+          "type": "string"
+        },
+        "label": {
+          "title": "Label",
+          "type": "string"
+        },
+        "description": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Description"
+        }
+      },
+      "required": [
+        "value",
+        "label"
+      ],
+      "title": "Choice",
+      "type": "object"
+    },
+    "CitationEvent": {
+      "properties": {
+        "seq": {
+          "default": 0,
+          "description": "Position in the turn, from 0.",
+          "title": "Seq",
+          "type": "integer"
+        },
+        "type": {
+          "const": "citation",
+          "default": "citation",
+          "title": "Type",
+          "type": "string"
+        },
+        "ref": {
+          "$ref": "#/$defs/CitationRef"
+        },
+        "span": {
+          "anyOf": [
+            {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "integer"
+                }
+              ],
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Character offsets [start, end) of the value in the answer text, when it appears there.",
+          "title": "Span"
+        },
+        "call_id": {
+          "title": "Call Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "ref",
+        "call_id"
+      ],
+      "title": "CitationEvent",
+      "type": "object"
+    },
+    "CitationRef": {
+      "description": "An official figure the answer relies on.",
+      "properties": {
+        "citation": {
+          "description": "The server's one-line citation.",
+          "title": "Citation",
+          "type": "string"
+        },
+        "value": {
+          "title": "Value",
+          "type": "number"
+        },
+        "measure": {
+          "title": "Measure",
+          "type": "string"
+        },
+        "court": {
+          "title": "Court",
+          "type": "string"
+        },
+        "fiscal_year": {
+          "title": "Fiscal Year",
+          "type": "integer"
+        },
+        "edition": {
+          "title": "Edition",
+          "type": "string"
+        },
+        "table_code": {
+          "title": "Table Code",
+          "type": "string"
+        },
+        "url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Url"
+        },
+        "revised": {
+          "title": "Revised",
+          "type": "boolean"
+        },
+        "first_published_value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "First Published Value"
+        },
+        "first_published_edition": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "First Published Edition"
+        }
+      },
+      "required": [
+        "citation",
+        "value",
+        "measure",
+        "court",
+        "fiscal_year",
+        "edition",
+        "table_code",
+        "revised"
+      ],
+      "title": "CitationRef",
+      "type": "object"
+    },
+    "Clarification": {
+      "description": "A question the server needs answered before it can give one figure.\n\nClients that support elicitation show it as a form; others get it in the\nresult. Either way, calling again with ``parameter`` set to a choice's\n``value`` answers it.",
+      "properties": {
+        "parameter": {
+          "description": "The argument to set when calling again.",
+          "title": "Parameter",
+          "type": "string"
+        },
+        "question": {
+          "title": "Question",
+          "type": "string"
+        },
+        "choices": {
+          "items": {
+            "$ref": "#/$defs/Choice"
+          },
+          "title": "Choices",
+          "type": "array"
+        },
+        "default": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "What the server would pick if it had to.",
+          "title": "Default"
+        }
+      },
+      "required": [
+        "parameter",
+        "question",
+        "choices"
+      ],
+      "title": "Clarification",
+      "type": "object"
+    },
+    "ClarifyEvent": {
+      "description": "The server asked the user to choose. POST the choice to\n``/api/ask/{turn_id}/clarify`` and the same stream resumes.",
+      "properties": {
+        "seq": {
+          "default": 0,
+          "description": "Position in the turn, from 0.",
+          "title": "Seq",
+          "type": "integer"
+        },
+        "type": {
+          "const": "clarify",
+          "default": "clarify",
+          "title": "Type",
+          "type": "string"
+        },
+        "turn_id": {
+          "title": "Turn Id",
+          "type": "string"
+        },
+        "clarify_id": {
+          "title": "Clarify Id",
+          "type": "string"
+        },
+        "clarification": {
+          "$ref": "#/$defs/Clarification"
+        }
+      },
+      "required": [
+        "turn_id",
+        "clarify_id",
+        "clarification"
+      ],
+      "title": "ClarifyEvent",
+      "type": "object"
+    },
+    "DocketCard": {
+      "description": "A docket reference. Text from CourtListener is untrusted: every string\nfield is HTML-escaped and length-capped before it gets here.",
+      "properties": {
+        "origin": {
+          "enum": [
+            "idb_sample",
+            "courtlistener",
+            "courtlistener_fixture"
+          ],
+          "title": "Origin",
+          "type": "string"
+        },
+        "court": {
+          "title": "Court",
+          "type": "string"
+        },
+        "docket_number": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Docket Number"
+        },
+        "filing_date": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Filing Date"
+        },
+        "nature_of_suit": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Nature Of Suit"
+        },
+        "cause": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Cause"
+        },
+        "url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Url"
+        },
+        "note": {
+          "title": "Note",
+          "type": "string"
+        }
+      },
+      "required": [
+        "origin",
+        "court",
+        "note"
+      ],
+      "title": "DocketCard",
+      "type": "object"
+    },
+    "DocketEvent": {
+      "properties": {
+        "seq": {
+          "default": 0,
+          "description": "Position in the turn, from 0.",
+          "title": "Seq",
+          "type": "integer"
+        },
+        "type": {
+          "const": "docket",
+          "default": "docket",
+          "title": "Type",
+          "type": "string"
+        },
+        "card": {
+          "$ref": "#/$defs/DocketCard"
+        },
+        "call_id": {
+          "title": "Call Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "card",
+        "call_id"
+      ],
+      "title": "DocketEvent",
+      "type": "object"
+    },
+    "ErrorEvent": {
+      "properties": {
+        "seq": {
+          "default": 0,
+          "description": "Position in the turn, from 0.",
+          "title": "Seq",
+          "type": "integer"
+        },
+        "type": {
+          "const": "error",
+          "default": "error",
+          "title": "Type",
+          "type": "string"
+        },
+        "code": {
+          "title": "Code",
+          "type": "string"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "message"
+      ],
+      "title": "ErrorEvent",
+      "type": "object"
+    },
+    "TextDelta": {
+      "properties": {
+        "seq": {
+          "default": 0,
+          "description": "Position in the turn, from 0.",
+          "title": "Seq",
+          "type": "integer"
+        },
+        "type": {
+          "const": "text_delta",
+          "default": "text_delta",
+          "title": "Type",
+          "type": "string"
+        },
+        "text": {
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "text"
+      ],
+      "title": "TextDelta",
+      "type": "object"
+    },
+    "Thinking": {
+      "description": "A short status line for the UI, not model reasoning.",
+      "properties": {
+        "seq": {
+          "default": 0,
+          "description": "Position in the turn, from 0.",
+          "title": "Seq",
+          "type": "integer"
+        },
+        "type": {
+          "const": "thinking",
+          "default": "thinking",
+          "title": "Type",
+          "type": "string"
+        },
+        "text": {
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "text"
+      ],
+      "title": "Thinking",
+      "type": "object"
+    },
+    "ToolCallEvent": {
+      "properties": {
+        "seq": {
+          "default": 0,
+          "description": "Position in the turn, from 0.",
+          "title": "Seq",
+          "type": "integer"
+        },
+        "type": {
+          "const": "tool_call",
+          "default": "tool_call",
+          "title": "Type",
+          "type": "string"
+        },
+        "call_id": {
+          "title": "Call Id",
+          "type": "string"
+        },
+        "server": {
+          "enum": [
+            "courts-analyst",
+            "courtlistener"
+          ],
+          "title": "Server",
+          "type": "string"
+        },
+        "tool": {
+          "title": "Tool",
+          "type": "string"
+        },
+        "arguments": {
+          "additionalProperties": true,
+          "title": "Arguments",
+          "type": "object"
+        }
+      },
+      "required": [
+        "call_id",
+        "server",
+        "tool",
+        "arguments"
+      ],
+      "title": "ToolCallEvent",
+      "type": "object"
+    },
+    "ToolResultEvent": {
+      "properties": {
+        "seq": {
+          "default": 0,
+          "description": "Position in the turn, from 0.",
+          "title": "Seq",
+          "type": "integer"
+        },
+        "type": {
+          "const": "tool_result",
+          "default": "tool_result",
+          "title": "Type",
+          "type": "string"
+        },
+        "call_id": {
+          "title": "Call Id",
+          "type": "string"
+        },
+        "server": {
+          "enum": [
+            "courts-analyst",
+            "courtlistener"
+          ],
+          "title": "Server",
+          "type": "string"
+        },
+        "tool": {
+          "title": "Tool",
+          "type": "string"
+        },
+        "status": {
+          "description": "The envelope's status ('ok', 'needs_clarification', 'declined'), or 'error'.",
+          "title": "Status",
+          "type": "string"
+        },
+        "result": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "The structured result (a `Result` envelope).",
+          "title": "Result"
+        },
+        "error": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Error"
+        },
+        "latency_ms": {
+          "title": "Latency Ms",
+          "type": "number"
+        }
+      },
+      "required": [
+        "call_id",
+        "server",
+        "tool",
+        "status",
+        "latency_ms"
+      ],
+      "title": "ToolResultEvent",
+      "type": "object"
+    },
+    "TurnEnd": {
+      "properties": {
+        "seq": {
+          "default": 0,
+          "description": "Position in the turn, from 0.",
+          "title": "Seq",
+          "type": "integer"
+        },
+        "type": {
+          "const": "turn_end",
+          "default": "turn_end",
+          "title": "Type",
+          "type": "string"
+        },
+        "usage": {
+          "$ref": "#/$defs/Usage"
+        },
+        "latency_ms": {
+          "title": "Latency Ms",
+          "type": "number"
+        },
+        "stop_reason": {
+          "enum": [
+            "end_turn",
+            "declined",
+            "max_tool_calls",
+            "max_model_turns",
+            "timeout",
+            "token_budget",
+            "refusal",
+            "error"
+          ],
+          "title": "Stop Reason",
+          "type": "string"
+        }
+      },
+      "required": [
+        "usage",
+        "latency_ms",
+        "stop_reason"
+      ],
+      "title": "TurnEnd",
+      "type": "object"
+    },
+    "TurnStart": {
+      "properties": {
+        "seq": {
+          "default": 0,
+          "description": "Position in the turn, from 0.",
+          "title": "Seq",
+          "type": "integer"
+        },
+        "type": {
+          "const": "turn_start",
+          "default": "turn_start",
+          "title": "Type",
+          "type": "string"
+        },
+        "turn_id": {
+          "title": "Turn Id",
+          "type": "string"
+        },
+        "model": {
+          "title": "Model",
+          "type": "string"
+        },
+        "provider": {
+          "title": "Provider",
+          "type": "string"
+        },
+        "prompt_version": {
+          "description": "Version of agent/system_prompt.md.",
+          "title": "Prompt Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "turn_id",
+        "model",
+        "provider",
+        "prompt_version"
+      ],
+      "title": "TurnStart",
+      "type": "object"
+    },
+    "Usage": {
+      "properties": {
+        "input_tokens": {
+          "default": 0,
+          "title": "Input Tokens",
+          "type": "integer"
+        },
+        "output_tokens": {
+          "default": 0,
+          "title": "Output Tokens",
+          "type": "integer"
+        },
+        "cost_usd": {
+          "default": 0.0,
+          "title": "Cost Usd",
+          "type": "number"
+        },
+        "model_requests": {
+          "default": 0,
+          "title": "Model Requests",
+          "type": "integer"
+        },
+        "tool_calls": {
+          "default": 0,
+          "title": "Tool Calls",
+          "type": "integer"
+        }
+      },
+      "title": "Usage",
+      "type": "object"
+    },
+    "WarningEvent": {
+      "properties": {
+        "seq": {
+          "default": 0,
+          "description": "Position in the turn, from 0.",
+          "title": "Seq",
+          "type": "integer"
+        },
+        "type": {
+          "const": "warning",
+          "default": "warning",
+          "title": "Type",
+          "type": "string"
+        },
+        "code": {
+          "title": "Code",
+          "type": "string"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        },
+        "severity": {
+          "default": "caution",
+          "enum": [
+            "info",
+            "caution",
+            "block"
+          ],
+          "title": "Severity",
+          "type": "string"
+        },
+        "source": {
+          "default": "agent",
+          "enum": [
+            "guardrail",
+            "tool",
+            "agent"
+          ],
+          "title": "Source",
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "message"
+      ],
+      "title": "WarningEvent",
+      "type": "object"
+    }
+  },
+  "discriminator": {
+    "mapping": {
+      "chart": "#/$defs/ChartEvent",
+      "citation": "#/$defs/CitationEvent",
+      "clarify": "#/$defs/ClarifyEvent",
+      "docket": "#/$defs/DocketEvent",
+      "error": "#/$defs/ErrorEvent",
+      "text_delta": "#/$defs/TextDelta",
+      "thinking": "#/$defs/Thinking",
+      "tool_call": "#/$defs/ToolCallEvent",
+      "tool_result": "#/$defs/ToolResultEvent",
+      "turn_end": "#/$defs/TurnEnd",
+      "turn_start": "#/$defs/TurnStart",
+      "warning": "#/$defs/WarningEvent"
+    },
+    "propertyName": "type"
+  },
+  "oneOf": [
+    {
+      "$ref": "#/$defs/TurnStart"
+    },
+    {
+      "$ref": "#/$defs/Thinking"
+    },
+    {
+      "$ref": "#/$defs/ToolCallEvent"
+    },
+    {
+      "$ref": "#/$defs/ToolResultEvent"
+    },
+    {
+      "$ref": "#/$defs/ClarifyEvent"
+    },
+    {
+      "$ref": "#/$defs/TextDelta"
+    },
+    {
+      "$ref": "#/$defs/CitationEvent"
+    },
+    {
+      "$ref": "#/$defs/ChartEvent"
+    },
+    {
+      "$ref": "#/$defs/DocketEvent"
+    },
+    {
+      "$ref": "#/$defs/WarningEvent"
+    },
+    {
+      "$ref": "#/$defs/TurnEnd"
+    },
+    {
+      "$ref": "#/$defs/ErrorEvent"
+    }
+  ]
+}

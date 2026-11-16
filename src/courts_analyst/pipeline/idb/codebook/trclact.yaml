@@ -1,0 +1,10 @@
+# TRCLACT — class action ruling at termination (requires CLASSACT = 1).
+# Source: FJC IDB Civil Codebook 1988 Forward (2023-10-25), p. 10.
+field: trclact
+column: TRCLACT
+title: Class action ruling
+description: Whether class certification was denied or granted, for cases alleging a class action.
+missing: ["-8"]
+codes:
+  - {code: "2", label: Denied}
+  - {code: "3", label: Granted}

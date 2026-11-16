@@ -1,0 +1,19 @@
+# Supply chain (Phase 6): weekly update PRs for Python (uv.lock), GitHub
+# Actions and the container base image. npm is added with the frontend (P8).
+version: 2
+updates:
+  - package-ecosystem: uv
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      python-minor:
+        update-types: [minor, patch]
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+  - package-ecosystem: docker
+    directory: /
+    schedule:
+      interval: weekly

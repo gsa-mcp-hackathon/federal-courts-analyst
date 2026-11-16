@@ -1,0 +1,98 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - run: uv sync --group dev --group pipeline --group eval --frozen
+      - name: Ruff lint
+        run: uv run ruff check --output-format=github .
+      - name: Ruff format
+        run: uv run ruff format --check .
+      - name: Mypy
+        run: uv run mypy
+
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # 3.12 is what we ship; 3.11 is the floor the deploy hosts need.
+        python: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          python-version: ${{ matrix.python }}
+      - run: uv sync --group dev --group pipeline --group eval --frozen
+      - name: Pytest
+        run: >
+          uv run pytest -v --cov --cov-report=term-missing
+          --cov-report=xml --cov-report=html --junitxml=junit.xml
+      - name: Coverage summary
+        if: always() && matrix.python == '3.12'
+        run: |
+          echo '### Coverage' >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          uv run coverage report >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload coverage
+        if: always() && matrix.python == '3.12'
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: |
+            coverage.xml
+            htmlcov/
+            junit.xml
+
+  security:
+    # Phase 6: known-vulnerable dependencies, risky Python patterns, committed
+    # secrets. npm audit joins in web.yml once the frontend exists (Phase 8).
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - name: pip-audit (every dependency group, as locked)
+        run: |
+          uv export --frozen --all-groups --no-hashes --no-emit-project -q > /tmp/requirements.txt
+          uvx pip-audit==2.9.0 -r /tmp/requirements.txt --no-deps --disable-pip --strict
+      - name: bandit
+        run: uvx bandit==1.9.4 -c pyproject.toml -r src
+      - name: detect-secrets
+        run: |  # pragma: allowlist secret
+          git ls-files | grep -vE '^(uv\.lock|data/|eval/results/|web/src/api/schemas/|tests/fixtures/)|\.ambr$' \
+            | xargs uvx --from detect-secrets==1.5.0 detect-secrets-hook --baseline .secrets.baseline
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - run: uv sync --group dev --group pipeline --group eval --frozen
+      - name: Build image
+        run: docker build --build-arg GIT_SHA=${GITHUB_SHA::7} -t federal-courts-analyst:dev .
+      - name: Container tests
+        run: uv run pytest -m docker tests/test_docker.py -v

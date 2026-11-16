@@ -1,0 +1,27 @@
+# FJC Integrated Database, civil (Phase 2). The FJC replaces the file in place
+# each quarter; `python -m courts_analyst.pipeline.idb fetch` pins the release
+# we build from (sha256, size, Last-Modified, ETag). A different release on the
+# server fails the fetch unless --accept-new-release is given.
+version: 1
+dataset: civil
+landing_url: https://www.fjc.gov/research/idb/civil-cases-filed-terminated-and-pending-sy-1988-present
+codebook:
+  url: https://www.fjc.gov/sites/default/files/idb/codebooks/Civil%20Codebook%201988%20Forward%2010252023.pdf
+  sha256: 57c1ab722420e3e680fabf02865fca3d49b3939261f380c04ba7873979c81adf
+  size: 172315
+  last_modified: Tue, 24 Oct 2023 17:25:10 GMT
+  etag: null
+data:
+  url: https://www.fjc.gov/sites/default/files/idb/textfiles/cv88on.zip
+  sha256: 74405231a9a3c246c7090d471a1525924fa5afb513ff22b4dc0f4babbac7223d
+  size: 329665474
+  last_modified: Wed, 26 Aug 2026 15:28:04 GMT
+  etag: '"13a64bc2-659f4dd979250"'
+member: cv88on.txt
+coverage: Cases terminated in SY 1988 through June 30, 2026 and cases pending as of June 30,
+  2026
+fy_from: 2015
+fy_to: 2025
+notes:
+- Tab-delimited cumulative file (all statistical/fiscal years in one text file). The same
+  page also offers per-year SAS datasets; we use the text file so the load needs no SAS reader.

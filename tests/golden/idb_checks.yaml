@@ -1,0 +1,60 @@
+# Official figures the full IDB build is checked against (tests/test_full_load.py).
+# None of these are inputs to the build.
+#
+# c1_filings / c1_terminations: national civil cases filed and terminated,
+# Table C-1, first-published edition (JB-<FY>), from the Phase 1 catalog.
+# Terminations must match exactly; filings within 0.5% (the IDB is a later
+# snapshot and counts a case once).
+c1_filings:
+  2016: 291851
+  2017: 267769
+  2018: 282936
+  2019: 297877
+  2020: 470581
+  2021: 344567
+  2022: 274771
+  2023: 339731
+  2024: 290896
+  2025: 303563
+c1_terminations:
+  2016: 271649
+  2017: 289901
+  2018: 276311
+  2019: 311900
+  2020: 271256
+  2021: 271625
+  2022: 308326
+  2023: 293677
+  2024: 396635
+  2025: 407539
+# c2_fy2024: civil cases commenced in FY2024 by nature-of-suit category and
+# group, JB-2024 Table C-2 (jb_c2_0930.2024.xlsx, "2024" column). Checked
+# within 1% (or 25 cases for small groups): enough to catch a misplaced code
+# (putting TCPA under Consumer Credit was off by ~1,350) while allowing for
+# records corrected since the table was published (largest gap: 0.53%).
+c2_fy2024:
+  Contract Actions: 29102
+  Real Property Actions: 4787
+  Tort Actions: 80982
+  Actions Under Statutes: 176025
+  Insurance: 13488
+  Other Contract Actions: 13497
+  Personal Injury/Product Liability: 54192
+  Other Personal Injury: 22198
+  Personal Property Damage: 4592
+  Antitrust: 800
+  Bankruptcy: 1387
+  Civil Rights: 45781
+  Prisoner Petitions: 49182
+  Forfeiture and Penalty: 786
+  Labor Laws: 12869
+  Immigration: 12218
+  Intellectual Property Rights: 14959
+  Securities, Commodities, and Exchanges: 1202
+  Social Security Laws: 13881
+  Racketeer Influenced and Corrupt Organization Act: 881
+  Tax Suits: 517
+  Consumer Credit: 8731
+  Other Statutory Actions: 10282
+  Freedom of Information Act: 959
+  Environmental Matters: 452

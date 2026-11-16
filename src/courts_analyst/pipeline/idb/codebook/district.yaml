@@ -1,0 +1,106 @@
+# DISTRICT — district court in which the case was filed (Guide to Judiciary
+# Policies, Vol. XI, App. A). Codes are two characters and some contain
+# letters ("3A") or a dash ("7-" is Alaska).
+# Source: FJC IDB Civil Codebook 1988 Forward (2023-10-25), pp. 1–2.
+# `court` is the canonical code from core/courts.py (tests check every one
+# resolves and sits in the circuit the IDB reports).
+field: district
+column: DISTRICT
+title: District
+description: District court in which the case was filed.
+missing: ["-8"]
+codes:
+  - {code: "00", label: Maine, court: ME}
+  - {code: "01", label: Massachusetts, court: MA}
+  - {code: "02", label: New Hampshire, court: NH}
+  - {code: "03", label: Rhode Island, court: RI}
+  - {code: "04", label: Puerto Rico, court: PR}
+  - {code: "05", label: Connecticut, court: CT}
+  - {code: "06", label: New York - Northern, court: NY-N}
+  - {code: "07", label: New York - Eastern, court: NY-E}
+  - {code: "08", label: New York - Southern, court: NY-S}
+  - {code: "09", label: New York - Western, court: NY-W}
+  - {code: "10", label: Vermont, court: VT}
+  - {code: "11", label: Delaware, court: DE}
+  - {code: "12", label: New Jersey, court: NJ}
+  - {code: "13", label: Pennsylvania - Eastern, court: PA-E}
+  - {code: "14", label: Pennsylvania - Middle, court: PA-M}
+  - {code: "15", label: Pennsylvania - Western, court: PA-W}
+  - {code: "16", label: Maryland, court: MD}
+  - {code: "17", label: North Carolina - Eastern, court: NC-E}
+  - {code: "18", label: North Carolina - Middle, court: NC-M}
+  - {code: "19", label: North Carolina - Western, court: NC-W}
+  - {code: "20", label: South Carolina, court: SC}
+  - {code: "22", label: Virginia - Eastern, court: VA-E}
+  - {code: "23", label: Virginia - Western, court: VA-W}
+  - {code: "24", label: West Virginia - Northern, court: WV-N}
+  - {code: "25", label: West Virginia - Southern, court: WV-S}
+  - {code: "26", label: Alabama - Northern, court: AL-N}
+  - {code: "27", label: Alabama - Middle, court: AL-M}
+  - {code: "28", label: Alabama - Southern, court: AL-S}
+  - {code: "29", label: Florida - Northern, court: FL-N}
+  - {code: "3A", label: Florida - Middle, court: FL-M}
+  - {code: "3C", label: Florida - Southern, court: FL-S}
+  - {code: "3E", label: Georgia - Northern, court: GA-N}
+  - {code: "3G", label: Georgia - Middle, court: GA-M}
+  - {code: "3J", label: Georgia - Southern, court: GA-S}
+  - {code: "3L", label: Louisiana - Eastern, court: LA-E}
+  - {code: "3N", label: Louisiana - Middle, court: LA-M}
+  - {code: "36", label: Louisiana - Western, court: LA-W}
+  - {code: "37", label: Mississippi - Northern, court: MS-N}
+  - {code: "38", label: Mississippi - Southern, court: MS-S}
+  - {code: "39", label: Texas - Northern, court: TX-N}
+  - {code: "40", label: Texas - Eastern, court: TX-E}
+  - {code: "41", label: Texas - Southern, court: TX-S}
+  - {code: "42", label: Texas - Western, court: TX-W}
+  - {code: "43", label: Kentucky - Eastern, court: KY-E}
+  - {code: "44", label: Kentucky - Western, court: KY-W}
+  - {code: "45", label: Michigan - Eastern, court: MI-E}
+  - {code: "46", label: Michigan - Western, court: MI-W}
+  - {code: "47", label: Ohio - Northern, court: OH-N}
+  - {code: "48", label: Ohio - Southern, court: OH-S}
+  - {code: "49", label: Tennessee - Eastern, court: TN-E}
+  - {code: "50", label: Tennessee - Middle, court: TN-M}
+  - {code: "51", label: Tennessee - Western, court: TN-W}
+  - {code: "52", label: Illinois - Northern, court: IL-N}
+  - {code: "53", label: Illinois - Central, court: IL-C}
+  - {code: "54", label: Illinois - Southern, court: IL-S}
+  - {code: "55", label: Indiana - Northern, court: IN-N}
+  - {code: "56", label: Indiana - Southern, court: IN-S}
+  - {code: "57", label: Wisconsin - Eastern, court: WI-E}
+  - {code: "58", label: Wisconsin - Western, court: WI-W}
+  - {code: "60", label: Arkansas - Eastern, court: AR-E}
+  - {code: "61", label: Arkansas - Western, court: AR-W}
+  - {code: "62", label: Iowa - Northern, court: IA-N}
+  - {code: "63", label: Iowa - Southern, court: IA-S}
+  - {code: "64", label: Minnesota, court: MN}
+  - {code: "65", label: Missouri - Eastern, court: MO-E}
+  - {code: "66", label: Missouri - Western, court: MO-W}
+  - {code: "67", label: Nebraska, court: NE}
+  - {code: "68", label: North Dakota, court: ND}
+  - {code: "69", label: South Dakota, court: SD}
+  - {code: "7-", label: Alaska, court: AK}
+  - {code: "70", label: Arizona, court: AZ}
+  - {code: "71", label: California - Northern, court: CA-N}
+  - {code: "72", label: California - Eastern, court: CA-E}
+  - {code: "73", label: California - Central, court: CA-C}
+  - {code: "74", label: California - Southern, court: CA-S}
+  - {code: "75", label: Hawaii, court: HI}
+  - {code: "76", label: Idaho, court: ID}
+  - {code: "77", label: Montana, court: MT}
+  - {code: "78", label: Nevada, court: NV}
+  - {code: "79", label: Oregon, court: OR}
+  - {code: "80", label: Washington - Eastern, court: WA-E}
+  - {code: "81", label: Washington - Western, court: WA-W}
+  - {code: "82", label: Colorado, court: CO}
+  - {code: "83", label: Kansas, court: KS}
+  - {code: "84", label: New Mexico, court: NM}
+  - {code: "85", label: Oklahoma - Northern, court: OK-N}
+  - {code: "86", label: Oklahoma - Eastern, court: OK-E}
+  - {code: "87", label: Oklahoma - Western, court: OK-W}
+  - {code: "88", label: Utah, court: UT}
+  - {code: "89", label: Wyoming, court: WY}
+  - {code: "90", label: District of Columbia, court: DC}
+  - {code: "91", label: Virgin Islands, court: VI}
+  - {code: "93", label: Guam, court: GU}
+  - {code: "94", label: Northern Mariana Islands, court: MP}

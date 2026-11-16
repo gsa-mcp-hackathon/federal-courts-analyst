@@ -1,0 +1,61 @@
+# Frontend: lint, types (and drift from the backend schemas), unit tests,
+# build, Playwright journeys with axe (mocked API), npm audit, Lighthouse.
+name: Web
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: web-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: web
+
+jobs:
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci --no-fund
+      - name: Lint and format
+        run: npm run lint
+      - name: Typecheck
+        run: npm run typecheck
+      - name: API types match the backend schemas
+        run: npm run types:check
+      - name: District geometry matches its inputs
+        run: npm run geo -- --check
+      - name: Unit tests
+        run: npm test
+      - name: Build
+        run: npx vite build
+      - name: npm audit (production dependencies)
+        run: npm audit --omit=dev --audit-level=high
+      - name: Playwright browsers
+        run: npx playwright install --with-deps chromium
+      - name: E2E journeys (mocked API, axe)
+        run: npx playwright test
+      - name: Lighthouse (Ask, presentation mode, gallery)
+        run: npx lhci autorun
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: web-reports
+          path: |
+            web/playwright-report/
+            web/test-results/
+            web/lighthouse/

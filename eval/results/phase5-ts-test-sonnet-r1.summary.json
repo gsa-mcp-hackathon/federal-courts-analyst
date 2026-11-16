@@ -1,0 +1,85 @@
+{
+  "run_id": "phase5-ts-test-sonnet",
+  "answerer": "claude-code-sonnet",
+  "label": "tool_selection-test",
+  "items": [
+    "ts-compare-top-districts",
+    "ts-compare-named-districts",
+    "ts-compare-circuits-districts",
+    "ts-explain-change-terminations",
+    "ts-cohort-median-time",
+    "ts-reconcile-figure",
+    "ts-explain-term-weighted",
+    "ts-sample-dockets-patent",
+    "ts-official-pending"
+  ],
+  "finished_at": "2026-09-27T01:34:02+00:00",
+  "summary": {
+    "n": 9,
+    "correct": 9,
+    "accuracy": 1.0,
+    "by_suite": {
+      "tool_selection": {
+        "n": 9,
+        "correct": 9,
+        "accuracy": 1.0
+      }
+    },
+    "by_split": {
+      "test": {
+        "n": 9,
+        "correct": 9,
+        "accuracy": 1.0
+      }
+    },
+    "by_check": {
+      "behavior": {
+        "n": 9,
+        "passed": 9,
+        "rate": 1.0
+      },
+      "tools": {
+        "n": 9,
+        "passed": 9,
+        "rate": 1.0
+      }
+    },
+    "behavior_confusion": {
+      "answer": {
+        "answer": 9,
+        "clarify": 0,
+        "decline": 0
+      },
+      "clarify": {
+        "answer": 0,
+        "clarify": 0,
+        "decline": 0
+      },
+      "decline": {
+        "answer": 0,
+        "clarify": 0,
+        "decline": 0
+      }
+    },
+    "behavior_metrics": {
+      "answer": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "support": 9
+      },
+      "clarify": {
+        "precision": null,
+        "recall": null,
+        "support": 0
+      },
+      "decline": {
+        "precision": null,
+        "recall": null,
+        "support": 0
+      }
+    },
+    "error_categories": {},
+    "latency_p50_s": 6.252,
+    "latency_p95_s": 17.939
+  }
+}

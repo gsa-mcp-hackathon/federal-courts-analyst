@@ -1,0 +1,168 @@
+"""MCP protocol: what the server advertises, over both protocol eras."""
+
+from __future__ import annotations
+
+from fastmcp import Client
+
+from courts_analyst import SERVER_NAME, __version__
+
+EXPECTED_TOOLS = {
+    "explain_change",
+    "get_official_figure",
+    "compare_courts",
+    "find_cases",
+    "analyze_cohort",
+    "reconcile",
+    "judgeship_context",
+    "explain_term",
+    "sample_dockets",
+    "find_published_answers",
+    "check_inquiry_eligibility",
+    "keep_answer",
+    "my_requests",
+    "open_request",
+    "save_verified_answer",
+    "file_revision_inquiry",
+    "server_info",
+}
+# Request desk writes (ADR 0013): sandbox records only, never destructive.
+DESK_WRITES = {
+    "keep_answer",
+    "open_request",
+    "save_verified_answer",
+    "file_revision_inquiry",
+}
+TOOL_ORDER = [
+    "explain_change",
+    "get_official_figure",
+    "compare_courts",
+    "find_cases",
+    "analyze_cohort",
+    "reconcile",
+    "judgeship_context",
+    "explain_term",
+    "sample_dockets",
+    "find_published_answers",
+    "check_inquiry_eligibility",
+    "keep_answer",
+    "my_requests",
+    "open_request",
+    "save_verified_answer",
+    "file_revision_inquiry",
+    "server_info",
+]
+EXPECTED_RESOURCES = {
+    "courts://catalog",
+    "courts://revisions",
+    "courts://glossary",
+    "courts://editions/{edition}/{table}",
+    "courts://codebook/{field}",
+    "courts://methodology/{topic}",
+    "desk://library",
+}
+EXPECTED_PROMPTS = {
+    "district_caseload_profile",
+    "what_changed_and_why",
+    "judgeship_briefing",
+    "compare_editions",
+    "keep_this_answer",
+}
+
+
+async def test_lists_expected_tools(client: Client) -> None:
+    tools = await client.list_tools()
+    assert {t.name for t in tools} == EXPECTED_TOOLS
+
+
+async def test_tool_order_is_deterministic(client: Client) -> None:
+    # Spec 2026-07-28 asks for a stable tools/list order (prompt-cache friendly).
+    first = [t.name for t in await client.list_tools()]
+    second = [t.name for t in await client.list_tools()]
+    assert first == second == TOOL_ORDER
+
+
+async def test_lists_expected_resources_and_prompts(client: Client) -> None:
+    resources = await client.list_resources()
+    templates = await client.list_resource_templates()
+    prompts = await client.list_prompts()
+    assert {str(r.uri) for r in resources} | {
+        t.uri_template for t in templates
+    } == EXPECTED_RESOURCES
+    assert {p.name for p in prompts} == EXPECTED_PROMPTS
+
+
+async def test_every_tool_has_description_schema_and_annotations(
+    client: Client,
+) -> None:
+    for tool in await client.list_tools():
+        assert tool.description and len(tool.description) > 40, tool.name
+        assert tool.output_schema, f"{tool.name} has no outputSchema"
+        assert tool.annotations is not None, tool.name
+        assert tool.annotations.read_only_hint is (tool.name not in DESK_WRITES), (
+            tool.name
+        )
+        assert tool.annotations.destructive_hint is False, tool.name
+        assert tool.annotations.title, tool.name
+        # Only sample_dockets points outside this server (CourtListener links).
+        assert tool.annotations.open_world_hint is (tool.name == "sample_dockets")
+
+
+async def test_server_info_structured_output(client: Client) -> None:
+    result = await client.call_tool("server_info", {})
+    data = result.structured_content
+    assert data is not None
+    assert data["name"] == SERVER_NAME
+    assert data["version"] == __version__
+    assert data["protocol_versions"][0] == "2026-07-28"
+    assert "2025-11-25" in data["protocol_versions"]
+    assert data["tools"] == sorted(EXPECTED_TOOLS)
+    assert data["data_status"] in {"ready", "not_built"}
+
+
+async def test_server_info_output_matches_its_schema(client: Client) -> None:
+    tool = next(t for t in await client.list_tools() if t.name == "server_info")
+    result = await client.call_tool("server_info", {})
+    assert tool.output_schema is not None
+    assert set(tool.output_schema["required"]) <= set(result.structured_content or {})
+
+
+async def test_legacy_clients_still_work(legacy_client: Client) -> None:
+    tools = await legacy_client.list_tools()
+    assert {t.name for t in tools} == EXPECTED_TOOLS
+    result = await legacy_client.call_tool("server_info", {})
+    assert result.structured_content is not None
+    assert result.structured_content["name"] == SERVER_NAME
+
+
+async def test_data_status_reflects_duckdb_file(
+    client: Client, tmp_path, monkeypatch
+) -> None:
+    from courts_analyst.config import settings
+
+    db = tmp_path / "courts.duckdb"
+    monkeypatch.setattr(settings, "duckdb_path", db)
+
+    result = await client.call_tool("server_info", {})
+    assert result.structured_content["data_status"] == "not_built"
+
+    db.write_bytes(b"")
+    result = await client.call_tool("server_info", {})
+    assert result.structured_content["data_status"] == "ready"
+
+
+async def test_datasets_report_each_database(
+    client: Client, tmp_path, monkeypatch
+) -> None:
+    from courts_analyst.config import settings
+
+    monkeypatch.setattr(settings, "duckdb_path", tmp_path / "courts.duckdb")
+    monkeypatch.setattr(settings, "idb_duckdb_path", tmp_path / "idb.duckdb")
+    result = await client.call_tool("server_info", {})
+    assert result.structured_content["datasets"] == {
+        "official_tables": "not_built",
+        "idb_civil": "not_built",
+    }
+    (tmp_path / "idb.duckdb").write_bytes(b"")
+    result = await client.call_tool("server_info", {})
+    assert result.structured_content["datasets"]["idb_civil"] == "ready"
+    assert result.structured_content["data_status"] == "not_built"

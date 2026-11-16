@@ -1,0 +1,38 @@
+{
+  "agent": "Untitled_Agent_1_6636bi",
+  "goals": {
+    "get_official_figure-1": [
+      "summarize"
+    ]
+  },
+  "goal_details": [
+    {
+      "type": "tool_call",
+      "name": "get_official_figure-1",
+      "tool_name": "get_official_figure",
+      "args": {
+        "court": "US",
+        "fiscal_year": 2017,
+        "measure": "civil_cases_pending"
+      },
+      "arg_matching": {
+        "court": "strict",
+        "fiscal_year": "strict",
+        "measure": "strict"
+      }
+    },
+    {
+      "name": "summarize",
+      "type": "text",
+      "response": "The two numbers are from different editions of the same table.  \n\n* 339,131 appears in the 2017 edition of Judicial Business (JB‑2017) Table C‑1.  \n* 366,195 appears in the 2018 edition of Judicial Business (JB‑2018) Table C‑1, which restates the FY‑2017 pending‑case count.  \n\nThe later edition revised the earlier figure → 339,131 (JB‑2017) → 366,195 (JB‑2018).",
+      "keywords": [
+        "339,131",
+        "366,195"
+      ],
+      "summary": "The explanation clarifies that the two figures come from successive editions of the same table, with the later edition updating the earlier number."
+    }
+  ],
+  "story": "You noticed that the FY 2017 national civil pending count is listed as 339,131 in one table and 366,195 in another, and you want to understand why the figures differ.",
+  "starting_sentence": "The FY2017 national civil pending count is 339,131 in one table and 366,195 in another. Why?",
+  "response_summary_version": "v2"
+}
