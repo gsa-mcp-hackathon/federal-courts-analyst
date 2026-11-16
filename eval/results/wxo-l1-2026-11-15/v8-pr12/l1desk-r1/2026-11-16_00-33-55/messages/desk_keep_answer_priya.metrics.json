@@ -1,0 +1,23 @@
+{
+    "orchestrate_agent_routing_accuracy": 1,
+    "total_steps": 32,
+    "llm_steps": 16,
+    "average_agent_response_time": 5.307,
+    "total_tool_calls": 7,
+    "expected_tool_calls": 2,
+    "correct_tool_calls": 2,
+    "missed_tool_calls": 0,
+    "relevant_tool_calls": 6,
+    "tool_calls_with_incorrect_parameter": 2,
+    "tool_call_recall": 1.0,
+    "tool_call_precision": 0.29,
+    "tool_match_success": true,
+    "tool_parameter_f1": 0.7,
+    "keyword_match": true,
+    "semantic_match": true,
+    "text_match": 1,
+    "is_success": true,
+    "run_idx": 1,
+    "dataset_name": "desk_keep_answer_priya",
+    "text_match_comment": "Matched 1/1 text goals"
+}

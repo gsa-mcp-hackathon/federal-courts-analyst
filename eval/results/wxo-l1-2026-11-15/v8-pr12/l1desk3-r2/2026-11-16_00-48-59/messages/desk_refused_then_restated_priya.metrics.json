@@ -1,0 +1,23 @@
+{
+    "orchestrate_agent_routing_accuracy": 1,
+    "total_steps": 26,
+    "llm_steps": 13,
+    "average_agent_response_time": 5.134,
+    "total_tool_calls": 7,
+    "expected_tool_calls": 4,
+    "correct_tool_calls": 2,
+    "missed_tool_calls": 0,
+    "relevant_tool_calls": 5,
+    "tool_calls_with_incorrect_parameter": 0,
+    "tool_call_recall": 0.5,
+    "tool_call_precision": 0.29,
+    "tool_match_success": false,
+    "tool_parameter_f1": 0.4524,
+    "keyword_match": true,
+    "semantic_match": false,
+    "text_match": 0,
+    "is_success": false,
+    "run_idx": 1,
+    "dataset_name": "desk_refused_then_restated_priya",
+    "text_match_comment": "Matched 0/1 text goals"
+}
