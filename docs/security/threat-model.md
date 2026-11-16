@@ -90,7 +90,9 @@ setting at deploy time).
   will get past it. What that text can do is bounded: numbers in an answer
   must match official figures (5 of the 15 missed attacks were stopped there),
   nobody but the asker and staff sees it until staff publish it, it arrives
-  labelled as quoted user text, and no desk tool is offered to the agent.
+  labelled as quoted user text, and no desk tool is offered to the web
+  app's agent (the watsonx Orchestrate agent has `keep_answer` and
+  `my_requests`, behind the user's yes and the `preview_id` check).
   The staff review before publishing is the control that matters; a model
   that obeys labelled user text anyway is outside the server's control (see
   above).
