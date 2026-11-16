@@ -106,18 +106,29 @@ Desk tests (Layer 1), checked with `courts-eval preview-check`:
 | Deployed: v8, preview check + digest fix | 6 | 10 | **0** | **0** |
 | v12 candidate (rule 2 for the new flow) | 6 | 19 | 3 | 0 |
 | v8 on the first preview-check build | 6 | 9 | 1 | 0 |
+| **Deployed after #12** (v8; gate and `ask_office` fixes below) | 6 | 14 | 3 | **0** |
 
 Every violation after the deploy was the old pattern, a confirm without a
 new "Shall I go ahead?". The server refused each one. v12 was not kept.
 Transcripts: `results/wxo-l1-2026-11-15/`.
 
-Still open:
-- **A gate gap:** a number backed only by re-running `get_official_figure`
-  skips the edition check, so "554 in FY2020 and 318 in FY2021" was saved as
-  verified.
-- **An `ask_office` slip:** the agent sometimes omits the figure to ask
-  about, and then misreports the error.
-- **No dev run** on the deployed setup.
+Then #12 (deployed) closed two gaps found in these runs:
+- **Gate gap.** A number backed only by re-running `get_official_figure` had
+  skipped the edition check, so "554 in FY2020 and 318 in FY2021" was saved
+  as verified. Such numbers are now placed in the edition that prints them
+  and checked.
+- **`ask_office` slip.** A missing, uncited or ineligible figure to ask
+  about is now refused before the user is asked.
+
+On the deployed setup, 5 of 6 desk runs ended in a save after a preview and a
+yes (2 of 6 before). The 3 violations were retries right after an error, and
+all were refused by the server.
+
+**Dev on the deployed setup** (v8, 117 items × 3): **85.2% (95% CI
+81.1–88.5%), pass@3 93.2%, pass^3 73.5%**. 11 of 351 attempts hit wxO tool
+errors (86.2%, 82.1–89.4%, without them). Step 09's v8 dev was 86.3%
+(82.3–89.5%), so there is no sign of a regression. Run:
+`results/20261116T005129Z-wxo-all-dev-subset.md`.
 
 ## Limits
 
