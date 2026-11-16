@@ -95,6 +95,12 @@ test("Ask → clarify → answer with citations", async ({ page }) => {
   const chips = page.getByRole("group", { name: "Choices" });
   await expect(chips).toBeVisible();
   await expect(page.getByText("Which filings per judgeship")).toBeVisible();
+  // Scan only once the panel has finished fading in: mid-fade, its text is
+  // partly transparent and fails colour contrast.
+  await expect(page.getByLabel("The server needs a choice").locator("..")).toHaveCSS(
+    "opacity",
+    "1",
+  );
   await axe(page);
   await chips.getByRole("button", { name: "Civil filings per judgeship (unweighted)" }).click();
   await expect(
