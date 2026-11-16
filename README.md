@@ -52,7 +52,7 @@ tables (no LLM judge). Full detail in [`eval/SUMMARY.md`](eval/SUMMARY.md).
 | Run | Items × repeats | Mean (95% CI) | pass^3 |
 | --- | --- | --- | ---: |
 | **Held-out `test2`**, written before any agent run, scored once | 45 × 3 | **80.0% (72.5–85.9%)** | 73.3% |
-| Dev split, on the deployed server | 117 × 3 | 85.2% (81.1–88.5%) | 73.5% |
+| Dev split, on the deployed server | 117 × 3 | 88.3% (84.5–91.3%) | 80.3% |
 
 - **Figures are reliable.** On held-out, every single-figure answer had the
   official value with the right edition, 3 times out of 3.
@@ -65,7 +65,9 @@ tables (no LLM judge). Full detail in [`eval/SUMMARY.md`](eval/SUMMARY.md).
 
 The held-out run used the server build from before the desk fixes. Those
 fixes touch only the desk tools, and dev on the deployed build shows no
-regression (85.2% against 86.3% before).
+regression (88.3% against 88.0% before). Dev scores are re-scored after a
+scorer fix for thousands separators written as narrow spaces ("297 877");
+as first scored they were 85.2% and 86.3%. Held-out was unaffected.
 
 ## How it works
 
