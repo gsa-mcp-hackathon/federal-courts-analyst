@@ -4,11 +4,12 @@ GSA MCP Server and SI Agent Government Hackathon
 
 | | |
 | --- | --- |
-| **Server under test** | Federal Courts Analyst MCP server, deployed to watsonx Orchestrate as the local MCP toolkit `courts_analyst_syed`, built from `reference/request-desk` at 159f529 |
+| **Server under test** | Federal Courts Analyst MCP server, deployed to watsonx Orchestrate as the local MCP toolkit `courts_analyst_syed`, built from 159f529 (now on `main`). The held-out run used the build before the request-desk fixes, cdd788b (section 3.1) |
 | **Agent under test** | `courts-analyst-syed` on watsonx Orchestrate: model `groq/openai/gpt-oss-120b`, instructions [v8](wxo/instructions/v8.txt) (5,285 characters), 8 tools |
 | **Evaluation framework** | `courts-eval`, this repository's deterministic harness (no LLM judge); IBM's `orchestrate evaluations` (ADK 2.19.1) for multi-turn desk conversations; `courts-eval preview-check` for the write-safety rule |
 | **Datasets** | Question bank of 231 items: **dev** split, 117 items on the agent's tools, for tuning; held-out **test2** split, 45 items, scored once; 3 multi-turn desk tests; a 22-case write-safety suite |
 | **Runs** | 2026-11-10 to 2026-11-16; every item asked 3 times |
+| **Also measured** | A no-tool baseline on the same model (3.9: 93.5% with the server, 20.6% without) and our scorer against an LLM judge on 486 saved replies and 340 planted errors (3.10) |
 | **On the instance** | Deployed to Live as version 1.0.0 "v8 evaluated, submission" (2026-11-16) and available in Orchestrate Chat; 6 showcase tests on the agent's Evaluate page pass 6/6 (section 3.7) |
 | **Short version** | [`SUMMARY.md`](SUMMARY.md) |
 
@@ -81,8 +82,9 @@ dev items).
 
 - **Numbers** are matched against the official tables at printed precision.
 - **The edition label must match.** "554 (JFF-2025)" fails, because JFF-2025
-  prints 322. An LLM judge is likely to pass that answer, since 554 is a real
-  published figure.
+  prints 322. We measured how an LLM judge handles this (section 3.10): it
+  caught every swapped edition, but a judge in the GSA template's style
+  passed **all 155** replies with the edition labels removed.
 - **Claims** in explanations are checked by phrase.
 - **Behaviour** (answer, clarify or decline) is inferred from the reply and
   the tool calls. **Tool choice** is checked against each item's expected
@@ -139,14 +141,32 @@ and each run also reports the score without them.
 
 | Run | Config | Items × repeats | Mean (95% CI) | pass@3 | pass^3 | Infra errors |
 | --- | --- | --- | --- | ---: | ---: | ---: |
-| **Held-out test2, once** | v8 | 45 × 3 | **80.0% (72.5–85.9)** | 86.7% | **73.3%** | 9 / 135 |
+| **Held-out test2, once** | v8, server cdd788b | 45 × 3 | **80.0% (72.5–85.9)** | 86.7% | **73.3%** | 9 / 135 |
 | Dev, deployed server (159f529) | v8 | 117 × 3 | 88.3% (84.5–91.3) | 93.2% | 80.3% | 11 / 351 |
-| Dev, before the desk fixes | v8 | 117 × 3 | 88.0% (84.2–91.0) | 92.3% | 80.3% | 14 / 351 |
+| Dev, before the desk fixes | v8, server cdd788b | 117 × 3 | 88.0% (84.2–91.0) | 92.3% | 80.3% | 14 / 351 |
 
 - The ~8-point gap between dev and held-out is expected: the instructions
   were tuned on dev.
-- The two dev runs on different server builds agree, so the desk fixes
-  didn't cost answer quality.
+- **The held-out run used the server build before the request-desk fixes**
+  (cdd788b, the same build as the third row). test2 can be scored only once,
+  so it wasn't run again on the deployed build. Between the two builds only
+  the request desk changed (`keep_answer`, its verification gate and its
+  prompt); no test2 reply calls it (`git diff cdd788b 159f529 -- src`), and
+  the two dev runs on the two builds agree (88.0% and 88.3%), so the desk
+  fixes didn't cost answer quality.
+- The held-out run's summary file predates the provenance block that later
+  runs record; its configuration is recorded here and in
+  [`SUMMARY.md`](SUMMARY.md).
+- **A later scorer fix raises held-out to 81.5% (74.1–87.1), pass^3 75.6%.**
+  The phrase checks didn't see through markdown bold, so "**7** additional
+  judgeships" failed a check for "7 additional" (section 3.6). We found this
+  while reviewing held-out replies against an LLM judge (3.10), so we keep the
+  original **80.0%** as the headline. No dev run changed.
+- **The engine suite is easy on watsonx Orchestrate.** Its items ask for a
+  case count rebuilt from the IDB and accept anything within 1% of Table C-1.
+  The toolkit there has no IDB, so the agent quotes the table and passes.
+  Without the engine items, dev is **86.1% (81.6–89.6)**. test2 has no
+  engine items.
 
 ### 3.2 By suite and behaviour
 
@@ -156,7 +176,7 @@ and each run also reports the score without them.
 | tool selection | 14/15 (93%) | 25/30 (83%) |
 | explanation | 10/18 (56%) | 35/42 (83%) |
 | adversarial | 42/60 (70%) | 81/102 (79%) |
-| engine | not in test2 | 62/63 (98%) |
+| engine | not in test2 | 62/63 (98%): the table figure, not an IDB rebuild (3.1) |
 
 | Behaviour | Held-out precision / recall | Dev precision / recall |
 | --- | --- | --- |
@@ -255,6 +275,11 @@ Instruction changes that were tried and **not kept**:
 
    An earlier scorer fix, for no-break hyphens in edition names ("JB‑2017"),
    followed the same pattern.
+5. **A second scorer bug, found by the LLM-judge comparison (3.10).** Phrase
+   checks read markdown literally, so "recommended **7** additional
+   judgeships" failed a check for "7 additional". The checks now ignore
+   emphasis and code marks. Re-scoring every saved wxO run changed two
+   held-out attempts (80.0% → 81.5%) and nothing on dev.
 
 ### 3.7 IBM's built-in evaluation (showcase)
 
@@ -295,6 +320,140 @@ a simulated user. The latest run (2026-11-16) passed **6 of 6**.
   can't determine whether a court has a judicial emergency. Tightening this
   needs an instruction change, a dev run and a redeploy, so it is left for
   after the submission.
+
+### 3.8 The same server with other models
+
+Before the watsonx Orchestrate work, the same harness ran other models
+connected straight to the server. They had none of the agent's tuned
+instructions: only the server's tool descriptions (and, in Claude Code, its
+MCP instructions), plus the same three-sentence system prompt for every
+client (name the edition next to every figure; ask one clarifying question
+rather than guess; see `SYSTEM_PROMPT` in
+`src/courts_analyst/evaluation/mcp_bridge.py`).
+
+| Client | Model | Items | Correct |
+| --- | --- | --- | ---: |
+| Claude Code, headless, server only | Claude Sonnet | e2e, 51 | 51 / 51 |
+| | | explanation, 20 | 20 / 20 |
+| | | tool selection, 25 | 24 / 25 |
+| | | adversarial, 47 | 45 / 47 |
+| Claude Code, headless, server only | Claude Haiku | tool selection, 25 | 24 / 25 |
+| Messages API with the server's tools | Claude Sonnet 5 | smoke set, 20 | 20 / 20 ($0.90) |
+| Responses API with the server's tools | GPT-5.6 Sol | smoke set, 20 | 19 / 20 ($0.19) |
+
+- **What this shows:** the tools work across clients and model families with
+  a minimal prompt, so the server's design (editions in every result, the
+  revision notes, structured declines) does most of the work, not the
+  watsonx Orchestrate instructions.
+- **What it doesn't:** these runs used the earlier bank (dev and the old
+  `test` split together), one attempt per item and earlier server builds
+  (September 2026). The adversarial and tool-selection rows are re-scored
+  after the scorer and item fixes listed in
+  [`results/README.md`](results/README.md) (40/47 and 23/25 as first
+  scored). They aren't comparable with the numbers above, and none of them
+  is held-out evidence.
+
+### 3.9 No-tool baseline: what the server adds
+
+The same model was asked the same 117 dev items twice: once with this
+server, once with no tools at all. Both used Claude Sonnet
+(`claude-sonnet-5-5`) through headless Claude Code, one attempt per item, on 2026-11-16, with the same three-sentence
+instructions (the baseline's copy drops the mention of the tools and
+replaces Claude Code's own system prompt, so it isn't told about tools it
+doesn't have).
+
+| | With the server | No tools |
+| --- | ---: | ---: |
+| **All items except tool selection** (107) | **93.5% (87.1–96.8)** | **20.6% (14.0–29.2)** |
+| e2e: single official figures (38) | 38 / 38 | 0 / 38 |
+| engine: IDB rebuilds (21) | 21 / 21 | 0 / 21 |
+| explanation (14) | 13 / 14 | 3 / 14 |
+| adversarial (34) | 28 / 34 | 19 / 34 |
+| Numbers right / with the right edition | 64 / 64, 43 / 43 | 1 / 64, 0 / 43 |
+| Decline precision / recall | 83% / 90% | 18% / 90% |
+
+- **Without the server the model can't answer.** It either refused ("I
+  don't want to quote a number from memory without the edition") or gave a
+  remembered figure with no edition. Its adversarial score comes from
+  declining nearly everything, which is why its decline precision is 18%.
+- **With the server it answered every figure correctly, with its edition.**
+  On every engine item it called `reconcile`, which rebuilds the count from
+  the IDB; the local server has the IDB, unlike the watsonx Orchestrate
+  toolkit (3.1).
+- Tool-selection items (10) are left out of the comparison because they
+  score the tools called, which a model without tools can't pass.
+- **Caveats.** This baseline uses Claude Sonnet, not the watsonx Orchestrate
+  agent's gpt-oss-120b, because it needs no API key or second agent; a
+  no-tool run on watsonx Orchestrate is still open. One attempt per item.
+  Both arms' instructions give "322 (JFF-2025) or 554 (JB-2020)" as an
+  example of the citation format, which is also the answer to one item
+  (`fy2020-weighted-civil-national`). That could only help the no-tool arm,
+  and it still failed the item.
+- Runs: [`results/baseline-dev-claude-sonnet-server.md`](results/baseline-dev-claude-sonnet-server.md)
+  and [`results/baseline-dev-claude-sonnet-notools.md`](results/baseline-dev-claude-sonnet-notools.md).
+
+### 3.10 Checking our scorer against an LLM judge
+
+Most MCP evaluation kits, including the GSA template's Phoenix kit, grade
+answers with an LLM judge. We chose exact checks instead, so we tested that
+choice: `courts-eval judge` re-grades the saved replies with an LLM judge,
+using no agent runs. The judge is Claude Sonnet, given the question, a
+reference answer built from the item and the reply. It isn't shown the tool
+calls. The judge model was `claude-sonnet-5-5`. Two prompts were used:
+
+- **generic:** the template's correctness judge, which tolerates formatting
+  differences;
+- **informed:** the same, plus this domain's rules (the edition is part of
+  the figure; revised figures need both editions; decline and clarify are
+  answers too).
+
+**Agreement on the agent's 486 real replies** (held-out and deployed dev):
+
+| Judge | Agree with our scorer | Cohen's κ | We pass, judge fails | We fail, judge passes |
+| --- | ---: | ---: | ---: | ---: |
+| generic | 96.7% | 0.86 | 4 | 12 |
+| informed | 97.1% | 0.88 | 5 | 9 |
+
+**Known-wrong replies.** We edited replies our scorer had passed so that
+each became wrong, then graded the edits with all three graders:
+
+| Edit | n | Our scorer caught | generic judge caught | informed judge caught |
+| --- | ---: | ---: | ---: | ---: |
+| Current and first-published values swapped ("554 (JFF-2025)") | 30 | 30 | 30 | 30 |
+| Every edition label removed | 155 | 155 | **0** | 152 |
+| One expected value moved by 2 | 155 | 155 | 153 | 155 |
+
+**Who was right?** We read all 20 replies where a judge and the scorer
+disagreed:
+
+| Verdict | Replies | What happened |
+| --- | ---: | --- |
+| Judge right, scorer too strict | 8 | Two markdown-bold replies (bug, now fixed); four correct declines or clarifications the behaviour rules read as answers or declines (refusing to average editions, the Guam table, "which measure of busy?"); two correct paraphrases the phrase checks missed |
+| Judge right, scorer too lenient | 2 | An engine item where the agent said it had no IDB but quoted the table figure (3.1); a definition that added an unsupported claim ("Judicial Business is the earlier series") |
+| Scorer right, judge wrong | 9 | Three tool-selection items (the judge can't see the wrong tool was called); a March-to-March period silently answered with the fiscal year; two definitions taken word for word from the FJC codebook that the judge, from its own knowledge, called fabricated; three correctly labelled first-published figures the judge called contradictions or missing a revision |
+| Debatable | 1 | "How many cases did D. Ariz. have?": declined and offered measures, where a clarifying question was expected |
+
+What this shows:
+- **A generic LLM judge ignores editions.** In this domain the edition is the
+  difference between a right and a wrong figure, and the template-style
+  judge never failed a reply for leaving it out.
+- **Telling the judge the rules closes most of that gap**, but the judge still
+  can't see tool calls or sources, so it misjudges replies that depend on
+  them in both directions.
+- **Our scorer's errors run mostly against the agent** (8 of 10). The headline
+  numbers are, if anything, slightly low.
+- **The judge isn't repeatable.** Graded a second time, 4 of the 135
+  held-out replies (3.0%) got a different verdict from the generic judge and
+  1 (0.7%) from the informed one. Our scorer gives the same verdict every
+  time.
+- **Cost:** $12.86 at list prices for 1,922 judge calls.
+- **The comparison found a real scorer bug,** now fixed. We'll keep it as a
+  standing check: `courts-eval judge` runs on any saved run, and its report
+  lists every disagreement for a person to read.
+
+The full report, with the judge's reason for every disagreement, is
+[`results/llm-judge-wxo-v8.md`](results/llm-judge-wxo-v8.md). The prompts are
+in `src/courts_analyst/evaluation/llm_judge.py`.
 
 ## 4. Security considerations
 
@@ -368,9 +527,21 @@ sent to the AO or FJC; routing is shown, not executed.
   error messages, and the IAM token is held in memory only.
 - `.env` files are gitignored. `detect-secrets`, `pip-audit` and `bandit`
   run in CI.
-- The HTTP deployment runs as a non-root, read-only container with rate
-  limits and request-size limits
-  ([threat model](../docs/security/threat-model.md)).
+
+### Transport and isolation
+
+- **On watsonx Orchestrate** the server runs as a local MCP toolkit over
+  stdio inside the platform's tool runtime. The upload holds only the server
+  package and the official tables, with no credentials and no IDB.
+- **The running server makes no outbound network calls.** Only the build
+  pipeline (`src/courts_analyst/pipeline/*/fetch.py`) downloads from
+  uscourts.gov and the FJC, and it runs before deployment, not on requests.
+  Nothing a user types can make the server fetch a URL.
+- **The HTTP deployment** (streamable HTTP, for Code Engine or cloud.gov) runs
+  as a non-root, read-only container with rate limits and request-size
+  limits ([threat model](../docs/security/threat-model.md)).
+- **The evaluation's own traffic** goes only to the watsonx Orchestrate runs
+  API with an IAM token held in memory; run records hold no credentials.
 
 ### Shared instance hygiene
 
@@ -389,10 +560,15 @@ Up to ten participants share one watsonx Orchestrate instance.
 
 - **Testing the real agent.** Every safety finding came from the deployed
   agent's own transcripts.
-- **Deterministic scoring.** In a numeric domain an exact check is both
-  stricter and cheaper than an LLM judge. Keeping scoring separate from
-  answering let us fix the scorer and re-score saved replies without
-  spending another run.
+- **Deterministic scoring, checked against an LLM judge.** In a numeric
+  domain an exact check is stricter, repeatable and free. We measured that
+  rather than assumed it: a template-style LLM judge passed every reply with
+  its edition labels removed and changed 3% of its own verdicts when asked
+  again (3.10). Keeping scoring separate from answering let us fix the
+  scorer and re-score saved replies without spending another run.
+- **A no-tool baseline.** The same model with and without the server: 93.5%
+  against 20.6%, and every official figure right with the server against
+  none without (3.9).
 - **Enforcing safety in the tool, not the prompt.** Three instruction
   changes failed to stop the save-on-retry slip. A server-side check took
   unapproved saves from 2 in 10 runs to 0 in 30.
@@ -407,9 +583,15 @@ Up to ten participants share one watsonx Orchestrate instance.
 ### Limitations
 
 - **test2 is small** (45 items, about ±7 points).
-- **One model:** gpt-oss-120b, the instance default.
-- **No no-tool baseline.** We haven't measured the same model answering
-  without the server, so the lift the server gives isn't quantified here.
+- **One model on watsonx Orchestrate:** gpt-oss-120b, the instance default.
+  Claude and GPT models were run on the server directly, but on an earlier
+  bank, once each (3.8).
+- **The bank was drafted with an AI assistant** from the catalog. Tests check
+  every expected number and edition against the official tables, but the
+  questions and the expected explanation claims haven't had an outside
+  domain expert's review.
+- **The no-tool baseline uses Claude Sonnet**, not the agent's gpt-oss-120b,
+  with one attempt per item (3.9).
 - **Clarification is close to zero** on both splits.
 - **Explanation claims are checked by phrase**, which can miss a correct
   paraphrase. The two held-out items above are left for expert review.
@@ -427,7 +609,10 @@ Up to ten participants share one watsonx Orchestrate instance.
 
 1. **Test the agent your users will meet**, through its own API.
 2. **Use deterministic checks wherever the answer is a fact.** Keep the raw
-   replies, so a scorer bug costs a re-score, not a re-run.
+   replies, so a scorer bug costs a re-score, not a re-run. If you use an
+   LLM judge, plant known-wrong answers and see whether it catches them, and
+   read the disagreements in both directions: that is how we found our own
+   scorer's bug.
 3. **Put irreversible actions behind a server-side check** that the model
    can't skip, such as a single-use preview token. Treat prompt rules as a
    second layer.
@@ -445,7 +630,10 @@ Up to ten participants share one watsonx Orchestrate instance.
 - Make clarification a server feature: a `needs_clarification` hint when a
   question names no measure, rather than a prompt rule.
 - Accept typographic thousands separators in the desk gate, then redeploy.
-- Measure a no-tool baseline on the same model.
+- Measure the no-tool baseline on gpt-oss-120b on watsonx Orchestrate too.
+- Fix the behaviour rules the LLM-judge review showed to be too strict:
+  refusing to combine editions while still listing both, and "I can't answer
+  that without knowing which measure" as a clarification (3.10).
 - Have the AO statistics staff review the revision narrative, and a domain
   expert review the two held-out items.
 - Write a fresh held-out set before any further tuning.

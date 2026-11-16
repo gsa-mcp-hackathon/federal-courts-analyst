@@ -31,7 +31,7 @@ A run writes `<run_id>.jsonl` (each answer record and its score),
 
 ## Reproduce the watsonx Orchestrate evaluation
 
-The submitted agent is `courts-analyst` on watsonx Orchestrate with this
+The submitted agent is `courts-analyst-syed` on watsonx Orchestrate with this
 server registered as a local MCP toolkit (8 tools). One script reproduces
 each published number (see [`wxo/README.md`](wxo/README.md) for setup):
 
@@ -54,10 +54,10 @@ without the agent.
 | Suite | Items | What it tests | Correct when |
 | --- | ---: | --- | --- |
 | `engine` | 30 | IDB-derived filings, terminations and pending vs Table C-1 | Within the item's relative tolerance |
-| `e2e` | 51 | Factual questions with official answers (national, district, circuit; rankings; IDB cohorts) | Every expected value, attributed to a correct edition; revisions flagged |
-| `explanation` | 20 | "Why" questions (the FY2020 jump, the 554 → 322 revision, definitions) | Every rule-based claim holds |
-| `tool_selection` | 25 | Which tool(s) a model picks from the descriptions alone | Every expected tool was called |
-| `adversarial` | 26 | Judge rankings, party names, out-of-scope years and periods, small cells, prompt injection, mixed editions, ambiguity | The right behaviour (answer / clarify / decline) plus its claims |
+| `e2e` | 66 | Factual questions with official answers (national, district, circuit; rankings; IDB cohorts) | Every expected value, attributed to a correct edition; revisions flagged |
+| `explanation` | 26 | "Why" questions (the FY2020 jump, the 554 → 322 revision, definitions) | Every rule-based claim holds |
+| `tool_selection` | 30 | Which tool(s) a model picks from the descriptions alone | Every expected tool was called |
+| `adversarial` | 79 | Judge rankings, party names, advocacy, out-of-scope years and periods, small cells, prompt injection, mixed editions, ambiguity, and over-refusal controls that must be answered | The right behaviour (answer / clarify / decline) plus its claims |
 
 Every expected official figure carries a `ref` to the catalog cell it came from
 (measure, court, fiscal year, edition). `tests/test_question_schema.py` checks
@@ -66,9 +66,14 @@ from the committed fixtures, and recomputes every expected ranking. The few
 IDB-derived figures (cohort counts and medians) are labelled `IDB-derived`,
 carry a relative tolerance and note the release they came from.
 
-Questions were drafted by Claude from the catalog and the IDB, following the
-plan's list of edition traps and the demo storyline. **They still need the
-domain expert's review** (issue [#17](https://github.com/syedaun-techsur/federal-courts-analyst/issues/17)).
+The 231 items (152 in the original bank, then 34 more dev and test items and
+the 45-item `test2` split) were drafted with Claude from the catalog and the
+IDB, following the plan's list of edition traps and the demo storyline. The
+tests above check every expected number and edition against the catalog, so
+no item carries a wrong figure. Whether each question is the one a court
+analyst would ask, and the wording of the expected explanation claims, haven't
+had an outside domain expert's review; [`EVALUATION.md`](EVALUATION.md) lists
+this under limitations.
 
 ### Smoke set
 
@@ -136,8 +141,14 @@ All deterministic ([`scoring/`](../src/courts_analyst/evaluation/scoring/)):
   number that no tool output contains), `output_interpretation`,
   `answerer_failure`.
 
-An LLM judge may later grade free-text explanation quality (Phase 10). It will
-be reported separately, with its prompt in the repo, and never scores a number.
+**LLM judge, for comparison only.** `courts-eval judge <run>.jsonl --out
+results/<name>` re-grades a saved run with an LLM judge (Claude through
+`claude -p`, no tools) using two prompts: `generic`, the GSA template's
+correctness judge, and `informed`, which adds this domain's rules. It also
+grades known-wrong edits of passing replies (swapped editions, editions
+removed, a value moved by 2) and reports agreement, Cohen's κ, catch rates
+and every disagreement with the judge's reason. It never changes a score.
+Results: [`EVALUATION.md`](EVALUATION.md), section 3.10.
 
 ## Answerers
 
@@ -151,6 +162,7 @@ Answerers other than `gold` must read only `item.question`.
 | `null` | Says nothing; must score 0% (every item has a check silence fails) | 3 |
 | `engine` | Our analytics core computing the `engine` suite directly | 4 |
 | `claude-code`, `claude-code-haiku` | Claude Sonnet / Haiku through headless Claude Code (`claude -p`), with every built-in tool off and only this MCP server connected; needs a logged-in `claude` CLI | 5 |
+| `claude-code-notools` | No-tool baseline: Claude Sonnet with no tools and the same short prompt as its whole system prompt | 10 |
 | `claude-api`, `claude-api-opus` | Claude Sonnet 5 / Opus 5 through the Messages API with this server's tools; prompt caching; **paid** | 5 |
 | `openai-api` | GPT-5.6 Sol through the Responses API with this server's tools; **paid** | 5 |
 | `agent`, `agent-openai` | The Phase 7 agent (the web app's answerer): same tools plus the request screen, the citation line for revised figures and the CourtListener fixture; **paid** (`make eval-agent-smoke`: 5 questions, $0.50 cap) | 7 |
@@ -175,8 +187,8 @@ runs both.
 - **Split.** An item is in the held-out `test` split when the first 32 bits of
   `sha256("split:" + id)` modulo 100 fall below 30; otherwise it's in `dev`.
   The split depends only on the id, so it can't drift when items are added,
-  and `tests/test_split_stability.py` pins known assignments. Today 50 of 152
-  items (33%) are held out, in every suite.
+  and `tests/test_split_stability.py` pins known assignments. Today 60 of
+  the 186 dev and test items (32%) are in `test`, in every suite.
 - **Who looks at `test`.** Nobody tunes against it. Tool descriptions, prompts
   and the agent are tuned only on `dev` runs; `courts-eval run` without
   `--split` scores both, so pass `--split dev` while iterating.

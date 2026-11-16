@@ -112,11 +112,11 @@ def _engine() -> Answerer:
     return EngineAnswerer()
 
 
-def _claude_code(model: str) -> Callable[[], Answerer]:
+def _claude_code(model: str, server: bool = True) -> Callable[[], Answerer]:
     def make() -> Answerer:
         from courts_analyst.evaluation.claude_code import ClaudeCodeAnswerer
 
-        return ClaudeCodeAnswerer(model)
+        return ClaudeCodeAnswerer(model, server=server)
 
     return make
 
@@ -143,6 +143,8 @@ ANSWERERS: dict[str, Callable[[], Answerer]] = {
     "engine": _engine,
     "claude-code": _claude_code("sonnet"),
     "claude-code-haiku": _claude_code("haiku"),
+    # No-tool baseline: the same model and prompt with no server attached.
+    "claude-code-notools": _claude_code("sonnet", server=False),
     # Paid API answerers (`uv sync --group eval`; keys in .env). The CLI runs
     # them on the smoke set only, under --budget-usd, unless told otherwise.
     "claude-api": _paid(
