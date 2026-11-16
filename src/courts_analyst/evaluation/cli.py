@@ -102,6 +102,19 @@ def _parser() -> argparse.ArgumentParser:
     jd.add_argument("--workers", type=int, default=8)
     jd.add_argument("--no-mutants", action="store_true")
     jd.add_argument("--limit", type=int, help="first N replies per file (trial runs)")
+    df = sub.add_parser(
+        "desk-flows",
+        help=(
+            "Scripted request-desk conversations with Claude on the full server: "
+            "step-by-step write tools vs keep_answer"
+        ),
+    )
+    df.add_argument("--out", type=Path, required=True, help="output stem (.jsonl, .md)")
+    df.add_argument("--model", default="sonnet")
+    df.add_argument("--repeats", type=int, default=3)
+    df.add_argument("--workers", type=int, default=4)
+    df.add_argument("--scenario", action="append", help="scenario id (default: all)")
+    df.add_argument("--arm", action="append", choices=["step", "keep"])
     s = sub.add_parser("show", help="Print a past run's summary as Markdown")
     s.add_argument("summary", type=Path, help="<run_id>.summary.json")
     pc = sub.add_parser(
@@ -149,6 +162,28 @@ def main(argv: list[str] | None = None) -> int:
             f"{total_violations} violation(s)"
         )
         return 1 if any_error else 0
+    if args.cmd == "desk-flows":
+        from courts_analyst.evaluation import desk_flows
+
+        flows = [
+            sc
+            for sc in desk_flows.SCENARIOS
+            if not args.scenario or sc.id in args.scenario
+        ]
+        args.out.parent.mkdir(parents=True, exist_ok=True)
+        flow_results = desk_flows.run_all(
+            args.out,
+            flows,
+            args.arm or desk_flows.ARMS,
+            args.repeats,
+            args.workers,
+            args.model,
+            progress=lambda line: print(f"  {line}", file=sys.stderr, flush=True),
+        )
+        md = desk_flows.report_markdown(flow_results, args.model)
+        args.out.with_suffix(".md").write_text(md)
+        print(md)
+        return 0
     if args.cmd == "show":
         from courts_analyst.evaluation.scoring.summary import RunSummary
 

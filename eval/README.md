@@ -150,6 +150,14 @@ removed, a value moved by 2) and reports agreement, Cohen's κ, catch rates
 and every disagreement with the judge's reason. It never changes a score.
 Results: [`EVALUATION.md`](EVALUATION.md), section 3.10.
 
+**Desk conversations.** `courts-eval desk-flows --out results/<name>` plays
+scripted multi-turn request-desk conversations through headless Claude Code
+on the full server, each with a fresh sandbox desk, once with the
+step-by-step write tools and once with `keep_answer`. It scores every write
+the server reports: approved (after a yes to the model's question) or not,
+and whether the scenario's outcome was met. Results:
+[`EVALUATION.md`](EVALUATION.md), section 3.11.
+
 ## Answerers
 
 Anything that implements `Answerer.answer(item) -> AnswerRecord` (final text,
