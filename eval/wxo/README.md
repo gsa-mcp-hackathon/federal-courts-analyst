@@ -2,7 +2,7 @@
 
 ## Agent instruction versions
 
-`instructions/v0.txt`–`v12.txt` are the **courts-analyst-syed** agent instruction versions used in the tuning rounds:
+`instructions/v0.txt`–`v13.txt` are the **courts-analyst-syed** agent instruction versions used in the tuning rounds:
 
 | File | Description |
 |------|-------------|
@@ -19,6 +19,7 @@
 | `v10.txt` | v8 + clarify check first in the list, and a new preview on a retry after a refused save (not kept: `adv-defendant-names-sample` 2/3 → 0/3) |
 | `v11.txt` | v10 + "which court was busiest" names no measure, refusals must give the reason (rejected: mean 84.3%, three preview violations) |
 | `v12.txt` | v8 with rule 2 rewritten for the `preview_id` check (step 10): in the preview turn call keep_answer with confirm=false, then confirm with that preview_id after the yes; a refused save or changed text needs a new preview call and a new yes |
+| `v13.txt` | v8 + one sentence in rule 3: after an error or `written: false`, no second `confirm=true` in that turn; start again from rule 2 (new preview, new "Shall I go ahead?"). Not kept: dev 87.5% (83.6–90.5%) but `explain-direct-filed-mdl` 3/3 → 0/3 |
 | `found-live-2026-11-15.txt` | Not a tuning round: what was live on the agent on 2026-11-15 before the step 10 deploy (v8 + rules 5–7: preview for every desk write tool, no "judicial emergency" label for 600, no 【…】 tool fields), with 13 tools attached. Author unknown; replaced by v8 + the evaluated 8 tools (step 10) |
 
 ## Reproduce a run
