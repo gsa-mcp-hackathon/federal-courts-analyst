@@ -9,7 +9,13 @@ export default defineConfig({
   fullyParallel: true,
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? [["github"], ["html", { open: "never" }]] : "list",
-  use: { baseURL: "http://127.0.0.1:4173", trace: "retain-on-failure" },
+  // Reduced motion: axe must not scan a panel mid-fade, when its text is
+  // still partly transparent and fails colour contrast (a flaky failure).
+  use: {
+    baseURL: "http://127.0.0.1:4173",
+    trace: "retain-on-failure",
+    reducedMotion: "reduce",
+  },
   projects: [
     {
       name: "desktop",

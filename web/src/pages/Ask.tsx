@@ -1,6 +1,6 @@
 import { lazy, Suspense, useCallback, useEffect, useReducer, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { answerClarification, ask, StreamError } from "@/api/sse";
 import { foldTurn, initialTurn, reduceTurn, type TurnState } from "@/api/turn";
 import type { AgentEvent, ClarifyEvent } from "@/api/types.gen";
@@ -230,6 +230,8 @@ export function AnswerView({
   const guard = turn.warnings.filter((w) => w.source === "guardrail");
   const other = turn.warnings.filter((w) => w.source !== "guardrail");
   const hasEvidence = turn.charts.length > 0 || turn.dockets.length > 0;
+  // With reduced motion the clarify panel appears at once instead of fading in.
+  const reduceMotion = useReducedMotion();
   return (
     <article aria-busy={live && turn.status === "streaming"} className="space-y-4">
       <h2 className="font-serif text-2xl font-semibold text-ink">{turn.question}</h2>
@@ -259,9 +261,9 @@ export function AnswerView({
           <AnimatePresence>
             {turn.clarify && onClarify && (
               <motion.div
-                initial={{ opacity: 0, y: 6 }}
+                initial={reduceMotion ? false : { opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }}
+                exit={reduceMotion ? undefined : { opacity: 0 }}
               >
                 <ClarifyChips
                   ev={turn.clarify}
