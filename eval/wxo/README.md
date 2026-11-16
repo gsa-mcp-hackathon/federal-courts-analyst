@@ -36,8 +36,9 @@ DESK=1 eval/wxo/run_eval.sh dev                               # dev, plus the th
 `run_eval.sh` checks the live agent against the instruction file with
 `agent_check.py` (instructions, tool count; writes the provenance JSON the run
 summary embeds), runs `courts-eval` with tools on the agent only, then
-`courts-eval preview-check` over the run and, with `DESK=1`, over both Layer 1
-desk transcripts. It exits 1 on a mismatch or any preview violation. A second
+`courts-eval preview-check` over the run and, with `DESK=1`, runs the three
+Layer 1 desk tests (`l1desk`, `l1desk2`, `l1desk3`) and checks their
+transcripts. It exits 1 on a mismatch or any preview violation. A second
 held-out run with the same instructions stops unless `HELDOUT_AGAIN=1`.
 
 ## Test cases

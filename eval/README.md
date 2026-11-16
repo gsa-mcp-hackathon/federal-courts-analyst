@@ -37,7 +37,7 @@ each published number (see [`wxo/README.md`](wxo/README.md) for setup):
 
 ```bash
 eval/wxo/run_eval.sh dev                  # dev split: 117 items x 3 repeats
-DESK=1 eval/wxo/run_eval.sh heldout       # test2 held-out split, once, plus both desk tests
+DESK=1 eval/wxo/run_eval.sh heldout       # test2 held-out split, once, plus the three desk tests
 ```
 
 It checks the live agent's instructions and tools against
@@ -192,3 +192,6 @@ runs both.
   any agent run and generated reproducibly by `eval/wxo/gen_test2.py`), was
   added for the final run. `courts-eval` never selects it unless asked
   (`--split test2`); it was run once, with the final instructions (v8).
+  `eval/results/.heldout-aece69f1ae6440c4` (the first 16 hex digits of v8's
+  SHA-256) is committed, so `run_eval.sh heldout` with v8 stops on any clone
+  unless `HELDOUT_AGAIN=1`.
