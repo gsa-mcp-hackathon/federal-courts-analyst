@@ -16,6 +16,13 @@ Rules (ADR 0013, decision 5):
    an earlier edition's value, in a sentence that says so ("first published
    as 554", "updated the number to 322") or that quotes another edition's
    value for the same figure beside it, is history, not part of the set.
+   A number backed only by re-running a read tool joins the set too, when
+   its sentence names a fiscal year and a cited measure's chain prints it:
+   it counts as cited from an edition that prints it (the one written beside
+   it, else one the answer already cites, else one of the same series, else
+   the latest). Otherwise
+   "554 (JB-2020) in FY2020 and 318 in FY2021" would pass, with 318 backed
+   by a re-run that lists every edition.
 4. The text argues for no outcome.
 
 A refusal names each number and what to write instead.
@@ -278,6 +285,73 @@ def _not_statistics(text: str) -> list[tuple[int, int]]:
     return [(m.start(), m.end()) for m in NOT_STATISTICS.finditer(text)]
 
 
+_FISCAL_YEAR = re.compile(r"\b(?:FY\s?|fiscal\s+year\s+)?((?:19|20)\d{2})\b", re.I)
+
+
+def _year_near(n: TextFigure, text: str) -> int | None:
+    """The fiscal year written closest to ``n`` in its sentence."""
+    lo, hi = n.sentence
+    best: tuple[int, int] | None = None
+    for m in _FISCAL_YEAR.finditer(text, lo, hi):
+        year = int(m.group(1))
+        if year not in YEARS or m.start() <= n.start < m.end():
+            continue
+        gap = n.start - m.end() if m.end() <= n.start else m.start() - n.end
+        if best is None or gap < best[0]:
+            best = (gap, year)
+    return best[1] if best else None
+
+
+def _computed_figures(
+    db: Database,
+    text: str,
+    hits: list[TextFigure],
+    used: list[_Figure],
+    problems: list[GateProblem],
+) -> list[tuple[_Figure, TextFigure]]:
+    """Numbers backed only by a re-run, placed in a cited measure's chain so
+    the consistency check sees them (rule 3)."""
+    out: list[tuple[_Figure, TextFigure]] = []
+    groups = {(f.c.measure, f.c.court) for f in used if not f.checked.historical}
+    for n in hits:
+        year = _year_near(n, text)
+        if year is None:
+            continue
+        for measure, court in sorted(groups):
+            try:
+                chain = load_chain(db, measure, court, year)
+            except CoreError:
+                continue
+            printing = [r for r in chain if _same(r.shown, n.value)]
+            if not printing:
+                continue
+            cited = {
+                f.c.edition
+                for f in used
+                if f.c.measure == measure and not f.checked.historical
+            }
+            series = {series_of(e) for e in cited}
+            row = (
+                next((r for r in printing if r.edition == n.edition), None)
+                or next((r for r in reversed(printing) if r.edition in cited), None)
+                or next(
+                    (r for r in reversed(printing) if series_of(r.edition) in series),
+                    None,
+                )
+                or printing[-1]
+            )
+            c = CitationIn(
+                measure=measure,
+                court=court,
+                fiscal_year=year,
+                edition=row.edition,
+                value=row.shown,
+            )
+            out += [(f, n) for f in _check_citations(db, [c], problems)]
+            break
+    return out
+
+
 def _derived(values: list[float]) -> set[float]:
     """Differences and percentage changes between backed values."""
     out: set[float] = set()
@@ -325,11 +399,13 @@ def verify(
 
     used: list[_Figure] = []
     text_of: dict[int, str] = {}
+    hits_of: dict[int, list[TextFigure]] = {}
     for f in figures:
         hits = [n for n in numbers if _same(n.value, f.c.value)]
         if not hits:
             continue  # cited but not quoted: not saved
         used.append(f)
+        hits_of[id(f)] = hits
         text_of[id(f)] = text[hits[0].start : hits[0].end]
         f.checked.historical = _as_history(f, hits, figures, numbers, text)
 
@@ -345,6 +421,7 @@ def verify(
     ]
     derived = _derived(backed[:60])
     computed_hits: list[ComputedValue] = []
+    computed_numbers: list[TextFigure] = []
     for n in numbers:
         if any(_same(n.value, f.c.value) for f in used):
             continue
@@ -357,6 +434,7 @@ def verify(
             computed_hits.append(
                 ComputedValue(number=text[n.start : n.end], source=hit)
             )
+            computed_numbers.append(n)
             continue
         if round(n.value, 6) in derived or round(n.value, 1) in derived:
             continue
@@ -398,7 +476,18 @@ def verify(
                 )
             )
 
-    problems += _consistency(used, pub_order, text_of)
+    placed = _computed_figures(db, text, computed_numbers, used, problems)
+    if placed:
+        # A placed number can be the other edition's value that makes a cited
+        # one history ("554 (JB-2020) -> 322 (JFF-2023, current)").
+        every = figures + [f for f, _ in placed]
+        for f in used:
+            f.checked.historical = _as_history(f, hits_of[id(f)], every, numbers, text)
+        for f, n in placed:
+            text_of[id(f)] = text[n.start : n.end]
+            f.checked.historical = _as_history(f, [n], every, numbers, text)
+            pub_order |= {r.edition: r.pub_order for r in f.chain}
+    problems += _consistency(used + [f for f, _ in placed], pub_order, text_of)
     for phrase in advocacy_phrases(text):
         problems.append(
             GateProblem(
@@ -409,7 +498,11 @@ def verify(
             )
         )
     basis = sorted(
-        {f.c.edition for f in used if not f.checked.historical},
+        {
+            f.c.edition
+            for f in used + [f for f, _ in placed]
+            if not f.checked.historical
+        },
         key=lambda e: pub_order.get(e, 0),
     )
     return GateReport(

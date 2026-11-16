@@ -252,3 +252,64 @@ def test_a_range_label_is_right_when_every_edition_prints_the_value(
     # JFF-2022 still printed 554, so "322 (JFF-2022)" is a wrong label.
     bad = verify(core_db, "It was 322 (JFF-2022).", [cite(2020, "JFF-2025", 322)])
     assert codes(bad) == ["edition_label"]
+
+
+# ── numbers backed only by re-running a read tool (rule 3) ──────────────────
+# Request #1008 (wxO desk run, 2026-11-15): "554 in FY2020 and 318 in FY2021"
+# was saved as verified. 554 was cited from JB-2020; 318 was backed only by
+# re-running get_official_figure, whose output lists every edition, so the
+# consistency check never saw it.
+
+RERUN = {318.0: "get_official_figure", 322.0: "get_official_figure"}
+
+
+def test_rerun_number_from_another_edition_is_mixed(core_db: Any) -> None:
+    r = verify(
+        core_db,
+        "National weighted civil filings per judgeship were 554 in FY2020 and 318 "
+        "in FY2021.",
+        [cite(2020, "JB-2020", 554)],
+        RERUN,
+    )
+    assert codes(r) == ["mixed_editions"]
+    assert r.problems[0].number == "554"
+    assert "322" in (r.problems[0].fix or "")
+
+
+def test_rerun_number_from_the_same_edition_set_passes(core_db: Any) -> None:
+    # 434 is what JB-2021 printed for FY2021: the same first-published series.
+    r = verify(
+        core_db,
+        "National weighted civil filings per judgeship were 554 in FY2020 and 434 "
+        "in FY2021.",
+        [cite(2020, "JB-2020", 554)],
+        {434.0: "get_official_figure"},
+    )
+    assert r.passed, r.problems
+
+
+def test_rerun_number_beside_a_cited_one_makes_it_history(core_db: Any) -> None:
+    # The recorded storyline's shape: the first-published value is cited, the
+    # current one comes from the re-run, in the same sentence.
+    r = verify(
+        core_db,
+        "FY2020: 554 (JB-2020) -> 322 (JFF-2024, current), a drop of 232.",
+        [cite(2020, "JB-2020", 554)],
+        RERUN,
+    )
+    assert r.passed, r.problems
+    assert [c.historical for c in r.citations] == [True]
+    assert r.edition_basis == ["JFF-2024"]
+
+
+def test_rerun_number_with_no_year_in_its_sentence_is_not_placed(
+    core_db: Any,
+) -> None:
+    # Without a fiscal year the gate can't tell which figure 318 is.
+    r = verify(
+        core_db,
+        "FY2020 was 554 (JB-2020). The latest tables print 318.",
+        [cite(2020, "JB-2020", 554)],
+        RERUN,
+    )
+    assert r.passed, r.problems

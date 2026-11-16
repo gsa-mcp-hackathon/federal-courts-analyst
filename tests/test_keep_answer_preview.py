@@ -235,3 +235,62 @@ def test_reset_clears_previews(tmp_path: Path) -> None:
     store.reset()
     assert not previews.redeem(store, actor, pid, "notify", ANSWER, [], None)
     store.close()
+
+
+# ── ask_office is checked before the user is asked ──────────────────────────
+# wxO desk runs, 2026-11-15: the agent left out `inquiry`, the user said yes,
+# and only the confirming call failed (then reported as "not eligible").
+
+
+@pytest.mark.parametrize(
+    ("extra", "match"),
+    [
+        ({}, "needs inquiry"),
+        (
+            {"inquiry": {"measure": W, "fiscal_year": 2019}},
+            "doesn't cite the figure",
+        ),
+        (
+            {
+                "citations": [
+                    {
+                        "measure": "civil_cases_pending",
+                        "fiscal_year": 2023,
+                        "edition": "JB-2023",
+                        "value": 1,
+                    }
+                ],
+                "inquiry": {"measure": "civil_cases_pending", "fiscal_year": 2023},
+            },
+            "",
+        ),
+    ],
+    ids=["no-inquiry", "not-cited", "not-eligible"],
+)
+async def test_ask_office_problems_are_refused_before_the_user_is_asked(
+    desk_path: Path, extra: dict[str, Any], match: str
+) -> None:
+    from fastmcp.exceptions import ToolError
+
+    asked: list[str] = []
+
+    async def yes(message: str, response_type: Any, params: Any, ctx: Any) -> Any:
+        asked.append(message)
+        return response_type(choice="yes")
+
+    async with Client(mcp) as c:
+        with pytest.raises(ToolError, match=r"\[not_eligible\]") as err:
+            await c.call_tool("keep_answer", _args(option="ask_office", **extra))
+    assert match in str(err.value)
+    async with Client(mcp, elicitation_handler=yes) as c:
+        with pytest.raises(ToolError, match=r"\[not_eligible\]"):
+            await c.call_tool("keep_answer", _args(option="ask_office", **extra))
+    assert asked == []
+
+
+async def test_eligible_ask_office_gets_a_preview(desk_path: Path) -> None:
+    async with Client(mcp) as c:
+        out = await _call(
+            c, option="ask_office", inquiry={"measure": W, "fiscal_year": 2020}
+        )
+    assert out["preview"] and out["preview_id"]

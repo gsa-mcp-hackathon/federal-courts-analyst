@@ -192,6 +192,23 @@ The proposal page for the team:
   (`courts-eval preview-check`) stay. `core/desk/previews.py`,
   `tests/test_keep_answer_preview.py`.
 
+- **Re-run numbers join the consistency check (2026-11-15).** A wxO desk
+  run saved "554 in FY2020 and 318 in FY2021" as verified (Request #1008):
+  554 was cited from JB-2020, and 318 was backed only by re-running
+  `get_official_figure`, whose output lists every edition's value, so rule 3
+  never saw it. Now a re-run number whose sentence names a fiscal year, and
+  which a cited measure's chain prints for that year, counts as cited from
+  an edition that prints it: the one written beside it, else one the answer
+  already cites, else one of the same series, else the latest. The history
+  test is re-run with these numbers, so "554 (JB-2020) -> 322 (JFF-2023,
+  current)" stays history. A re-run number with no fiscal year in its
+  sentence, or for a measure the answer doesn't cite, is still not placed.
+- **`ask_office` is checked before the user is asked (2026-11-15).**
+  `keep_answer` runs `check_option` with `check_text`, before a preview or an
+  elicitation: the inquiry must be given, cited by the answer, and eligible.
+  In wxO runs the agent left out `inquiry`, the user said yes, and only the
+  confirming call failed. The message now names the missing argument.
+
 ## Alternatives considered
 
 - **Write into the catalog or a DuckDB file like the cohort store.** The

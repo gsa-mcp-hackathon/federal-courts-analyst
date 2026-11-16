@@ -343,6 +343,38 @@ def check_text(
             _screen_text(db, _clean(text, limit, what))
 
 
+ASK_WHICH_FIGURE = (
+    "Nothing was saved or filed: 'ask_office' needs inquiry={measure, court, "
+    "fiscal_year}, the revised figure the statistics office should explain. "
+    "Call again with it (check_inquiry_eligibility says whether a figure can go)."
+)
+
+
+def check_option(
+    db: Database,
+    option: Option,
+    citations: Sequence[CitationIn],
+    inquiry: InquiryTarget | None,
+) -> None:
+    """What can be checked about an option before the user is asked to
+    confirm it: for 'ask_office', that the inquiry is given, that the answer
+    cites that figure, and that the figure can go to the office."""
+    if option != "ask_office":
+        return
+    if inquiry is None:
+        raise NotEligibleError(ASK_WHICH_FIGURE, ["pass inquiry"])
+    target = (inquiry.measure, inquiry.court, inquiry.fiscal_year)
+    if not any((c.measure, c.court, c.fiscal_year) == target for c in citations):
+        raise NotEligibleError(
+            "Nothing was saved or filed: the answer doesn't cite the figure in "
+            "inquiry; ask about a figure the answer quotes and cites.",
+            ["cite the figure, or change inquiry"],
+        )
+    e = _eligibility(db, *target)
+    if not e.eligible:
+        raise NotEligibleError(e.reason, ["offer verified_copy instead"])
+
+
 def _replay(
     store: DeskStore, actor: Actor, tool: str, key: str | None
 ) -> DeskOutcome | None:
@@ -1104,9 +1136,7 @@ def submit_option(
     e: Eligibility | None = None
     if option == "ask_office":
         if inquiry is None:
-            raise NotEligibleError(
-                "Say which figure to ask the statistics office about."
-            )
+            raise NotEligibleError(ASK_WHICH_FIGURE, ["pass inquiry"])
         if not any(
             (c.measure, c.court, c.fiscal_year)
             == (inquiry.measure, inquiry.court, inquiry.fiscal_year)

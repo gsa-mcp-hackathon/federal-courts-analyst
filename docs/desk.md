@@ -49,7 +49,10 @@ not statistics and are skipped. On top of that:
 - **Editions stay consistent.** One measure's cited figures come from one
   series, and no edition used for one figure prints another differently
   (`guardrails.vintage`). A value quoted as history in a sentence that says
-  so ("first published as 554") is allowed.
+  so ("first published as 554") is allowed. A number backed only by re-running
+  a read tool counts too, when its sentence names a fiscal year and a cited
+  measure prints it: it is placed in the edition that prints it, so "554
+  (JB-2020) in FY2020 and 318 in FY2021" is refused as mixed editions.
 - **Labels match.** An edition written right after a number ("322
   (JFF-2024)") must be the edition it's cited from.
 - **No advocacy**, no party names (the IDB scanner), no judge-level
