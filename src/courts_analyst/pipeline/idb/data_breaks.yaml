@@ -1,0 +1,154 @@
+# Known breaks in the civil IDB: codebook changes, new codes, collection
+# changes and events that make a trend across the date misleading unless
+# explained. Loaded into the `data_breaks` table; Phase 6 guardrails warn when
+# a query spans one.
+#
+#   id        stable identifier
+#   field     IDB field affected (null = whole dataset)
+#   codes     codes affected, if any
+#   date      first day the break applies
+#   kind      codebook | new_code | collection | policy | event | method
+#   summary   one line for warnings
+#   detail    what changes and how to read a trend across it
+#   source    where the fact comes from ("observed" = computed from the data)
+breaks:
+  - id: origin-13-mdl-direct
+    field: origin
+    codes: ["13"]
+    date: 2016-07-01
+    kind: codebook
+    summary: Origin 13 (MDL cases filed directly in the MDL court) begins July 1, 2016.
+    detail: >-
+      Before July 2016, cases filed directly into an MDL court were coded as
+      original proceedings (origin 1). Direct-filed MDL counts before FY2017
+      are therefore not comparable; the first full fiscal year with origin 13
+      is FY2017. No record in the release carries origin 13 with a filing
+      date before July 1, 2016.
+    source: FJC IDB Civil Codebook 1988 Forward (2023-10-25), origin field; observed.
+
+  - id: nos-376-qui-tam
+    field: nos
+    codes: ["376"]
+    date: 2015-11-01
+    kind: new_code
+    summary: NOS 376 (qui tam False Claims Act) first appears November 2015 (FY2016).
+    detail: >-
+      Qui tam cases before FY2016 carried another code (presumably 375,
+      False Claims Act). Trends in 375/376 across FY2015–FY2016 reflect the
+      new code, not necessarily a change in filings.
+    source: observed (earliest AO filing date for code 376).
+
+  - id: nos-835-anda
+    field: nos
+    codes: ["835"]
+    date: 2017-06-01
+    kind: new_code
+    summary: NOS 835 (patent, abbreviated new drug application) first appears June 2017 (FY2017).
+    detail: >-
+      ANDA patent cases carried another code (presumably 830, patent)
+      before June 2017. Patent trends should combine 830 and 835 across the
+      break.
+    source: observed (earliest AO filing date for code 835).
+
+  - id: nos-485-tcpa
+    field: nos
+    codes: ["485"]
+    date: 2018-10-01
+    kind: new_code
+    summary: NOS 485 (Telephone Consumer Protection Act) first appears October 2018 (FY2019).
+    detail: >-
+      TCPA cases before FY2019 carried other codes and can't be separated.
+      Table C-2 counts 485 in "Other Statutory Actions" (our FY2024 check
+      against C-2 confirms this).
+    source: observed (earliest AO filing date for code 485); JB-2024 Table C-2.
+
+  - id: nos-880-dtsa
+    field: nos
+    codes: ["880"]
+    date: 2020-10-01
+    kind: new_code
+    summary: NOS 880 (Defend Trade Secrets Act) first appears October 2020 (FY2021).
+    detail: >-
+      The Act took effect in May 2016, but its cases carried other codes
+      until 880 appears in FY2021.
+    source: observed (earliest AO filing date for code 880).
+
+  - id: nos-2011-categories
+    field: nos
+    codes: ["367", "448", "560", "751"]
+    date: 2011-10-01
+    kind: collection
+    summary: Health care/pharma, education, civil detainee and FMLA categories began October 1, 2011.
+    detail: >-
+      Table C-2 notes that collection for these categories began on
+      October 1, 2011. The IDB carries some of these codes on older records,
+      so pre-FY2012 counts by these codes won't match published tables.
+      Before our FY2015 window; recorded for completeness.
+    source: JB-2024 Table C-2, note.
+
+  - id: judge-fields-blank
+    field: filejudg
+    codes: []
+    date: 1988-07-01
+    kind: policy
+    summary: Judge and magistrate judge codes are blank on the public-use files.
+    detail: >-
+      FILEJUDG, FILEMAG, TERMJUDG and TERMMAG are removed by Judicial
+      Conference policy. The loader fails if any of them is ever populated,
+      and no output can rank or profile individual judges.
+    source: FJC IDB Civil Codebook 1988 Forward (2023-10-25).
+
+  - id: ao-dates-month-precision
+    field: fdateuse
+    codes: []
+    date: 1988-07-01
+    kind: method
+    summary: Filing and termination dates "used by AO" are month precision.
+    detail: >-
+      FDATEUSE and TDATEUSE are always the first of a month and place a case
+      in the fiscal year the AO counted it. Fiscal-year cohorts use them so
+      counts match published tables; durations use the actual FILEDATE and
+      TERMDATE.
+    source: FJC IDB Civil Codebook 1988 Forward (2023-10-25); observed.
+
+  - id: reopened-without-date
+    field: null
+    codes: []
+    date: 1988-07-01
+    kind: method
+    summary: Reopened cases can carry the original filing date and no reopening date.
+    detail: >-
+      A case terminated, reopened under the same docket number and filing
+      date, and terminated again appears as two terminated records. Each
+      termination is counted (this reproduces Table C-1 terminations
+      exactly), but the reopening date isn't recorded, so pending counts
+      reconstructed for a past date can differ from the published figure.
+      The largest effect is FY2017, when about 22,000 S.D. W. Va. MDL
+      records terminated in FY2017 were terminated again in FY2018–FY2019.
+    source: observed; see docs/methodology/idb.md.
+
+  - id: pandemic-2020
+    field: null
+    codes: []
+    date: 2020-03-13
+    kind: event
+    summary: COVID-19 national emergency (March 13, 2020) disrupted court operations.
+    detail: >-
+      Courts limited in-person proceedings and jury trials from March 2020.
+      Filing and termination trends across FY2020–FY2022 mix the pandemic
+      with the N.D. Fla. 3M earplug MDL (MDL 2885) surge; don't attribute a
+      change to either without decomposing it.
+    source: Proclamation 9994 (national emergency, 2020-03-13); observed.
+
+  - id: release-snapshot
+    field: null
+    codes: []
+    date: 2026-06-30
+    kind: method
+    summary: The IDB is a snapshot; this release reflects case status as of June 30, 2026.
+    detail: >-
+      Each FJC release replaces the cumulative file. Records are corrected
+      over time, so IDB counts for a past year can differ slightly from the
+      table edition published that year (which Phase 4 reconciliation
+      explains). Pending records show status as of the release date.
+    source: FJC civil IDB landing page ("cases pending as of June 30, 2026").

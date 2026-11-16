@@ -1,0 +1,69 @@
+{
+  "agent": "Untitled_Agent_1_6636bi",
+  "story": "You are Priya-2213. You want the FY2020 national weighted civil filings per judgeship. Then you want that answer kept and the statistics office asked why the FY2020 national weighted civil filings per judgeship was revised from 554 (JB-2020) to 322 (JFF-2025): that revised figure is the one to ask about. When the agent describes what it will save and asks whether to go ahead, you say yes. After it reports the result, you ask what the status of your requests is.",
+  "starting_sentence": "I'm Priya-2213. What were weighted civil filings per judgeship nationally in FY2020? Please keep that answer and ask the statistics office why the FY2020 national figure was revised from 554 to 322.",
+  "goals": {
+    "get_official_figure-1": [
+      "keep_answer-1"
+    ],
+    "keep_answer-1": [
+      "my_requests-1"
+    ],
+    "my_requests-1": [
+      "summarize"
+    ]
+  },
+  "goal_details": [
+    {
+      "type": "tool_call",
+      "name": "get_official_figure-1",
+      "tool_name": "get_official_figure",
+      "args": {
+        "court": "US",
+        "measure": "weighted_civil_filings_per_judgeship",
+        "fiscal_year": 2020
+      },
+      "arg_matching": {
+        "court": "strict",
+        "measure": "strict",
+        "fiscal_year": "strict"
+      }
+    },
+    {
+      "type": "tool_call",
+      "name": "keep_answer-1",
+      "tool_name": "keep_answer",
+      "args": {
+        "confirm": true,
+        "option": "ask_office",
+        "question": null,
+        "answer_text": null,
+        "citations": null,
+        "inquiry": null
+      },
+      "arg_matching": {
+        "confirm": "strict",
+        "option": "strict",
+        "question": "ignore",
+        "answer_text": "ignore",
+        "citations": "ignore",
+        "inquiry": "ignore"
+      }
+    },
+    {
+      "type": "tool_call",
+      "name": "my_requests-1",
+      "tool_name": "my_requests",
+      "args": {},
+      "arg_matching": {}
+    },
+    {
+      "type": "text",
+      "name": "summarize",
+      "response": "The agent reports the saved request and its inquiry, then the status of the requests as my_requests returned it.",
+      "keywords": [
+        "322"
+      ]
+    }
+  ]
+}

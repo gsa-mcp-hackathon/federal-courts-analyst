@@ -1,0 +1,11 @@
+# IFP — fee status. Captured since October 2000. -8 means "not IFP", not
+# missing, so it is decoded as a label here.
+# Source: FJC IDB Civil Codebook 1988 Forward (2023-10-25), p. 14.
+field: ifp
+column: IFP
+title: Fee status
+description: Whether the case was filed in forma pauperis.
+missing: []
+codes:
+  - {code: "FP", label: In forma pauperis}
+  - {code: "-8", label: Not in forma pauperis}

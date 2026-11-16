@@ -1,0 +1,664 @@
+"""Official figures: one published statistic, every edition of it, and
+cross-court comparisons that never mix editions.
+
+Default edition policy (ADR 0004): return the **latest** edition's value and
+always attach the first-published value and every revision in between, so
+the 554 → 322 story is visible without anyone having to ask for it. Every
+figure also carries a one-line ``citation`` that names the edition and the
+revision, so even a "just one number" answer can't drop them.
+
+Multi-year series (:func:`official_series`) follow the never-mix-vintages
+rule in ``core/guardrails/vintage``.
+"""
+
+from __future__ import annotations
+
+from typing import Literal
+
+from pydantic import BaseModel, Field
+
+from courts_analyst.core.chain import (
+    Row,
+    history_text,
+    later_revisions,
+    load_chain,
+    revision_status,
+)
+from courts_analyst.core.courts import COURTS, TERRITORIAL, CourtLevel
+from courts_analyst.core.db import Database
+from courts_analyst.core.enums import EDITIONS
+from courts_analyst.core.errors import (
+    InvalidCohortError,
+    NotPublishedError,
+    OutOfScopeError,
+    UnknownCourtError,
+    UnknownEditionError,
+)
+from courts_analyst.core.guardrails import guarded
+from courts_analyst.core.guardrails.periods import (
+    PeriodEnding,
+    check_period,
+    period_caveats,
+)
+from courts_analyst.core.guardrails.vintage import choose_vintage
+from courts_analyst.core.measures import Measure, get_measure
+from courts_analyst.core.numbers import fmt, round_half_up
+from courts_analyst.core.provenance import (
+    FigureRef,
+    Period,
+    Provenance,
+    RevisionStatus,
+    series_title,
+)
+from courts_analyst.core.results import Caveat, Result, ok
+from courts_analyst.core.revisions import RevisionNote, revision_notes
+
+YEARS_SQL = """
+SELECT DISTINCT fiscal_year FROM cat.observation
+WHERE measure_id = ? AND court = ? AND value IS NOT NULL ORDER BY 1
+"""
+
+FOOTNOTES_SQL = "SELECT text FROM cat.footnote WHERE list_contains(?, footnote_id)"
+
+EDITION_ROWS_SQL = """
+SELECT o.edition, e.pub_order, count(*) AS n
+FROM cat.observation o JOIN cat.edition e USING (edition)
+WHERE o.measure_id = ? AND o.fiscal_year = ? AND o.value IS NOT NULL
+  AND list_contains(?, o.court)
+GROUP BY ALL ORDER BY e.pub_order DESC
+"""
+
+COMPARE_SQL = """
+SELECT o.court, o.value, o.decimals, o.cell_ref, o.table_code, s.url, o.period_end
+FROM cat.observation o JOIN cat.source_file s USING (file_id)
+WHERE o.measure_id = ? AND o.fiscal_year = ? AND o.edition = ? AND o.value IS NOT NULL
+  AND list_contains(?, o.court)
+"""
+
+
+class OfficialFigure(BaseModel):
+    """A published statistic in one edition, with its full edition history."""
+
+    measure: str
+    measure_label: str
+    unit: str
+    court: str
+    court_name: str
+    fiscal_year: int
+    value: float = Field(description="The value as printed in `edition`.")
+    citation: str = Field(
+        description="One line to quote with the number: value, edition, table and, "
+        "when editions disagree, the revision."
+    )
+    edition: str
+    table_code: str
+    period: Period
+    revision_status: RevisionStatus
+    first_published: FigureRef
+    latest: FigureRef
+    editions: list[FigureRef] = Field(
+        description="Every edition that printed this figure, oldest first."
+    )
+    footnotes: list[str] = Field(default_factory=list)
+    revision_notes: list[RevisionNote] = Field(
+        default_factory=list,
+        description="Why the editions differ: the official history, and our "
+        "inference (basis 'inferred') only where the district figures support it.",
+    )
+
+
+class CourtRow(BaseModel):
+    rank: int
+    court: str
+    court_name: str
+    citation: str | None
+    value: float
+    cell_ref: str | None
+
+
+class CourtComparison(BaseModel):
+    """Courts ranked on one measure, all from the same edition."""
+
+    measure: str
+    measure_label: str
+    unit: str
+    fiscal_year: int
+    edition: str
+    table_code: str
+    order: Literal["desc", "asc"]
+    rows: list[CourtRow]
+    national: FigureRef | None = Field(
+        default=None, description="The national figure from the same edition."
+    )
+    national_latest: FigureRef | None = Field(
+        default=None,
+        description="The national figure in the latest edition, when it differs.",
+    )
+    not_published: list[str] = Field(
+        default_factory=list,
+        description="Requested courts the edition prints no value for.",
+    )
+    total_courts: int
+
+
+def _check_court(court: str) -> None:
+    if court not in COURTS:
+        raise UnknownCourtError(f"Unknown court code {court!r}.", ["explain_term"])
+
+
+def _years(db: Database, measure: str, court: str) -> list[int]:
+    return [r[0] for r in db.rows(YEARS_SQL, [measure, court])]
+
+
+def _missing(db: Database, m: Measure, court: str, fy: int) -> Exception:
+    years = _years(db, m.id, court)
+    name = COURTS[court].citation or COURTS[court].name
+    if not years:
+        if court in TERRITORIAL and m.family in {"per_judgeship"}:
+            why = (
+                "Table X-1A excludes the territorial courts (they're outside the FJC "
+                "case-weight studies)"
+            )
+        elif COURTS[court].level is not CourtLevel.NATIONAL and not (
+            {"X-1A", "C-1", "C-5"} & set(m.tables)
+        ):
+            why = (
+                f"{m.label} is published only nationally (Table {', '.join(m.tables)})"
+            )
+        else:
+            why = "no table in the catalog prints it"
+        return NotPublishedError(
+            f"{m.label} for {name} isn't published: {why}.",
+            ["compare_courts", "explain_term"],
+        )
+    return OutOfScopeError(
+        f"{m.label} for {name} isn't published for FY{fy}. Available years: "
+        f"{', '.join(str(y) for y in years)}.",
+        [f"get_official_figure with fiscal_year in {years[0]}–{years[-1]}"],
+    )
+
+
+def _select(chain: list[Row], edition: str | None) -> Row:
+    if edition in (None, "latest"):
+        return chain[-1]
+    if edition == "first_published":
+        return chain[0]
+    for row in chain:
+        if row.edition == edition:
+            return row
+    if edition not in EDITIONS:
+        raise UnknownEditionError(f"Unknown edition {edition!r}.")
+    printed = ", ".join(r.edition for r in chain)
+    raise UnknownEditionError(
+        f"{edition} doesn't print this figure. Editions that do: {printed}.",
+        [f"call again with edition in [{printed}] or 'latest'"],
+    )
+
+
+def citation(row: Row, chain: list[Row], period: Period) -> str:
+    """ "322 (JFF-2025, Table 1.4); revised: first published as 554 (JB-2020)"."""
+    first, latest = chain[0], chain[-1]
+    text = f"{fmt(row.shown)} ({row.edition}, Table {row.table_code})"
+    if len({r.shown for r in chain}) > 1:
+        if row.shown != first.shown:
+            text += (
+                f"; revised: first published as {fmt(first.shown)} ({first.edition})"
+            )
+        if row.shown != latest.shown:
+            text += f"; later revised to {fmt(latest.shown)} ({latest.edition})"
+    if period.period_type == "statistical_year":
+        text += f"; statistical year ending June 30, {period.fiscal_year}"
+    return text
+
+
+@guarded
+def get_official_figure(
+    db: Database,
+    measure: str,
+    court: str,
+    fiscal_year: int,
+    edition: str | None = None,
+    period_ending: PeriodEnding = "september_30",
+) -> Result[OfficialFigure]:
+    """A published figure with its edition, definition and revision history.
+
+    ``period_ending`` other than September 30 is answered only where the
+    catalog holds that period (the 1990 statistical-year rows); otherwise the
+    error says what the server holds and the nearest fiscal year."""
+    m = get_measure(measure)
+    _check_court(court)
+    chain = load_chain(db, measure, court, fiscal_year)
+    if not chain:
+        if period_ending != "september_30":
+            check_period(period_ending, fiscal_year, [])
+        raise _missing(db, m, court, fiscal_year)
+    check_period(
+        period_ending,
+        fiscal_year,
+        [Period.for_end(fiscal_year, r.period_end) for r in chain],
+    )
+    row = _select(chain, edition)
+    status = revision_status(chain)
+    first, latest = chain[0], chain[-1]
+    footnote_ids = row.footnote_ids
+    footnotes = (
+        [r[0] for r in db.rows(FOOTNOTES_SQL, [footnote_ids])] if footnote_ids else []
+    )
+    period = Period.for_end(fiscal_year, row.period_end)
+    notes, note_warnings = revision_notes(db, m, court, fiscal_year, chain)
+    court_obj = COURTS[court]
+    figure = OfficialFigure(
+        measure=m.id,
+        measure_label=m.label,
+        unit=m.unit,
+        court=court,
+        court_name=court_obj.citation or court_obj.name,
+        fiscal_year=fiscal_year,
+        value=row.shown,
+        citation=citation(row, chain, period),
+        edition=row.edition,
+        table_code=row.table_code,
+        period=period,
+        revision_status=status,
+        first_published=first.ref(),
+        latest=latest.ref(),
+        editions=[r.ref() for r in chain],
+        footnotes=footnotes,
+        revision_notes=notes,
+    )
+    warnings: list[Caveat] = []
+    nxt: list[str] = []
+    if status == "revised":
+        history = history_text(chain)
+        warnings.append(
+            Caveat(
+                code="revised_figure",
+                message=(
+                    f"This figure was revised between editions ({history}). Report "
+                    f"which edition you quote; don't average or mix them."
+                ),
+            )
+        )
+        if row is not latest and row.shown != latest.shown:
+            warnings.append(
+                Caveat(
+                    code="revised_figure",
+                    message=f"The current official figure is {fmt(latest.shown)} "
+                    f"({latest.edition}).",
+                )
+            )
+        warnings += note_warnings
+    if period.period_type == "statistical_year":
+        warnings.append(
+            Caveat(
+                code="period_mismatch",
+                message=(
+                    f"{fiscal_year} here is a statistical year: the 12 months ending "
+                    f"June 30, {fiscal_year}, not a fiscal year ending September 30."
+                ),
+            )
+        )
+    prov = Provenance(
+        source="official_table",
+        table_code=row.table_code,
+        series=series_title(row.edition),
+        edition=row.edition,
+        period=period,
+        definition=m.definition,
+        url=row.url,
+        cell_ref=row.cell_ref,
+        revision_status=status,
+        first_published=first.ref(),
+        later_revisions=later_revisions(chain),
+    )
+    return ok(figure, [prov], warnings, nxt)
+
+
+def _expand(courts: list[str] | None) -> list[str]:
+    if not courts:
+        return [c for c, v in COURTS.items() if v.level is CourtLevel.DISTRICT]
+    out: list[str] = []
+    for c in courts:
+        _check_court(c)
+        if c not in out:
+            out.append(c)
+    return out
+
+
+@guarded
+def compare_courts(
+    db: Database,
+    measure: str,
+    fiscal_year: int,
+    courts: list[str] | None = None,
+    edition: str | None = None,
+    top_n: int | None = None,
+    order: Literal["desc", "asc"] = "desc",
+) -> Result[CourtComparison]:
+    """Rank courts on one measure. Every value comes from one edition."""
+    m = get_measure(measure)
+    wanted = _expand(courts)
+    candidates = db.rows(EDITION_ROWS_SQL, [measure, fiscal_year, wanted])
+    if not candidates:
+        if not _years(db, measure, wanted[0]) and len(wanted) == 1:
+            raise _missing(db, m, wanted[0], fiscal_year)
+        raise OutOfScopeError(
+            f"No edition prints {m.label} for these courts in FY{fiscal_year}.",
+            ["get_official_figure for the national figure"],
+        )
+    if edition in (None, "latest"):
+        # The latest edition printing the most of the requested courts.
+        best = max(candidates, key=lambda r: (r[2], r[1]))
+        chosen = best[0]
+    elif edition == "first_published":
+        chosen = min(candidates, key=lambda r: r[1])[0]
+    else:
+        chosen = str(edition)
+        if chosen not in {r[0] for r in candidates}:
+            raise UnknownEditionError(
+                f"{chosen} prints no {m.label} for these courts in FY{fiscal_year}. "
+                f"Editions that do: {', '.join(r[0] for r in candidates)}."
+            )
+    rows = db.rows(COMPARE_SQL, [measure, fiscal_year, chosen, wanted])
+    by_court = {r[0]: r for r in rows}
+    ranked = sorted(
+        (r for r in rows if r[0] != "US"),
+        key=lambda r: r[1],
+        reverse=order == "desc",
+    )
+    if top_n:
+        ranked = ranked[:top_n]
+    table_code = rows[0][4]
+    url = rows[0][5]
+    period_end = rows[0][6]
+    out_rows = [
+        CourtRow(
+            rank=i,
+            court=c,
+            court_name=COURTS[c].name,
+            citation=COURTS[c].citation,
+            value=round_half_up(v, d or 0),
+            cell_ref=cell,
+        )
+        for i, (c, v, d, cell, *_rest) in enumerate(ranked, 1)
+    ]
+    national_chain = load_chain(db, measure, "US", fiscal_year)
+    national = next((r for r in national_chain if r.edition == chosen), None)
+    latest_national = national_chain[-1] if national_chain else None
+    warnings: list[Caveat] = []
+    national_latest = None
+    if national and latest_national and latest_national.shown != national.shown:
+        national_latest = latest_national.ref()
+        warnings.append(
+            Caveat(
+                code="revised_figure",
+                message=(
+                    f"Court values are only published in {chosen}. The national "
+                    f"figure in that edition is {fmt(national.shown)}; "
+                    f"{latest_national.edition} later revised it to "
+                    f"{fmt(latest_national.shown)}. Compare courts with the {chosen} "
+                    "national figure, not the revised one."
+                ),
+            )
+        )
+    missing = [c for c in wanted if c not in by_court and c != "US"]
+    if courts is None:
+        missing = [c for c in missing if c not in TERRITORIAL]
+    prov = Provenance(
+        source="official_table",
+        table_code=table_code,
+        series=series_title(chosen),
+        edition=chosen,
+        period=Period.for_end(fiscal_year, period_end),
+        definition=m.definition,
+        url=url,
+        note=f"All {len(rows)} values from {chosen} Table {table_code}.",
+    )
+    data = CourtComparison(
+        measure=m.id,
+        measure_label=m.label,
+        unit=m.unit,
+        fiscal_year=fiscal_year,
+        edition=chosen,
+        table_code=table_code,
+        order=order,
+        rows=out_rows,
+        national=national.ref() if national else None,
+        national_latest=national_latest,
+        not_published=missing,
+        total_courts=len([r for r in rows if r[0] != "US"]),
+    )
+    return ok(data, [prov], warnings)
+
+
+# ── Series (never mix vintages) ──────────────────────────────────────────────
+
+MAX_SERIES_YEARS = 40
+
+
+class SeriesPoint(BaseModel):
+    fiscal_year: int
+    value: float
+    edition: str
+    table_code: str
+    period: Period
+    revision_status: RevisionStatus
+    first_published: FigureRef
+    cell_ref: str | None = None
+
+
+class OfficialSeries(BaseModel):
+    """One measure over several years, every point from one consistent series
+    unless mixing was explicitly requested (then each point names its edition)."""
+
+    measure: str
+    measure_label: str
+    unit: str
+    court: str
+    court_name: str
+    vintage: str = Field(description="How the points were chosen.")
+    consistent: bool = Field(
+        description="False only when allow_mixed was set and the points come "
+        "from editions that don't form one series."
+    )
+    points: list[SeriesPoint]
+    years_not_published: list[int] = Field(default_factory=list)
+
+
+@guarded
+def official_series(
+    db: Database,
+    measure: str,
+    court: str,
+    fy_from: int,
+    fy_to: int,
+    edition: str | None = None,
+    allow_mixed: bool = False,
+) -> Result[OfficialSeries]:
+    """A measure for each published year in ``fy_from``–``fy_to``.
+
+    Years the catalog doesn't print are listed in ``years_not_published``.
+    Raises ``mixed_editions`` when the years don't come from one consistent
+    series (see ``core/guardrails/vintage``), unless ``allow_mixed``.
+    """
+    m = get_measure(measure)
+    _check_court(court)
+    if fy_from > fy_to or fy_to - fy_from >= MAX_SERIES_YEARS:
+        raise InvalidCohortError(
+            f"fy_from must be <= fy_to and the range at most {MAX_SERIES_YEARS} years."
+        )
+    chains = {}
+    missing = []
+    for fy in range(fy_from, fy_to + 1):
+        chain = load_chain(db, measure, court, fy)
+        if chain:
+            chains[fy] = chain
+        else:
+            missing.append(fy)
+    if not chains:
+        raise _missing(db, m, court, fy_from)
+    v = choose_vintage(chains, edition, allow_mixed, measure=m.id)
+    points = []
+    provenance = []
+    for fy, row in sorted(v.points.items()):
+        chain = chains[fy]
+        period = Period.for_end(fy, row.period_end)
+        status = revision_status(chain)
+        points.append(
+            SeriesPoint(
+                fiscal_year=fy,
+                value=row.shown,
+                edition=row.edition,
+                table_code=row.table_code,
+                period=period,
+                revision_status=status,
+                first_published=chain[0].ref(),
+                cell_ref=row.cell_ref,
+            )
+        )
+        provenance.append(
+            Provenance(
+                source="official_table",
+                table_code=row.table_code,
+                series=series_title(row.edition),
+                edition=row.edition,
+                period=period,
+                definition=m.definition,
+                url=row.url,
+                cell_ref=row.cell_ref,
+                revision_status=status,
+                first_published=chain[0].ref(),
+                later_revisions=later_revisions(chain),
+            )
+        )
+    court_obj = COURTS[court]
+    data = OfficialSeries(
+        measure=m.id,
+        measure_label=m.label,
+        unit=m.unit,
+        court=court,
+        court_name=court_obj.citation or court_obj.name,
+        vintage=v.label,
+        consistent=v.consistent,
+        points=points,
+        years_not_published=missing,
+    )
+    warnings = list(v.warnings) + period_caveats(p.period for p in points)
+    if missing:
+        warnings.append(
+            Caveat(
+                code="out_of_scope",
+                severity="info",
+                message="Not published for "
+                + ", ".join(f"FY{fy}" for fy in missing)
+                + ".",
+            )
+        )
+    return ok(data, provenance, warnings)
+
+
+# ── Vintages: every edition's own series ─────────────────────────────────────
+
+VINTAGES_SQL = """
+SELECT o.edition, e.pub_order, o.fiscal_year, o.value, o.decimals, o.table_code,
+       o.cell_ref, s.url, o.period_end
+FROM cat.observation o
+JOIN cat.edition e USING (edition)
+JOIN cat.source_file s USING (file_id)
+WHERE o.measure_id = ? AND o.court = ? AND o.value IS NOT NULL
+ORDER BY e.pub_order, o.fiscal_year
+"""
+
+
+class VintagePoint(BaseModel):
+    fiscal_year: int
+    value: float
+    table_code: str
+    cell_ref: str | None = None
+    period: Period
+
+
+class EditionVintage(BaseModel):
+    """One edition's figures for the measure, exactly as that edition prints
+    them: a single edition is always one consistent vintage."""
+
+    edition: str
+    series: str | None
+    url: str | None
+    points: list[VintagePoint]
+
+
+class EditionVintages(BaseModel):
+    """Every edition that prints this measure for this court, oldest first
+    (the Edition Tracker draws one line per edition)."""
+
+    measure: str
+    measure_label: str
+    unit: str
+    court: str
+    court_name: str
+    editions: list[EditionVintage]
+
+
+@guarded
+def edition_vintages(db: Database, measure: str, court: str) -> Result[EditionVintages]:
+    """Each edition's own series for ``measure`` and ``court``. Lines are never
+    spliced across editions; compare them, don't join them."""
+    m = get_measure(measure)
+    _check_court(court)
+    rows = db.rows(VINTAGES_SQL, [measure, court])
+    if not rows:
+        raise NotPublishedError(
+            f"No edition prints {m.label} for {COURTS[court].name}.",
+            ["compare_courts for the courts an edition does print"],
+        )
+    by_ed: dict[str, EditionVintage] = {}
+    for ed, _order, fy, value, dec, table, cell, url, period_end in rows:
+        v = by_ed.get(ed)
+        if v is None:
+            v = by_ed[ed] = EditionVintage(
+                edition=ed, series=series_title(ed), url=url, points=[]
+            )
+        v.points.append(
+            VintagePoint(
+                fiscal_year=fy,
+                value=round_half_up(value, dec or 0),
+                table_code=table,
+                cell_ref=cell,
+                period=Period.for_end(fy, period_end),
+            )
+        )
+    court_obj = COURTS[court]
+    data = EditionVintages(
+        measure=m.id,
+        measure_label=m.label,
+        unit=m.unit,
+        court=court,
+        court_name=court_obj.citation or court_obj.name,
+        editions=list(by_ed.values()),
+    )
+    prov = [
+        Provenance(
+            source="official_table",
+            table_code=v.points[-1].table_code,
+            series=v.series,
+            edition=v.edition,
+            period=v.points[-1].period,
+            definition=m.definition,
+            url=v.url,
+            note=f"{len(v.points)} fiscal years as printed in {v.edition}.",
+        )
+        for v in data.editions
+    ]
+    warnings = []
+    if len({v.edition.split("-")[0] for v in data.editions}) > 1:
+        warnings.append(
+            Caveat(
+                code="mixed_editions",
+                severity="info",
+                message="Each edition is listed separately, exactly as printed; "
+                "compare the editions, don't join them into one series "
+                "(use official_series for that).",
+            )
+        )
+    return ok(data, prov, warnings)

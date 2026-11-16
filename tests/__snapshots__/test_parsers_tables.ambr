@@ -1,0 +1,1589 @@
+# serializer version: 1
+# name: test_parser_snapshot[jb_c1-2016-pdf]
+  dict({
+    'courts': 106,
+    'fiscal_years': list([
+      2015,
+      2016,
+    ]),
+    'footnotes': list([
+      tuple(
+        '¹',
+        'Revised.',
+      ),
+    ]),
+    'measures': list([
+      'civil_cases_filed',
+      'civil_cases_pending',
+      'civil_cases_terminated',
+      'private_civil_cases_filed',
+      'private_civil_cases_pending',
+      'private_civil_cases_terminated',
+      'us_civil_cases_filed',
+      'us_civil_cases_pending',
+      'us_civil_cases_terminated',
+    ]),
+    'national': list([
+      tuple(
+        'civil_cases_filed',
+        2016,
+        '291,851',
+      ),
+      tuple(
+        'civil_cases_pending',
+        2016,
+        '361,566',
+      ),
+      tuple(
+        'civil_cases_terminated',
+        2016,
+        '271,649',
+      ),
+      tuple(
+        'private_civil_cases_filed',
+        2016,
+        '231,715',
+      ),
+      tuple(
+        'private_civil_cases_pending',
+        2016,
+        '306,986',
+      ),
+      tuple(
+        'private_civil_cases_terminated',
+        2016,
+        '225,005',
+      ),
+      tuple(
+        'us_civil_cases_filed',
+        2016,
+        '60,136',
+      ),
+      tuple(
+        'us_civil_cases_pending',
+        2016,
+        '54,580',
+      ),
+      tuple(
+        'us_civil_cases_terminated',
+        2016,
+        '46,644',
+      ),
+    ]),
+    'observations': 1272,
+    'title': 'Table C-1.',
+  })
+# ---
+# name: test_parser_snapshot[jb_c1-2020-xlsx]
+  dict({
+    'courts': 106,
+    'fiscal_years': list([
+      2019,
+      2020,
+    ]),
+    'footnotes': list([
+      tuple(
+        None,
+        'NOTE: The number of pending cases in this report includes ca',
+      ),
+      tuple(
+        '¹',
+        'Revised.',
+      ),
+      tuple(
+        '²',
+        'The higher number of pending cases reported for the Southern',
+      ),
+    ]),
+    'measures': list([
+      'civil_cases_filed',
+      'civil_cases_pending',
+      'civil_cases_terminated',
+      'private_civil_cases_filed',
+      'private_civil_cases_pending',
+      'private_civil_cases_terminated',
+      'us_civil_cases_filed',
+      'us_civil_cases_pending',
+      'us_civil_cases_terminated',
+    ]),
+    'national': list([
+      tuple(
+        'civil_cases_filed',
+        2020,
+        '470581',
+      ),
+      tuple(
+        'civil_cases_pending',
+        2020,
+        '556366',
+      ),
+      tuple(
+        'civil_cases_terminated',
+        2020,
+        '271256',
+      ),
+      tuple(
+        'private_civil_cases_filed',
+        2020,
+        '423059',
+      ),
+      tuple(
+        'private_civil_cases_pending',
+        2020,
+        '507687',
+      ),
+      tuple(
+        'private_civil_cases_terminated',
+        2020,
+        '228292',
+      ),
+      tuple(
+        'us_civil_cases_filed',
+        2020,
+        '47522',
+      ),
+      tuple(
+        'us_civil_cases_pending',
+        2020,
+        '48679',
+      ),
+      tuple(
+        'us_civil_cases_terminated',
+        2020,
+        '42964',
+      ),
+    ]),
+    'observations': 1272,
+    'title': 'Table C-1.  ',
+  })
+# ---
+# name: test_parser_snapshot[jb_c1-2023-xlsx]
+  dict({
+    'courts': 106,
+    'fiscal_years': list([
+      2023,
+    ]),
+    'footnotes': list([
+      tuple(
+        None,
+        'NOTE: The number of pending cases in this report includes ca',
+      ),
+      tuple(
+        '¹',
+        'The higher number of pending cases reported for the Southern',
+      ),
+    ]),
+    'measures': list([
+      'civil_cases_filed',
+      'civil_cases_pending',
+      'civil_cases_terminated',
+      'private_civil_cases_filed',
+      'private_civil_cases_pending',
+      'private_civil_cases_terminated',
+      'us_civil_cases_filed',
+      'us_civil_cases_pending',
+      'us_civil_cases_terminated',
+    ]),
+    'national': list([
+      tuple(
+        'civil_cases_filed',
+        2023,
+        '339731',
+      ),
+      tuple(
+        'civil_cases_pending',
+        2023,
+        '642013',
+      ),
+      tuple(
+        'civil_cases_terminated',
+        2023,
+        '293677',
+      ),
+      tuple(
+        'private_civil_cases_filed',
+        2023,
+        '292942',
+      ),
+      tuple(
+        'private_civil_cases_pending',
+        2023,
+        '602458',
+      ),
+      tuple(
+        'private_civil_cases_terminated',
+        2023,
+        '248254',
+      ),
+      tuple(
+        'us_civil_cases_filed',
+        2023,
+        '46789',
+      ),
+      tuple(
+        'us_civil_cases_pending',
+        2023,
+        '39555',
+      ),
+      tuple(
+        'us_civil_cases_terminated',
+        2023,
+        '45423',
+      ),
+    ]),
+    'observations': 954,
+    'title': 'Table C-1.  ',
+  })
+# ---
+# name: test_parser_snapshot[jb_c1-2024-pdf]
+  dict({
+    'courts': 106,
+    'fiscal_years': list([
+      2024,
+    ]),
+    'footnotes': list([
+      tuple(
+        None,
+        'NOTE: The number of pending cases in this report includes ca',
+      ),
+      tuple(
+        '¹',
+        'The higher number of pending cases reported for the Southern',
+      ),
+    ]),
+    'measures': list([
+      'civil_cases_filed',
+      'civil_cases_pending',
+      'civil_cases_terminated',
+      'private_civil_cases_filed',
+      'private_civil_cases_pending',
+      'private_civil_cases_terminated',
+      'us_civil_cases_filed',
+      'us_civil_cases_pending',
+      'us_civil_cases_terminated',
+    ]),
+    'national': list([
+      tuple(
+        'civil_cases_filed',
+        2024,
+        '290,896',
+      ),
+      tuple(
+        'civil_cases_pending',
+        2024,
+        '536,766',
+      ),
+      tuple(
+        'civil_cases_terminated',
+        2024,
+        '396,635',
+      ),
+      tuple(
+        'private_civil_cases_filed',
+        2024,
+        '245,260',
+      ),
+      tuple(
+        'private_civil_cases_pending',
+        2024,
+        '497,976',
+      ),
+      tuple(
+        'private_civil_cases_terminated',
+        2024,
+        '350,206',
+      ),
+      tuple(
+        'us_civil_cases_filed',
+        2024,
+        '45,636',
+      ),
+      tuple(
+        'us_civil_cases_pending',
+        2024,
+        '38,790',
+      ),
+      tuple(
+        'us_civil_cases_terminated',
+        2024,
+        '46,429',
+      ),
+    ]),
+    'observations': 954,
+    'title': 'Table C-1.',
+  })
+# ---
+# name: test_parser_snapshot[jb_c5-2016-pdf]
+  dict({
+    'courts': 106,
+    'fiscal_years': list([
+      2016,
+    ]),
+    'footnotes': list([
+      tuple(
+        None,
+        'NOTE: Median time intervals are not computed when fewer than',
+      ),
+    ]),
+    'measures': list([
+      'civil_cases_court_action_before_pretrial',
+      'civil_cases_court_action_during_after_pretrial',
+      'civil_cases_court_action_trial',
+      'civil_cases_no_court_action',
+      'civil_cases_terminated_for_median',
+      'civil_median_months_court_action_before_pretrial',
+      'civil_median_months_court_action_during_after_pretrial',
+      'civil_median_months_court_action_trial',
+      'civil_median_months_no_court_action',
+      'civil_median_months_to_disposition',
+    ]),
+    'national': list([
+      tuple(
+        'civil_cases_court_action_before_pretrial',
+        2016,
+        '137,505',
+      ),
+      tuple(
+        'civil_cases_court_action_during_after_pretrial',
+        2016,
+        '28,138',
+      ),
+      tuple(
+        'civil_cases_court_action_trial',
+        2016,
+        '2,414',
+      ),
+      tuple(
+        'civil_cases_no_court_action',
+        2016,
+        '42,604',
+      ),
+      tuple(
+        'civil_cases_terminated_for_median',
+        2016,
+        '210,661',
+      ),
+      tuple(
+        'civil_median_months_court_action_before_pretrial',
+        2016,
+        '9.6',
+      ),
+      tuple(
+        'civil_median_months_court_action_during_after_pretrial',
+        2016,
+        '12.7',
+      ),
+      tuple(
+        'civil_median_months_court_action_trial',
+        2016,
+        '25.6',
+      ),
+      tuple(
+        'civil_median_months_no_court_action',
+        2016,
+        '5.2',
+      ),
+      tuple(
+        'civil_median_months_to_disposition',
+        2016,
+        '9.2',
+      ),
+    ]),
+    'observations': 1060,
+    'title': 'Table C-5.',
+  })
+# ---
+# name: test_parser_snapshot[jb_c5-2017-pdf]
+  dict({
+    'courts': 106,
+    'fiscal_years': list([
+      2017,
+    ]),
+    'footnotes': list([
+      tuple(
+        None,
+        'NOTE: Median time intervals are not computed when fewer than',
+      ),
+    ]),
+    'measures': list([
+      'civil_cases_court_action_before_pretrial',
+      'civil_cases_court_action_during_after_pretrial',
+      'civil_cases_court_action_trial',
+      'civil_cases_no_court_action',
+      'civil_cases_terminated_for_median',
+      'civil_median_months_court_action_before_pretrial',
+      'civil_median_months_court_action_during_after_pretrial',
+      'civil_median_months_court_action_trial',
+      'civil_median_months_no_court_action',
+      'civil_median_months_to_disposition',
+    ]),
+    'national': list([
+      tuple(
+        'civil_cases_court_action_before_pretrial',
+        2017,
+        '148,706',
+      ),
+      tuple(
+        'civil_cases_court_action_during_after_pretrial',
+        2017,
+        '29,389',
+      ),
+      tuple(
+        'civil_cases_court_action_trial',
+        2017,
+        '2,322',
+      ),
+      tuple(
+        'civil_cases_no_court_action',
+        2017,
+        '41,739',
+      ),
+      tuple(
+        'civil_cases_terminated_for_median',
+        2017,
+        '222,156',
+      ),
+      tuple(
+        'civil_median_months_court_action_before_pretrial',
+        2017,
+        '11.0',
+      ),
+      tuple(
+        'civil_median_months_court_action_during_after_pretrial',
+        2017,
+        '12.9',
+      ),
+      tuple(
+        'civil_median_months_court_action_trial',
+        2017,
+        '25.2',
+      ),
+      tuple(
+        'civil_median_months_no_court_action',
+        2017,
+        '4.9',
+      ),
+      tuple(
+        'civil_median_months_to_disposition',
+        2017,
+        '9.9',
+      ),
+    ]),
+    'observations': 1060,
+    'title': 'Table C-5.',
+  })
+# ---
+# name: test_parser_snapshot[jb_c5-2020-xlsx]
+  dict({
+    'courts': 106,
+    'fiscal_years': list([
+      2020,
+    ]),
+    'footnotes': list([
+      tuple(
+        None,
+        'NOTE: Median time intervals are not computed when fewer than',
+      ),
+    ]),
+    'measures': list([
+      'civil_cases_court_action_before_pretrial',
+      'civil_cases_court_action_during_after_pretrial',
+      'civil_cases_court_action_trial',
+      'civil_cases_no_court_action',
+      'civil_cases_terminated_for_median',
+      'civil_median_months_court_action_before_pretrial',
+      'civil_median_months_court_action_during_after_pretrial',
+      'civil_median_months_court_action_trial',
+      'civil_median_months_no_court_action',
+      'civil_median_months_to_disposition',
+    ]),
+    'national': list([
+      tuple(
+        'civil_cases_court_action_before_pretrial',
+        2020,
+        '131917',
+      ),
+      tuple(
+        'civil_cases_court_action_during_after_pretrial',
+        2020,
+        '37793',
+      ),
+      tuple(
+        'civil_cases_court_action_trial',
+        2020,
+        '1201',
+      ),
+      tuple(
+        'civil_cases_no_court_action',
+        2020,
+        '44391',
+      ),
+      tuple(
+        'civil_cases_terminated_for_median',
+        2020,
+        '215302',
+      ),
+      tuple(
+        'civil_median_months_court_action_before_pretrial',
+        2020,
+        '8.49180327868852',
+      ),
+      tuple(
+        'civil_median_months_court_action_during_after_pretrial',
+        2020,
+        '22.0983606557377',
+      ),
+      tuple(
+        'civil_median_months_court_action_trial',
+        2020,
+        '27.672131147541',
+      ),
+      tuple(
+        'civil_median_months_no_court_action',
+        2020,
+        '4.62295081967213',
+      ),
+      tuple(
+        'civil_median_months_to_disposition',
+        2020,
+        '8.91803278688525',
+      ),
+    ]),
+    'observations': 1060,
+    'title': 'Table C-5.',
+  })
+# ---
+# name: test_parser_snapshot[jb_x1a-2016-pdf]
+  dict({
+    'courts': 92,
+    'fiscal_years': list([
+      2016,
+    ]),
+    'footnotes': list([
+      tuple(
+        None,
+        'Note: Case weights are based on the district court case weig',
+      ),
+    ]),
+    'measures': list([
+      'authorized_judgeships',
+      'civil_filings_per_judgeship',
+      'criminal_filings_per_judgeship',
+      'supervision_hearings_per_judgeship',
+      'total_filings_per_judgeship',
+      'weighted_civil_filings_per_judgeship',
+      'weighted_criminal_filings_per_judgeship',
+      'weighted_supervision_hearings_per_judgeship',
+      'weighted_total_filings_per_judgeship',
+    ]),
+    'national': list([
+      tuple(
+        'authorized_judgeships',
+        2016,
+        '673',
+      ),
+      tuple(
+        'civil_filings_per_judgeship',
+        2016,
+        '406',
+      ),
+      tuple(
+        'criminal_filings_per_judgeship',
+        2016,
+        '114',
+      ),
+      tuple(
+        'supervision_hearings_per_judgeship',
+        2016,
+        '38.2',
+      ),
+      tuple(
+        'total_filings_per_judgeship',
+        2016,
+        '559',
+      ),
+      tuple(
+        'weighted_civil_filings_per_judgeship',
+        2016,
+        '355',
+      ),
+      tuple(
+        'weighted_criminal_filings_per_judgeship',
+        2016,
+        '130',
+      ),
+      tuple(
+        'weighted_supervision_hearings_per_judgeship',
+        2016,
+        '3.5',
+      ),
+      tuple(
+        'weighted_total_filings_per_judgeship',
+        2016,
+        '489',
+      ),
+    ]),
+    'observations': 828,
+    'title': 'Table X-1A.',
+  })
+# ---
+# name: test_parser_snapshot[jb_x1a-2020-pdf]
+  dict({
+    'courts': 92,
+    'fiscal_years': list([
+      2020,
+    ]),
+    'footnotes': list([
+      tuple(
+        None,
+        'Note: Case weights are based on the 2015 district court case',
+      ),
+    ]),
+    'measures': list([
+      'authorized_judgeships',
+      'civil_filings_per_judgeship',
+      'criminal_filings_per_judgeship',
+      'supervision_hearings_per_judgeship',
+      'total_filings_per_judgeship',
+      'weighted_civil_filings_per_judgeship',
+      'weighted_criminal_filings_per_judgeship',
+      'weighted_supervision_hearings_per_judgeship',
+      'weighted_total_filings_per_judgeship',
+    ]),
+    'national': list([
+      tuple(
+        'authorized_judgeships',
+        2020,
+        '673',
+      ),
+      tuple(
+        'civil_filings_per_judgeship',
+        2020,
+        '676',
+      ),
+      tuple(
+        'criminal_filings_per_judgeship',
+        2020,
+        '109',
+      ),
+      tuple(
+        'supervision_hearings_per_judgeship',
+        2020,
+        '32.6',
+      ),
+      tuple(
+        'total_filings_per_judgeship',
+        2020,
+        '818',
+      ),
+      tuple(
+        'weighted_civil_filings_per_judgeship',
+        2020,
+        '554',
+      ),
+      tuple(
+        'weighted_criminal_filings_per_judgeship',
+        2020,
+        '124',
+      ),
+      tuple(
+        'weighted_supervision_hearings_per_judgeship',
+        2020,
+        '3.1',
+      ),
+      tuple(
+        'weighted_total_filings_per_judgeship',
+        2020,
+        '681',
+      ),
+    ]),
+    'observations': 828,
+    'title': 'Table X-1A.',
+  })
+# ---
+# name: test_parser_snapshot[jb_x1a-2020-xlsx]
+  dict({
+    'courts': 92,
+    'fiscal_years': list([
+      2020,
+    ]),
+    'footnotes': list([
+      tuple(
+        None,
+        'Note: Case weights are based on the 2015 district court case',
+      ),
+    ]),
+    'measures': list([
+      'authorized_judgeships',
+      'civil_filings_per_judgeship',
+      'criminal_filings_per_judgeship',
+      'supervision_hearings_per_judgeship',
+      'total_filings_per_judgeship',
+      'weighted_civil_filings_per_judgeship',
+      'weighted_criminal_filings_per_judgeship',
+      'weighted_supervision_hearings_per_judgeship',
+      'weighted_total_filings_per_judgeship',
+    ]),
+    'national': list([
+      tuple(
+        'authorized_judgeships',
+        2020,
+        '673',
+      ),
+      tuple(
+        'civil_filings_per_judgeship',
+        2020,
+        '676.120356612184',
+      ),
+      tuple(
+        'criminal_filings_per_judgeship',
+        2020,
+        '109.292719167905',
+      ),
+      tuple(
+        'supervision_hearings_per_judgeship',
+        2020,
+        '32.5601783060921',
+      ),
+      tuple(
+        'total_filings_per_judgeship',
+        2020,
+        '817.973254086181',
+      ),
+      tuple(
+        'weighted_civil_filings_per_judgeship',
+        2020,
+        '553.954918276375',
+      ),
+      tuple(
+        'weighted_criminal_filings_per_judgeship',
+        2020,
+        '123.742935661218',
+      ),
+      tuple(
+        'weighted_supervision_hearings_per_judgeship',
+        2020,
+        '3.0541456166419',
+      ),
+      tuple(
+        'weighted_total_filings_per_judgeship',
+        2020,
+        '680.751999554235',
+      ),
+    ]),
+    'observations': 828,
+    'title': 'Table X-1A.',
+  })
+# ---
+# name: test_parser_snapshot[jb_x1a-2025-pdf]
+  dict({
+    'courts': 92,
+    'fiscal_years': list([
+      2025,
+    ]),
+    'footnotes': list([
+      tuple(
+        None,
+        'Note: Case weights are based on the 2015 district court case',
+      ),
+    ]),
+    'measures': list([
+      'authorized_judgeships',
+      'civil_filings_per_judgeship',
+      'criminal_filings_per_judgeship',
+      'supervision_hearings_per_judgeship',
+      'total_filings_per_judgeship',
+      'weighted_civil_filings_per_judgeship',
+      'weighted_criminal_filings_per_judgeship',
+      'weighted_supervision_hearings_per_judgeship',
+      'weighted_total_filings_per_judgeship',
+    ]),
+    'national': list([
+      tuple(
+        'authorized_judgeships',
+        2025,
+        '673',
+      ),
+      tuple(
+        'civil_filings_per_judgeship',
+        2025,
+        '433',
+      ),
+      tuple(
+        'criminal_filings_per_judgeship',
+        2025,
+        '117',
+      ),
+      tuple(
+        'supervision_hearings_per_judgeship',
+        2025,
+        '39.3',
+      ),
+      tuple(
+        'total_filings_per_judgeship',
+        2025,
+        '590',
+      ),
+      tuple(
+        'weighted_civil_filings_per_judgeship',
+        2025,
+        '414',
+      ),
+      tuple(
+        'weighted_criminal_filings_per_judgeship',
+        2025,
+        '117',
+      ),
+      tuple(
+        'weighted_supervision_hearings_per_judgeship',
+        2025,
+        '3.8',
+      ),
+      tuple(
+        'weighted_total_filings_per_judgeship',
+        2025,
+        '534',
+      ),
+    ]),
+    'observations': 828,
+    'title': 'Table X-1A.',
+  })
+# ---
+# name: test_parser_snapshot[jff_6.1-2023-xlsx]
+  dict({
+    'courts': 1,
+    'fiscal_years': list([
+      1990,
+      1995,
+      2005,
+      2010,
+      2015,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+    ]),
+    'footnotes': list([
+      tuple(
+        None,
+        'Note: Due to a change in methodology, numbers prior to 2015 ',
+      ),
+      tuple(
+        '¹',
+        'Twelve-month period ending June 30. Criminal data for 1990 e',
+      ),
+      tuple(
+        None,
+        'Source: Text table 5, Table C, and Table D (Cases), Annual R',
+      ),
+    ]),
+    'measures': list([
+      'authorized_judgeships_incl_territorial',
+      'total_cases_filed',
+      'total_cases_pending',
+      'total_cases_terminated',
+    ]),
+    'national': list([
+      tuple(
+        'authorized_judgeships_incl_territorial',
+        2020,
+        '677',
+      ),
+      tuple(
+        'authorized_judgeships_incl_territorial',
+        2023,
+        '677',
+      ),
+      tuple(
+        'total_cases_filed',
+        2020,
+        '530465',
+      ),
+      tuple(
+        'total_cases_filed',
+        2023,
+        '392879',
+      ),
+      tuple(
+        'total_cases_pending',
+        2020,
+        '642628',
+      ),
+      tuple(
+        'total_cases_pending',
+        2023,
+        '730930',
+      ),
+      tuple(
+        'total_cases_terminated',
+        2020,
+        '329845',
+      ),
+      tuple(
+        'total_cases_terminated',
+        2023,
+        '350691',
+      ),
+    ]),
+    'observations': 40,
+    'title': 'Table 6.1',
+  })
+# ---
+# name: test_parser_snapshot[jff_6.1-2025-pdf]
+  dict({
+    'courts': 1,
+    'fiscal_years': list([
+      1990,
+      1995,
+      2005,
+      2010,
+      2015,
+      2020,
+      2025,
+    ]),
+    'footnotes': list([
+      tuple(
+        None,
+        'Note: Due to a change in methodology, numbers prior to 2015 ',
+      ),
+      tuple(
+        '¹',
+        'Twelve-month period ending June 30. Criminal data for 1990 e',
+      ),
+      tuple(
+        None,
+        'Source: Text table 5, Table C, and Table D (Cases), Annual R',
+      ),
+    ]),
+    'measures': list([
+      'authorized_judgeships_incl_territorial',
+      'total_cases_filed',
+      'total_cases_pending',
+      'total_cases_terminated',
+    ]),
+    'national': list([
+      tuple(
+        'authorized_judgeships_incl_territorial',
+        2020,
+        '677',
+      ),
+      tuple(
+        'authorized_judgeships_incl_territorial',
+        2025,
+        '677',
+      ),
+      tuple(
+        'total_cases_filed',
+        2020,
+        '530,465',
+      ),
+      tuple(
+        'total_cases_filed',
+        2025,
+        '370,579',
+      ),
+      tuple(
+        'total_cases_pending',
+        2020,
+        '642,628',
+      ),
+      tuple(
+        'total_cases_pending',
+        2025,
+        '517,267',
+      ),
+      tuple(
+        'total_cases_terminated',
+        2020,
+        '329,845',
+      ),
+      tuple(
+        'total_cases_terminated',
+        2025,
+        '476,110',
+      ),
+    ]),
+    'observations': 28,
+    'title': 'Table 6.1',
+  })
+# ---
+# name: test_parser_snapshot[jff_6.2-2023-xlsx]
+  dict({
+    'courts': 1,
+    'fiscal_years': list([
+      1990,
+      1995,
+      2005,
+      2010,
+      2015,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+    ]),
+    'footnotes': list([
+      tuple(
+        None,
+        'Note: Due to a change in methodology, numbers for years prio',
+      ),
+      tuple(
+        '¹',
+        'Authorized judgeships for 1990-2011 include territorial cour',
+      ),
+      tuple(
+        '²',
+        'Beginning in 2002, supervised release hearings have been inc',
+      ),
+      tuple(
+        '³',
+        'Twelve-month period ending June 30.',
+      ),
+      tuple(
+        None,
+        'Source: Table X-1A, Annual Report of the Director: Judicial ',
+      ),
+    ]),
+    'measures': list([
+      'authorized_judgeships',
+      'civil_filings_per_judgeship',
+      'criminal_filings_per_judgeship',
+      'supervision_hearings_per_judgeship',
+      'total_filings_per_judgeship',
+      'weighted_civil_filings_per_judgeship',
+      'weighted_criminal_filings_per_judgeship',
+      'weighted_supervision_hearings_per_judgeship',
+      'weighted_total_filings_per_judgeship',
+    ]),
+    'national': list([
+      tuple(
+        'authorized_judgeships',
+        2020,
+        '674',
+      ),
+      tuple(
+        'authorized_judgeships',
+        2023,
+        '674',
+      ),
+      tuple(
+        'civil_filings_per_judgeship',
+        2020,
+        '675.182492581602',
+      ),
+      tuple(
+        'civil_filings_per_judgeship',
+        2023,
+        '485.574183976261',
+      ),
+      tuple(
+        'criminal_filings_per_judgeship',
+        2020,
+        '109.189910979228',
+      ),
+      tuple(
+        'criminal_filings_per_judgeship',
+        2023,
+        '97.6884272997033',
+      ),
+      tuple(
+        'supervision_hearings_per_judgeship',
+        2020,
+        '32.6',
+      ),
+      tuple(
+        'supervision_hearings_per_judgeship',
+        2023,
+        '38.3',
+      ),
+      tuple(
+        'total_filings_per_judgeship',
+        2020,
+        '816.927299703264',
+      ),
+      tuple(
+        'total_filings_per_judgeship',
+        2023,
+        '621.53115727003',
+      ),
+      tuple(
+        'weighted_civil_filings_per_judgeship',
+        2020,
+        '322.216335311573',
+      ),
+      tuple(
+        'weighted_civil_filings_per_judgeship',
+        2023,
+        '431',
+      ),
+      tuple(
+        'weighted_criminal_filings_per_judgeship',
+        2020,
+        '123.633186646884',
+      ),
+      tuple(
+        'weighted_criminal_filings_per_judgeship',
+        2023,
+        '114',
+      ),
+      tuple(
+        'weighted_supervision_hearings_per_judgeship',
+        2020,
+        '3.05305637982196',
+      ),
+      tuple(
+        'weighted_supervision_hearings_per_judgeship',
+        2023,
+        '3.67320474777448',
+      ),
+      tuple(
+        'weighted_total_filings_per_judgeship',
+        2020,
+        '448.902578338279',
+      ),
+      tuple(
+        'weighted_total_filings_per_judgeship',
+        2023,
+        '549',
+      ),
+    ]),
+    'observations': 90,
+    'title': 'Table 6.2',
+  })
+# ---
+# name: test_parser_snapshot[jff_6.2-2025-pdf]
+  dict({
+    'courts': 1,
+    'fiscal_years': list([
+      1990,
+      1995,
+      2005,
+      2010,
+      2015,
+      2020,
+      2025,
+    ]),
+    'footnotes': list([
+      tuple(
+        None,
+        'Note: Due to a change in methodology, numbers for years prio',
+      ),
+      tuple(
+        '¹',
+        'Authorized judgeships for 1990-2011 include territorial cour',
+      ),
+      tuple(
+        '²',
+        'Beginning in 2002, supervised release hearings have been inc',
+      ),
+      tuple(
+        '³',
+        'Twelve-month period ending June 30.',
+      ),
+      tuple(
+        None,
+        'Source: Table X-1A, Annual Report of the Director: Judicial ',
+      ),
+    ]),
+    'measures': list([
+      'authorized_judgeships',
+      'civil_filings_per_judgeship',
+      'criminal_filings_per_judgeship',
+      'supervision_hearings_per_judgeship',
+      'total_filings_per_judgeship',
+      'weighted_civil_filings_per_judgeship',
+      'weighted_criminal_filings_per_judgeship',
+      'weighted_supervision_hearings_per_judgeship',
+      'weighted_total_filings_per_judgeship',
+    ]),
+    'national': list([
+      tuple(
+        'authorized_judgeships',
+        2020,
+        '674',
+      ),
+      tuple(
+        'authorized_judgeships',
+        2025,
+        '674',
+      ),
+      tuple(
+        'civil_filings_per_judgeship',
+        2020,
+        '675',
+      ),
+      tuple(
+        'civil_filings_per_judgeship',
+        2025,
+        '433',
+      ),
+      tuple(
+        'criminal_filings_per_judgeship',
+        2020,
+        '109',
+      ),
+      tuple(
+        'criminal_filings_per_judgeship',
+        2025,
+        '117',
+      ),
+      tuple(
+        'supervision_hearings_per_judgeship',
+        2020,
+        '32.6',
+      ),
+      tuple(
+        'supervision_hearings_per_judgeship',
+        2025,
+        '39.3',
+      ),
+      tuple(
+        'total_filings_per_judgeship',
+        2020,
+        '817',
+      ),
+      tuple(
+        'total_filings_per_judgeship',
+        2025,
+        '589',
+      ),
+      tuple(
+        'weighted_civil_filings_per_judgeship',
+        2020,
+        '322',
+      ),
+      tuple(
+        'weighted_civil_filings_per_judgeship',
+        2025,
+        '372',
+      ),
+      tuple(
+        'weighted_criminal_filings_per_judgeship',
+        2020,
+        '124',
+      ),
+      tuple(
+        'weighted_criminal_filings_per_judgeship',
+        2025,
+        '117',
+      ),
+      tuple(
+        'weighted_supervision_hearings_per_judgeship',
+        2020,
+        '3.1',
+      ),
+      tuple(
+        'weighted_supervision_hearings_per_judgeship',
+        2025,
+        '3.8',
+      ),
+      tuple(
+        'weighted_total_filings_per_judgeship',
+        2020,
+        '449',
+      ),
+      tuple(
+        'weighted_total_filings_per_judgeship',
+        2025,
+        '493',
+      ),
+    ]),
+    'observations': 63,
+    'title': 'Table 6.2',
+  })
+# ---
+# name: test_parser_snapshot[jff_6.3-2023-pdf]
+  dict({
+    'courts': 1,
+    'fiscal_years': list([
+      1990,
+      1995,
+      2005,
+      2010,
+      2015,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+    ]),
+    'footnotes': list([
+      tuple(
+        None,
+        'Note: Due to a change in methodology, numbers for years prio',
+      ),
+      tuple(
+        '¹',
+        'Twelve-month period ending June 30.',
+      ),
+      tuple(
+        None,
+        'Source: Table C-5 and D-6, Annual Report of the Director: Ju',
+      ),
+    ]),
+    'measures': list([
+      'civil_median_months_court_action_before_pretrial',
+      'civil_median_months_court_action_during_after_pretrial',
+      'civil_median_months_court_action_trial',
+      'civil_median_months_no_court_action',
+      'civil_median_months_to_disposition',
+      'criminal_median_months_bench_trial',
+      'criminal_median_months_dismissed',
+      'criminal_median_months_guilty_plea',
+      'criminal_median_months_jury_trial',
+      'criminal_median_months_to_disposition',
+    ]),
+    'national': list([
+      tuple(
+        'civil_median_months_court_action_before_pretrial',
+        2020,
+        '8.5',
+      ),
+      tuple(
+        'civil_median_months_court_action_before_pretrial',
+        2023,
+        '8.1',
+      ),
+      tuple(
+        'civil_median_months_court_action_during_after_pretrial',
+        2020,
+        '22.1',
+      ),
+      tuple(
+        'civil_median_months_court_action_during_after_pretrial',
+        2023,
+        '16.3',
+      ),
+      tuple(
+        'civil_median_months_court_action_trial',
+        2020,
+        '27.7',
+      ),
+      tuple(
+        'civil_median_months_court_action_trial',
+        2023,
+        '33.0',
+      ),
+      tuple(
+        'civil_median_months_no_court_action',
+        2020,
+        '4.6',
+      ),
+      tuple(
+        'civil_median_months_no_court_action',
+        2023,
+        '6.2',
+      ),
+      tuple(
+        'civil_median_months_to_disposition',
+        2020,
+        '8.9',
+      ),
+      tuple(
+        'civil_median_months_to_disposition',
+        2023,
+        '8.7',
+      ),
+      tuple(
+        'criminal_median_months_bench_trial',
+        2020,
+        '11.3',
+      ),
+      tuple(
+        'criminal_median_months_bench_trial',
+        2023,
+        '18.9',
+      ),
+      tuple(
+        'criminal_median_months_dismissed',
+        2020,
+        '9.6',
+      ),
+      tuple(
+        'criminal_median_months_dismissed',
+        2023,
+        '15.0',
+      ),
+      tuple(
+        'criminal_median_months_guilty_plea',
+        2020,
+        '6.7',
+      ),
+      tuple(
+        'criminal_median_months_guilty_plea',
+        2023,
+        '9.9',
+      ),
+      tuple(
+        'criminal_median_months_jury_trial',
+        2020,
+        '19.3',
+      ),
+      tuple(
+        'criminal_median_months_jury_trial',
+        2023,
+        '25.9',
+      ),
+      tuple(
+        'criminal_median_months_to_disposition',
+        2020,
+        '7.0',
+      ),
+      tuple(
+        'criminal_median_months_to_disposition',
+        2023,
+        '10.4',
+      ),
+    ]),
+    'observations': 100,
+    'title': 'Table 6.3',
+  })
+# ---
+# name: test_parser_snapshot[jff_6.3-2023-xlsx]
+  dict({
+    'courts': 1,
+    'fiscal_years': list([
+      1990,
+      1995,
+      2005,
+      2010,
+      2015,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+    ]),
+    'footnotes': list([
+      tuple(
+        None,
+        'Note: Due to a change in methodology, numbers for years prio',
+      ),
+      tuple(
+        '¹',
+        'Twelve-month period ending June 30.',
+      ),
+      tuple(
+        None,
+        'Source: Table C-5 and D-6, Annual Report of the Director: Ju',
+      ),
+    ]),
+    'measures': list([
+      'civil_median_months_court_action_before_pretrial',
+      'civil_median_months_court_action_during_after_pretrial',
+      'civil_median_months_court_action_trial',
+      'civil_median_months_no_court_action',
+      'civil_median_months_to_disposition',
+      'criminal_median_months_bench_trial',
+      'criminal_median_months_dismissed',
+      'criminal_median_months_guilty_plea',
+      'criminal_median_months_jury_trial',
+      'criminal_median_months_to_disposition',
+    ]),
+    'national': list([
+      tuple(
+        'civil_median_months_court_action_before_pretrial',
+        2020,
+        '8.49180327868852',
+      ),
+      tuple(
+        'civil_median_months_court_action_before_pretrial',
+        2023,
+        '8.09836065573771',
+      ),
+      tuple(
+        'civil_median_months_court_action_during_after_pretrial',
+        2020,
+        '22.0983606557377',
+      ),
+      tuple(
+        'civil_median_months_court_action_during_after_pretrial',
+        2023,
+        '16.2950819672131',
+      ),
+      tuple(
+        'civil_median_months_court_action_trial',
+        2020,
+        '27.672131147541',
+      ),
+      tuple(
+        'civil_median_months_court_action_trial',
+        2023,
+        '33.0491803278689',
+      ),
+      tuple(
+        'civil_median_months_no_court_action',
+        2020,
+        '4.62295081967213',
+      ),
+      tuple(
+        'civil_median_months_no_court_action',
+        2023,
+        '6.19672131147541',
+      ),
+      tuple(
+        'civil_median_months_to_disposition',
+        2020,
+        '8.91803278688525',
+      ),
+      tuple(
+        'civil_median_months_to_disposition',
+        2023,
+        '8.72131147540984',
+      ),
+      tuple(
+        'criminal_median_months_bench_trial',
+        2020,
+        '11.2786885245902',
+      ),
+      tuple(
+        'criminal_median_months_bench_trial',
+        2023,
+        '18.9180327868852',
+      ),
+      tuple(
+        'criminal_median_months_dismissed',
+        2020,
+        '9.63934426229508',
+      ),
+      tuple(
+        'criminal_median_months_dismissed',
+        2023,
+        '14.9836065573771',
+      ),
+      tuple(
+        'criminal_median_months_guilty_plea',
+        2020,
+        '6.72131147540984',
+      ),
+      tuple(
+        'criminal_median_months_guilty_plea',
+        2023,
+        '9.90163934426229',
+      ),
+      tuple(
+        'criminal_median_months_jury_trial',
+        2020,
+        '19.327868852459',
+      ),
+      tuple(
+        'criminal_median_months_jury_trial',
+        2023,
+        '25.8852459016393',
+      ),
+      tuple(
+        'criminal_median_months_to_disposition',
+        2020,
+        '6.98360655737705',
+      ),
+      tuple(
+        'criminal_median_months_to_disposition',
+        2023,
+        '10.3934426229508',
+      ),
+    ]),
+    'observations': 100,
+    'title': 'Table 6.3',
+  })
+# ---

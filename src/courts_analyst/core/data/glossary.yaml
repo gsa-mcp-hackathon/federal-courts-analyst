@@ -1,0 +1,265 @@
+# Glossary for explain_term (core/glossary.py).
+#
+# Definitions are drawn from the tables' own notes, the FJC IDB codebook and
+# the AO's published definitions; each names its source. Measure definitions
+# live in measures.yaml and nature-of-suit codes in the IDB codebook; the
+# glossary tool searches all three. Needs domain expert review (issue #5).
+#
+# Fields: term, aliases, definition, source, related (other terms), see_also
+# (a measure id or resource).
+
+- term: weighted filings
+  aliases: [weighted caseload, weighted filings per judgeship, case weights, case weight]
+  definition: >-
+    Filings multiplied by case weights the Federal Judicial Center derives from
+    time studies, so each case counts by the relative judge time its type
+    needs (a death-penalty habeas case weighs far more than a student-loan
+    collection). Weighted filings per judgeship divide the weighted total by
+    authorized judgeships. The Judicial Conference uses them to assess
+    judgeship needs. Current weights come from the FJC's 2016 study; the
+    weights themselves are not fully published.
+  source: Judicial Business Table X-1A and JFF Table 6.2 notes; FJC
+  related: [authorized judgeships, unweighted filings]
+  see_also: weighted_total_filings_per_judgeship
+- term: unweighted filings
+  aliases: [raw filings, filings per judgeship, unweighted filings per judgeship]
+  definition: >-
+    Cases (civil) or defendants (criminal) filed, divided by authorized
+    judgeships, with every case counting once. Table X-1A excludes civil cases
+    reopened, remanded or transferred in by the JPML.
+  source: Judicial Business Table X-1A notes
+  related: [weighted filings]
+  see_also: civil_filings_per_judgeship
+- term: authorized judgeships
+  aliases: [judgeships, authorized judgeship]
+  definition: >-
+    Article III district judgeships authorized by statute, used as the
+    denominator of per-judgeship figures. Table X-1A excludes the territorial
+    courts; JFF Table 6.1 counts them. Districts that share a judgeship show
+    halves (E.D. Ky. 5.5). Vacancies don't reduce the count.
+  source: Tables X-1A, 6.1, 6.2
+  related: [weighted filings, territorial courts]
+  see_also: authorized_judgeships
+- term: territorial courts
+  aliases: [territorial district courts, article iv courts, guam, virgin islands, northern mariana islands]
+  definition: >-
+    The District Courts of Guam, the Northern Mariana Islands and the Virgin
+    Islands (Article IV courts). They are excluded from the FJC case-weight
+    studies, so Table X-1A publishes no weighted filings for them.
+  source: JFF Table 6.2 note 1
+  related: [authorized judgeships]
+- term: multidistrict litigation
+  aliases: [mdl, multi-district litigation, jpml, judicial panel on multidistrict litigation]
+  definition: >-
+    Civil cases with common questions of fact, consolidated before one
+    district (the transferee court) for pretrial proceedings by the Judicial
+    Panel on Multidistrict Litigation under 28 U.S.C. § 1407. The IDB marks
+    cases transferred in by the Panel (origin 6) and, from July 1, 2016, cases
+    filed directly in the MDL court (origin 13).
+  source: FJC IDB Civil Codebook (origin field)
+  related: [directly filed MDL case, transferred MDL case]
+- term: directly filed MDL case
+  aliases: [direct filing, direct-filed mdl, directly filed mdl, direct filed, mdl direct filing, origin 13]
+  definition: >-
+    A case filed directly in the MDL (transferee) court instead of being filed
+    elsewhere and transferred by the Panel. The IDB codes it origin 13 from
+    July 1, 2016; before that such cases were origin 1 (original proceeding)
+    and can't be told apart. Direct filing can concentrate tens of thousands
+    of cases in one district in one year, as in N.D. Fla. in FY2020 (MDL 2885,
+    3M Combat Arms earplugs). Table X-1A counts them as filings in that
+    district.
+  source: FJC IDB Civil Codebook (origin 13); IDB counts (Phase 2)
+  related: [multidistrict litigation]
+- term: transferred MDL case
+  aliases: [mdl transfer, origin 6, jpml transfer]
+  definition: >-
+    A case transferred to the MDL court by the Judicial Panel (origin 6).
+    Table X-1A excludes these from civil filings per judgeship; Table C-1's
+    pending counts include them.
+  source: FJC IDB Civil Codebook; Tables X-1A and C-1 notes
+  related: [multidistrict litigation]
+- term: fiscal year
+  aliases: [fy, federal fiscal year]
+  definition: >-
+    October 1 to September 30, named for the year it ends: FY2020 ran from
+    October 1, 2019 to September 30, 2020. Every recent table in the catalog
+    reports fiscal years; older rows may be statistical years.
+  source: Judicial Business tables
+  related: [statistical year]
+- term: statistical year
+  aliases: [sy, statistical years, twelve-month period ending june 30]
+  definition: >-
+    Before the judiciary switched to fiscal-year reporting in the early 1990s,
+    it reported 12-month periods ending June 30 (July 1 to June 30). JFF's 1990 rows are
+    statistical year 1990 (July 1989 to June 1990), so they aren't directly
+    comparable with the fiscal-year rows after them.
+  source: JFF Tables 6.1–6.3 notes ("Twelve-month period ending June 30")
+  related: [fiscal year]
+- term: edition
+  aliases: [vintage, editions, publication]
+  definition: >-
+    One publication of a table, such as Judicial Business 2020 (JB-2020) or
+    Judicial Facts and Figures 2023 (JFF-2023). The same statistic for the
+    same year can appear in several editions, sometimes with different values;
+    this server labels every figure with its edition and never mixes them.
+  source: this server's methodology
+  related: [revision, judicial business, judicial facts and figures]
+- term: revision
+  aliases: [revised, restated, restatement, revised figure]
+  definition: >-
+    A later edition printing a different value for the same measure, court
+    and year than an earlier edition did. Example: FY2020 weighted civil
+    filings per judgeship were 554 in JB-2020 (and JFF 2020–2022) and 322 in
+    JFF-2023 onward. The server returns the latest edition by default and
+    attaches the first-published value.
+  source: this server's revision log (docs/revision-log.md)
+  related: [edition]
+- term: judicial business
+  aliases: [jb, judicial business of the united states courts, annual report]
+  definition: >-
+    The Director of the AO's annual report on the courts' work for the fiscal
+    year, with detailed statistical tables (C-1, C-5, X-1A…). It is where a
+    year's figures are first published.
+  source: uscourts.gov
+  related: [judicial facts and figures, edition]
+- term: judicial facts and figures
+  aliases: [jff, facts and figures]
+  definition: >-
+    The AO's multi-year summary tables (6.1, 6.2, 6.3 for the district
+    courts), updated each year. They repeat, and sometimes revise, figures
+    first published in Judicial Business.
+  source: uscourts.gov
+  related: [judicial business, edition, revision]
+- term: table x-1a
+  aliases: [x-1a, x1a]
+  definition: >-
+    Judicial Business Table X-1A: weighted and unweighted filings per
+    authorized judgeship for each district court, the source for district-level
+    per-judgeship figures.
+  source: Judicial Business
+  related: [weighted filings]
+- term: table c-1
+  aliases: [c-1, c1]
+  definition: >-
+    Judicial Business Table C-1: civil cases filed, terminated and pending by
+    district and by U.S./private jurisdiction for the fiscal year.
+  source: Judicial Business
+  related: [pending cases]
+- term: table c-5
+  aliases: [c-5, c5]
+  definition: >-
+    Judicial Business Table C-5: median time from filing to disposition of
+    civil cases by district and stage of disposition.
+  source: Judicial Business
+  related: [median time to disposition]
+- term: table 6.2
+  aliases: ["6.2", jff 6.2]
+  definition: >-
+    Judicial Facts and Figures Table 6.2: national weighted and unweighted
+    filings per authorized judgeship over many years. Its 2023 edition revised
+    the weighted civil series for recent years down; the table's notes don't
+    explain why.
+  source: Judicial Facts and Figures
+  related: [revision, weighted filings]
+- term: pending cases
+  aliases: [pending, pending caseload, backlog]
+  definition: >-
+    Cases open at the end of the period (September 30 for a fiscal year).
+    Table C-1 includes cases transferred in under an MDL order. A later
+    edition can restate the prior year's closing count (FY2017: 339,131 in
+    JB-2017, 366,195 in JB-2018).
+  source: Table C-1 notes; revision log
+  related: [terminations]
+  see_also: civil_cases_pending
+- term: terminations
+  aliases: [terminated, dispositions, closed cases]
+  definition: >-
+    Cases closed in the period, by any disposition (dismissal, judgment,
+    transfer, remand, statistical closing). A case reopened and closed again
+    counts as a termination each time.
+  source: Table C-1; FJC IDB codebook (DISP)
+  related: [pending cases]
+  see_also: civil_cases_terminated
+- term: median time to disposition
+  aliases: [median time, time to disposition, median months]
+  definition: >-
+    The median months from filing to disposition for the cases terminated in
+    the period (Table C-5, JFF 6.3). Land condemnations, prisoner petitions,
+    deportation reviews, recovery of overpayments and enforcement of judgments
+    are excluded; not computed for fewer than 10 cases.
+  source: Table C-5 notes
+  see_also: civil_median_months_to_disposition
+- term: nature of suit
+  aliases: [nos, nature-of-suit, nos code, case type]
+  definition: >-
+    The three-digit code for the subject of a civil case (for example 442
+    employment civil rights, 830 patent). Table C-2 groups the codes into
+    categories (contract, real property, torts, statutes) and groups. Ask about
+    a code ("nature of suit 442") for its label and group.
+  source: FJC IDB Civil Codebook; Table C-2
+  related: [integrated database]
+- term: integrated database
+  aliases: [idb, fjc idb, fjc integrated database]
+  definition: >-
+    The Federal Judicial Center's case-level data on federal cases. This
+    server uses the civil file: every case active in FY2015–FY2025, one row
+    per record, all codes decoded. Judge identifiers are removed by Judicial
+    Conference policy, and party names are never loaded into the server.
+  source: FJC IDB; docs/methodology/idb.md
+  related: [nature of suit, reconciliation]
+- term: reconciliation
+  aliases: [reconcile, variance, idb vs official]
+  definition: >-
+    Rebuilding a published count (filings, terminations, pending) from the
+    IDB and comparing it with the official table. The result is matched
+    (within tolerance), explained variance (a known, quantified cause such as
+    a restated figure or reopened cases) or unexplained.
+  source: this server's methodology (docs/variance-report.md)
+  related: [integrated database]
+- term: pro se
+  aliases: [self-represented, pro se litigant, pro se plaintiff]
+  definition: >-
+    A party representing itself without a lawyer. The IDB records whether the
+    plaintiff, the defendant, both or neither were pro se at filing.
+  source: FJC IDB Civil Codebook (PROSE)
+- term: in forma pauperis
+  aliases: [ifp, fee waiver]
+  definition: >-
+    A party allowed to proceed without paying the filing fee because of
+    inability to pay. Recorded in the IDB's IFP field.
+  source: FJC IDB Civil Codebook (IFP)
+- term: statistical closing
+  aliases: [statistically closed]
+  definition: >-
+    A disposition code (18) for cases pending over three years with no
+    activity for 12 months and all contemplated proceedings completed; it
+    removes the case from pending counts though it may be reopened.
+  source: FJC IDB Civil Codebook (DISP)
+  related: [terminations]
+- term: judicial emergency
+  aliases: [judicial emergencies, emergency]
+  definition: >-
+    A vacancy the AO designates an emergency: in a district court, a vacancy
+    where weighted filings exceed 600 per judgeship, a vacancy open more than
+    18 months where weighted filings are 430–600, or a multi-judgeship court
+    with only one active judge. It depends on vacancies, which this server
+    doesn't track.
+  source: https://www.uscourts.gov/judicial-emergency-definition
+  related: [weighted filings, judgeship thresholds]
+- term: judgeship thresholds
+  aliases: [430, "430 weighted filings", "600 weighted filings", new judgeship standard]
+  definition: >-
+    The Judicial Conference generally requires more than 430 weighted filings
+    per authorized judgeship before recommending an additional district
+    judgeship (with other factors); 600 marks a judicial emergency where
+    there is a vacancy. The server reports these as context and makes no
+    recommendation.
+  source: CRS Insight IN12541; AO judicial emergency definition
+  related: [judicial emergency, weighted filings]
+- term: jurisdiction
+  aliases: [basis of jurisdiction, u.s. civil, private civil, federal question, diversity]
+  definition: >-
+    The basis of federal jurisdiction: U.S. government plaintiff or defendant
+    ("U.S. civil" in Table C-1), or, between private parties, federal
+    question, diversity of citizenship or local question ("private civil").
+  source: FJC IDB Civil Codebook (JURIS); Table C-1

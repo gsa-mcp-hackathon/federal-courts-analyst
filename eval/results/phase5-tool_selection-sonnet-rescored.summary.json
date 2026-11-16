@@ -1,0 +1,108 @@
+{
+  "run_id": "phase5-tool_selection-sonnet-rescored",
+  "answerer": "claude-code-sonnet",
+  "label": "rescored:phase5-tool_selection-sonnet",
+  "items": [
+    "ts-single-official-figure",
+    "ts-official-figure-edition",
+    "ts-revisions-of-figure",
+    "ts-compare-top-districts",
+    "ts-compare-named-districts",
+    "ts-compare-circuits-districts",
+    "ts-explain-change-national",
+    "ts-explain-change-district",
+    "ts-explain-change-terminations",
+    "ts-cohort-count",
+    "ts-cohort-median-time",
+    "ts-cohort-outcome-rates",
+    "ts-cohort-trend",
+    "ts-reconcile-figure",
+    "ts-reconcile-pending",
+    "ts-judgeship-context",
+    "ts-judgeship-context-national",
+    "ts-explain-term-weighted",
+    "ts-explain-term-nos",
+    "ts-explain-term-jff",
+    "ts-sample-dockets",
+    "ts-sample-dockets-patent",
+    "ts-server-info",
+    "ts-official-pending",
+    "ts-official-median-time"
+  ],
+  "finished_at": "2026-09-27T14:07:44+00:00",
+  "summary": {
+    "n": 25,
+    "correct": 25,
+    "accuracy": 1.0,
+    "by_suite": {
+      "tool_selection": {
+        "n": 25,
+        "correct": 25,
+        "accuracy": 1.0
+      }
+    },
+    "by_split": {
+      "dev": {
+        "n": 16,
+        "correct": 16,
+        "accuracy": 1.0
+      },
+      "test": {
+        "n": 9,
+        "correct": 9,
+        "accuracy": 1.0
+      }
+    },
+    "by_check": {
+      "behavior": {
+        "n": 25,
+        "passed": 25,
+        "rate": 1.0
+      },
+      "tools": {
+        "n": 25,
+        "passed": 25,
+        "rate": 1.0
+      }
+    },
+    "behavior_confusion": {
+      "answer": {
+        "answer": 25,
+        "clarify": 0,
+        "decline": 0
+      },
+      "clarify": {
+        "answer": 0,
+        "clarify": 0,
+        "decline": 0
+      },
+      "decline": {
+        "answer": 0,
+        "clarify": 0,
+        "decline": 0
+      }
+    },
+    "behavior_metrics": {
+      "answer": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "support": 25
+      },
+      "clarify": {
+        "precision": null,
+        "recall": null,
+        "support": 0
+      },
+      "decline": {
+        "precision": null,
+        "recall": null,
+        "support": 0
+      }
+    },
+    "error_categories": {},
+    "latency_p50_s": 6.198,
+    "latency_p95_s": 15.139,
+    "cost_usd": null,
+    "cost_per_question_usd": null
+  }
+}

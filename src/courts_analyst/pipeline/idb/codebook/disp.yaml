@@ -1,0 +1,34 @@
+# DISP — manner of disposition.
+# Source: FJC IDB Civil Codebook 1988 Forward (2023-10-25), pp. 11–12 and
+# Appendix A. `group` follows the codebook's three headings; 15–20 are listed
+# under "Judgment on" in the codebook, including statistical closings (18).
+field: disp
+column: DISP
+title: Disposition
+description: The manner in which the case was disposed of.
+missing: ["-8"]
+codes:
+  - {code: "0", label: Transferred to another district, group: transferred_or_remanded}
+  - {code: "1", label: Remanded to state court, group: transferred_or_remanded}
+  - {code: "10", label: Multidistrict litigation transfer, group: transferred_or_remanded}
+  - {code: "11", label: Remanded to U.S. agency, group: transferred_or_remanded}
+  - {code: "2", label: Dismissed for want of prosecution, group: dismissed}
+  - {code: "3", label: Dismissed for lack of jurisdiction, group: dismissed}
+  - {code: "12", label: Dismissed voluntarily, group: dismissed}
+  - {code: "13", label: Dismissed as settled, group: dismissed}
+  - {code: "14", label: Dismissed (other), group: dismissed}
+  - {code: "4", label: Default judgment, group: judgment}
+  - {code: "5", label: Consent judgment, group: judgment}
+  - {code: "6", label: Judgment on motion before trial, group: judgment}
+  - {code: "7", label: Judgment on jury verdict, group: judgment}
+  - {code: "8", label: Judgment on directed verdict, group: judgment}
+  - {code: "9", label: Judgment after court trial, group: judgment}
+  - {code: "15", label: Award of arbitrator, group: judgment}
+  - {code: "16", label: Stayed pending bankruptcy, group: judgment}
+  - {code: "17", label: Judgment (other), group: judgment}
+  - code: "18"
+    label: Statistical closing
+    group: judgment
+    note: Pending over 3 years, no activity for over 12 months, and all contemplated proceedings completed.
+  - {code: "19", label: Appeal affirmed (magistrate judge), group: judgment}
+  - {code: "20", label: Appeal denied (magistrate judge), group: judgment}

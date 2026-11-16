@@ -1,0 +1,519 @@
+# Golden official figures (Phase 1).
+#
+# Each entry is a value exactly as printed in one edition of one uscourts.gov
+# table. tests/test_golden_figures.py checks that the catalog built from the
+# committed fixtures returns this value (rounded half-up at the printed
+# precision) for this measure, court, fiscal year AND edition.
+#
+# Verification: every value was read from the catalog and independently
+# matched against the PDF text of the same edition (a path that does not use
+# the table parsers). The six concept-document figures were also checked by
+# eye against the xlsx and PDF. A second person still needs to double-check
+# the list (plan/phase-01, open issue).
+#
+# `cell` is where the catalog read the number (xlsx sheet!cell or PDF
+# page/line/column); `source` is the published file.
+- measure: authorized_judgeships
+  court: US
+  fiscal_year: 2020
+  edition: JB-2020
+  table: X-1A
+  value: 673.0
+  printed: '673'
+  source: https://www.uscourts.gov/sites/default/files/data_tables/jb_x1a_0930.2020.xlsx
+  cell: 'xlsx:Table X-1A.!B6'
+- measure: civil_filings_per_judgeship
+  court: US
+  fiscal_year: 2020
+  edition: JB-2020
+  table: X-1A
+  value: 676.0
+  printed: '676'
+  source: https://www.uscourts.gov/sites/default/files/data_tables/jb_x1a_0930.2020.xlsx
+  cell: 'xlsx:Table X-1A.!C6'
+- measure: weighted_civil_filings_per_judgeship
+  court: US
+  fiscal_year: 2020
+  edition: JB-2020
+  table: X-1A
+  value: 554.0
+  printed: '554'
+  source: https://www.uscourts.gov/sites/default/files/data_tables/jb_x1a_0930.2020.xlsx
+  cell: 'xlsx:Table X-1A.!G6'
+- measure: authorized_judgeships
+  court: US
+  fiscal_year: 2020
+  edition: JFF-2023
+  table: '6.2'
+  value: 674.0
+  printed: '674'
+  source: https://www.uscourts.gov/sites/default/files/data_tables/jff_6.2_0930.2023.xlsx
+  cell: 'xlsx:Table 6.2!B8'
+- measure: civil_filings_per_judgeship
+  court: US
+  fiscal_year: 2020
+  edition: JFF-2023
+  table: '6.2'
+  value: 675.0
+  printed: '675'
+  source: https://www.uscourts.gov/sites/default/files/data_tables/jff_6.2_0930.2023.xlsx
+  cell: 'xlsx:Table 6.2!H8'
+- measure: weighted_civil_filings_per_judgeship
+  court: US
+  fiscal_year: 2020
+  edition: JFF-2023
+  table: '6.2'
+  value: 322.0
+  printed: '322'
+  source: https://www.uscourts.gov/sites/default/files/data_tables/jff_6.2_0930.2023.xlsx
+  cell: 'xlsx:Table 6.2!D8'
+- measure: weighted_civil_filings_per_judgeship
+  court: US
+  fiscal_year: 2020
+  edition: JFF-2021
+  table: '6.2'
+  value: 554.0
+  printed: '554'
+  source: https://www.uscourts.gov/sites/default/files/data_tables/jff_6.2_0930.2021.xlsx
+  cell: 'xlsx:Table 6.2!D7'
+- measure: weighted_civil_filings_per_judgeship
+  court: US
+  fiscal_year: 2020
+  edition: JFF-2022
+  table: '6.2'
+  value: 554.0
+  printed: '554'
+  source: https://www.uscourts.gov/sites/default/files/data_tables/jff_6.2_0930.2022.xlsx
+  cell: 'xlsx:Table 6.2!D8'
+- measure: weighted_civil_filings_per_judgeship
+  court: US
+  fiscal_year: 2020
+  edition: JFF-2025
+  table: '6.2'
+  value: 322.0
+  printed: '322'
+  source: https://www.uscourts.gov/sites/default/files/document/jff_6.2_0930.2025.xlsx
+  cell: 'xlsx:Table 6.2!D5'
+- measure: weighted_total_filings_per_judgeship
+  court: US
+  fiscal_year: 2020
+  edition: JB-2020
+  table: X-1A
+  value: 681.0
+  printed: '681'
+  source: https://www.uscourts.gov/sites/default/files/data_tables/jb_x1a_0930.2020.xlsx
+  cell: 'xlsx:Table X-1A.!J6'
+- measure: weighted_total_filings_per_judgeship
+  court: US
+  fiscal_year: 2020
+  edition: JFF-2023
+  table: '6.2'
+  value: 449.0
+  printed: '449'
+  source: https://www.uscourts.gov/sites/default/files/data_tables/jff_6.2_0930.2023.xlsx
+  cell: 'xlsx:Table 6.2!C8'
+- measure: weighted_civil_filings_per_judgeship
+  court: US
+  fiscal_year: 2021
+  edition: JB-2021
+  table: X-1A
+  value: 434.0
+  printed: '434'
+  source: https://www.uscourts.gov/sites/default/files/data_tables/jb_x1a_0930.2021.xlsx
+  cell: 'xlsx:Table X-1A.!G6'
+- measure: weighted_civil_filings_per_judgeship
+  court: US
+  fiscal_year: 2021
+  edition: JFF-2023
+  table: '6.2'
+  value: 318.0
+  printed: '318'
+  source: https://www.uscourts.gov/sites/default/files/data_tables/jff_6.2_0930.2023.xlsx
+  cell: 'xlsx:Table 6.2!D7'
+- measure: weighted_civil_filings_per_judgeship
+  court: US
+  fiscal_year: 2022
+  edition: JB-2022
+  table: X-1A
+  value: 355.0
+  printed: '355'
+  source: https://www.uscourts.gov/sites/default/files/data_tables/jb_x1a_0930.2022.xlsx
+  cell: 'xlsx:Table X-1A!H5'
+- measure: weighted_civil_filings_per_judgeship
+  court: US
+  fiscal_year: 2022
+  edition: JFF-2023
+  table: '6.2'
+  value: 309.0
+  printed: '309'
+  source: https://www.uscourts.gov/sites/default/files/data_tables/jff_6.2_0930.2023.xlsx
+  cell: 'xlsx:Table 6.2!D6'
+- measure: weighted_civil_filings_per_judgeship
+  court: US
+  fiscal_year: 2023
+  edition: JB-2023
+  table: X-1A
+  value: 431.0
+  printed: '431'
+  source: https://www.uscourts.gov/sites/default/files/data_tables/jb_x1a_0930.2023.xlsx
+  cell: 'xlsx:Table X-1A!H5'
+- measure: weighted_civil_filings_per_judgeship
+  court: US
+  fiscal_year: 2023
+  edition: JFF-2024
+  table: '6.2'
+  value: 332.0
+  printed: '332'
+  source: https://www.uscourts.gov/sites/default/files/document/jff_6.2_0930.2024.xlsx
+  cell: 'xlsx:Table 6.2!D6'
+- measure: weighted_civil_filings_per_judgeship
+  court: US
+  fiscal_year: 2024
+  edition: JB-2024
+  table: X-1A
+  value: 384.0
+  printed: '384'
+  source: https://www.uscourts.gov/sites/default/files/2025-01/jb_x1a_0930.2024.xlsx
+  cell: 'xlsx:Table X-1A!H5'
+- measure: weighted_civil_filings_per_judgeship
+  court: US
+  fiscal_year: 2024
+  edition: JFF-2024
+  table: '6.2'
+  value: 335.0
+  printed: '335'
+  source: https://www.uscourts.gov/sites/default/files/document/jff_6.2_0930.2024.xlsx
+  cell: 'xlsx:Table 6.2!D5'
+- measure: weighted_civil_filings_per_judgeship
+  court: US
+  fiscal_year: 2025
+  edition: JB-2025
+  table: X-1A
+  value: 414.0
+  printed: '414'
+  source: https://www.uscourts.gov/sites/default/files/document/jb_x1a_0930.2025.xlsx
+  cell: 'xlsx:Table X-1A!H5'
+- measure: weighted_civil_filings_per_judgeship
+  court: US
+  fiscal_year: 2025
+  edition: JFF-2025
+  table: '6.2'
+  value: 372.0
+  printed: '372'
+  source: https://www.uscourts.gov/sites/default/files/document/jff_6.2_0930.2025.xlsx
+  cell: 'xlsx:Table 6.2!D4'
+- measure: authorized_judgeships
+  court: US
+  fiscal_year: 2025
+  edition: JB-2025
+  table: X-1A
+  value: 673.0
+  printed: '673'
+  source: https://www.uscourts.gov/sites/default/files/document/jb_x1a_0930.2025.xlsx
+  cell: 'xlsx:Table X-1A!B5'
+- measure: authorized_judgeships
+  court: US
+  fiscal_year: 2025
+  edition: JFF-2025
+  table: '6.2'
+  value: 674.0
+  printed: '674'
+  source: https://www.uscourts.gov/sites/default/files/document/jff_6.2_0930.2025.xlsx
+  cell: 'xlsx:Table 6.2!B4'
+- measure: weighted_civil_filings_per_judgeship
+  court: US
+  fiscal_year: 2019
+  edition: JB-2019
+  table: X-1A
+  value: 381.0
+  printed: '381'
+  source: https://www.uscourts.gov/sites/default/files/data_tables/jb_x1a_0930.2019.xlsx
+  cell: 'xlsx:Table X-1A.!G6'
+- measure: weighted_civil_filings_per_judgeship
+  court: US
+  fiscal_year: 2019
+  edition: JFF-2023
+  table: '6.2'
+  value: 332.0
+  printed: '332'
+  source: https://www.uscourts.gov/sites/default/files/data_tables/jff_6.2_0930.2023.xlsx
+  cell: 'xlsx:Table 6.2!D9'
+- measure: weighted_civil_filings_per_judgeship
+  court: US
+  fiscal_year: 2016
+  edition: JB-2016
+  table: X-1A
+  value: 355.0
+  printed: '355'
+  source: https://www.uscourts.gov/sites/default/files/data_tables/jb_x1a_0930.2016.pdf
+  cell: 'pdf:p1:line7:col6'
+- measure: weighted_civil_filings_per_judgeship
+  court: US
+  fiscal_year: 2016
+  edition: JFF-2016
+  table: '6.2'
+  value: 350.0
+  printed: '350'
+  source: https://www.uscourts.gov/sites/default/files/data_tables/jff_6.2_0930.2016.xlsx
+  cell: 'xlsx:Table 6.2!D5'
+- measure: weighted_total_filings_per_judgeship
+  court: US
+  fiscal_year: 2016
+  edition: JB-2016
+  table: X-1A
+  value: 489.0
+  printed: '489'
+  source: https://www.uscourts.gov/sites/default/files/data_tables/jb_x1a_0930.2016.pdf
+  cell: 'pdf:p1:line7:col9'
+- measure: authorized_judgeships
+  court: FL-N
+  fiscal_year: 2020
+  edition: JB-2020
+  table: X-1A
+  value: 4.0
+  printed: '4'
+  source: https://www.uscourts.gov/sites/default/files/data_tables/jb_x1a_0930.2020.xlsx
+  cell: 'xlsx:Table X-1A.!B93'
+- measure: civil_filings_per_judgeship
+  court: FL-N
+  fiscal_year: 2020
+  edition: JB-2020
+  table: X-1A
+  value: 51153.0
+  printed: 51,153
+  source: https://www.uscourts.gov/sites/default/files/data_tables/jb_x1a_0930.2020.xlsx
+  cell: 'xlsx:Table X-1A.!C93'
+- measure: weighted_civil_filings_per_judgeship
+  court: FL-N
+  fiscal_year: 2020
+  edition: JB-2020
+  table: X-1A
+  value: 35430.0
+  printed: 35,430
+  source: https://www.uscourts.gov/sites/default/files/data_tables/jb_x1a_0930.2020.xlsx
+  cell: 'xlsx:Table X-1A.!G93'
+- measure: weighted_civil_filings_per_judgeship
+  court: FL-N
+  fiscal_year: 2021
+  edition: JB-2021
+  table: X-1A
+  value: 14733.0
+  printed: 14,733
+  source: https://www.uscourts.gov/sites/default/files/data_tables/jb_x1a_0930.2021.xlsx
+  cell: 'xlsx:Table X-1A.!G93'
+- measure: weighted_civil_filings_per_judgeship
+  court: FL-N
+  fiscal_year: 2025
+  edition: JB-2025
+  table: X-1A
+  value: 641.0
+  printed: '641'
+  source: https://www.uscourts.gov/sites/default/files/document/jb_x1a_0930.2025.xlsx
+  cell: 'xlsx:Table X-1A!H91'
+- measure: civil_cases_filed
+  court: FL-N
+  fiscal_year: 2020
+  edition: JB-2020
+  table: C-1
+  value: 204994.0
+  printed: 204,994
+  source: https://www.uscourts.gov/sites/default/files/data_tables/jb_c1_0930.2020.xlsx
+  cell: 'xlsx:Report C-1!C107'
+- measure: civil_cases_pending
+  court: FL-N
+  fiscal_year: 2020
+  edition: JB-2020
+  table: C-1
+  value: 204766.0
+  printed: 204,766
+  source: https://www.uscourts.gov/sites/default/files/data_tables/jb_c1_0930.2020.xlsx
+  cell: 'xlsx:Report C-1!E107'
+- measure: civil_cases_pending
+  court: FL-N
+  fiscal_year: 2023
+  edition: JB-2023
+  table: C-1
+  value: 264222.0
+  printed: 264,222
+  source: https://www.uscourts.gov/sites/default/files/data_tables/jb_c1_0930.2023.xlsx
+  cell: 'xlsx:Report C-1!D107'
+- measure: civil_cases_filed
+  court: FL-N
+  fiscal_year: 2016
+  edition: JB-2016
+  table: C-1
+  value: 2137.0
+  printed: 2,137
+  source: https://www.uscourts.gov/sites/default/files/data_tables/jb_c1_0930.2016.pdf
+  cell: 'pdf:p3:line34:col2'
+- measure: weighted_total_filings_per_judgeship
+  court: NY-S
+  fiscal_year: 2020
+  edition: JB-2020
+  table: X-1A
+  value: 536.0
+  printed: '536'
+  source: https://www.uscourts.gov/sites/default/files/data_tables/jb_x1a_0930.2020.xlsx
+  cell: 'xlsx:Table X-1A.!J17'
+- measure: weighted_total_filings_per_judgeship
+  court: NJ
+  fiscal_year: 2025
+  edition: JB-2025
+  table: X-1A
+  value: 974.0
+  printed: '974'
+  source: https://www.uscourts.gov/sites/default/files/document/jb_x1a_0930.2025.xlsx
+  cell: 'xlsx:Table X-1A!G19'
+- measure: weighted_total_filings_per_judgeship
+  court: WV-S
+  fiscal_year: 2016
+  edition: JB-2016
+  table: X-1A
+  value: 1781.0
+  printed: 1,781
+  source: https://www.uscourts.gov/sites/default/files/data_tables/jb_x1a_0930.2016.pdf
+  cell: 'pdf:p1:line37:col9'
+- measure: weighted_total_filings_per_judgeship
+  court: TX-W
+  fiscal_year: 2020
+  edition: JB-2020
+  table: X-1A
+  value: 830.0
+  printed: '830'
+  source: https://www.uscourts.gov/sites/default/files/data_tables/jb_x1a_0930.2020.xlsx
+  cell: 'xlsx:Table X-1A.!J42'
+- measure: authorized_judgeships
+  court: KY-E
+  fiscal_year: 2020
+  edition: JB-2020
+  table: X-1A
+  value: 5.5
+  printed: '5.5'
+  source: https://www.uscourts.gov/sites/default/files/data_tables/jb_x1a_0930.2020.xlsx
+  cell: 'xlsx:Table X-1A.!B43'
+- measure: civil_cases_filed
+  court: US
+  fiscal_year: 2020
+  edition: JB-2020
+  table: C-1
+  value: 470581.0
+  printed: 470,581
+  source: https://www.uscourts.gov/sites/default/files/data_tables/jb_c1_0930.2020.xlsx
+  cell: 'xlsx:Report C-1!C6'
+- measure: civil_cases_filed
+  court: US
+  fiscal_year: 2023
+  edition: JB-2023
+  table: C-1
+  value: 339731.0
+  printed: 339,731
+  source: https://www.uscourts.gov/sites/default/files/data_tables/jb_c1_0930.2023.xlsx
+  cell: 'xlsx:Report C-1!B6'
+- measure: civil_cases_filed
+  court: US
+  fiscal_year: 2024
+  edition: JB-2024
+  table: C-1
+  value: 290896.0
+  printed: 290,896
+  source: https://www.uscourts.gov/sites/default/files/2024-12/jb_c1_0930.2024.xlsx
+  cell: 'xlsx:Report C-1!B5'
+- measure: civil_cases_pending
+  court: US
+  fiscal_year: 2019
+  edition: JB-2020
+  table: C-1
+  value: 357041.0
+  printed: 357,041
+  source: https://www.uscourts.gov/sites/default/files/data_tables/jb_c1_0930.2020.xlsx
+  cell: 'xlsx:Report C-1!B6'
+- measure: civil_cases_filed
+  court: CIR-11
+  fiscal_year: 2023
+  edition: JB-2023
+  table: C-1
+  value: 91648.0
+  printed: 91,648
+  source: https://www.uscourts.gov/sites/default/files/data_tables/jb_c1_0930.2023.xlsx
+  cell: 'xlsx:Report C-1!B103'
+- measure: us_civil_cases_filed
+  court: US
+  fiscal_year: 2016
+  edition: JB-2016
+  table: C-1
+  value: 60136.0
+  printed: 60,136
+  source: https://www.uscourts.gov/sites/default/files/data_tables/jb_c1_0930.2016.pdf
+  cell: 'pdf:p1:line7:col6'
+- measure: total_cases_filed
+  court: US
+  fiscal_year: 2020
+  edition: JFF-2023
+  table: '6.1'
+  value: 530465.0
+  printed: 530,465
+  source: https://www.uscourts.gov/sites/default/files/data_tables/jff_6.1_0930.2023.xlsx
+  cell: 'xlsx:Report 1!C8'
+- measure: authorized_judgeships_incl_territorial
+  court: US
+  fiscal_year: 2023
+  edition: JFF-2023
+  table: '6.1'
+  value: 677.0
+  printed: '677'
+  source: https://www.uscourts.gov/sites/default/files/data_tables/jff_6.1_0930.2023.xlsx
+  cell: 'xlsx:Report 1!B5'
+- measure: total_cases_filed
+  court: US
+  fiscal_year: 2025
+  edition: JFF-2025
+  table: '6.1'
+  value: 370579.0
+  printed: 370,579
+  source: https://www.uscourts.gov/sites/default/files/document/jff_6.1_0930.2025.xlsx
+  cell: 'xlsx:Table 6.1!C4'
+- measure: civil_median_months_to_disposition
+  court: US
+  fiscal_year: 2020
+  edition: JB-2020
+  table: C-5
+  value: 8.9
+  printed: '8.9'
+  source: https://www.uscourts.gov/sites/default/files/data_tables/jb_c5_0930.2020.xlsx
+  cell: 'xlsx:Table C-5!C8'
+- measure: civil_median_months_to_disposition
+  court: US
+  fiscal_year: 2020
+  edition: JFF-2023
+  table: '6.3'
+  value: 8.9
+  printed: '8.9'
+  source: https://www.uscourts.gov/sites/default/files/data_tables/jff_6.3_0930.2023.xlsx
+  cell: 'xlsx:Table 6.3!B9'
+- measure: civil_median_months_to_disposition
+  court: FL-N
+  fiscal_year: 2020
+  edition: JB-2020
+  table: C-5
+  value: 6.7
+  printed: '6.7'
+  source: https://www.uscourts.gov/sites/default/files/data_tables/jb_c5_0930.2020.xlsx
+  cell: 'xlsx:Table C-5!C109'
+- measure: civil_median_months_to_disposition
+  court: US
+  fiscal_year: 2016
+  edition: JB-2016
+  table: C-5
+  value: 9.2
+  printed: '9.2'
+  source: https://www.uscourts.gov/sites/default/files/data_tables/jb_c5_0930.2016.pdf
+  cell: 'pdf:p1:line10:col2'
+- measure: criminal_median_months_to_disposition
+  court: US
+  fiscal_year: 2023
+  edition: JFF-2023
+  table: '6.3'
+  value: 10.4
+  printed: '10.4'
+  source: https://www.uscourts.gov/sites/default/files/data_tables/jff_6.3_0930.2023.xlsx
+  cell: 'xlsx:Table 6.3!G6'

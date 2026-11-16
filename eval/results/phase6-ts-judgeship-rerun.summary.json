@@ -1,0 +1,81 @@
+{
+  "run_id": "phase6-ts-judgeship-rerun",
+  "answerer": "claude-code-sonnet",
+  "label": "all-both",
+  "items": [
+    "ts-judgeship-context-national"
+  ],
+  "finished_at": "2026-09-27T15:25:53+00:00",
+  "summary": {
+    "n": 1,
+    "correct": 0,
+    "accuracy": 0.0,
+    "by_suite": {
+      "tool_selection": {
+        "n": 1,
+        "correct": 0,
+        "accuracy": 0.0
+      }
+    },
+    "by_split": {
+      "dev": {
+        "n": 1,
+        "correct": 0,
+        "accuracy": 0.0
+      }
+    },
+    "by_check": {
+      "behavior": {
+        "n": 1,
+        "passed": 0,
+        "rate": 0.0
+      },
+      "tools": {
+        "n": 1,
+        "passed": 1,
+        "rate": 1.0
+      }
+    },
+    "behavior_confusion": {
+      "answer": {
+        "answer": 0,
+        "clarify": 0,
+        "decline": 1
+      },
+      "clarify": {
+        "answer": 0,
+        "clarify": 0,
+        "decline": 0
+      },
+      "decline": {
+        "answer": 0,
+        "clarify": 0,
+        "decline": 0
+      }
+    },
+    "behavior_metrics": {
+      "answer": {
+        "precision": null,
+        "recall": 0.0,
+        "support": 1
+      },
+      "clarify": {
+        "precision": null,
+        "recall": null,
+        "support": 0
+      },
+      "decline": {
+        "precision": 0.0,
+        "recall": null,
+        "support": 0
+      }
+    },
+    "error_categories": {
+      "task_understanding": 1
+    },
+    "latency_p50_s": 7.679,
+    "latency_p95_s": 7.679,
+    "cost_usd": null,
+    "cost_per_question_usd": null
+  }
+}

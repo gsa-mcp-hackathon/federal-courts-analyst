@@ -1,0 +1,34 @@
+# Nightly evaluation. Today: validate the question bank and self-check the
+# harness (gold must score 100%, null 0%) with no model calls. Phase 10 adds
+# a model run of the 20-question smoke set (`--tag smoke`) once API key
+# secrets exist (#18); the full bank is run by hand at phase ends.
+name: Eval (nightly)
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 7 * * *"   # 03:00 ET
+
+permissions:
+  contents: read
+
+jobs:
+  eval:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - run: uv sync --group dev --group eval --frozen
+      - name: Validate question bank
+        run: uv run courts-eval validate
+      - name: Harness self-check (gold)
+        run: uv run courts-eval run --answerer gold --quiet --expect-accuracy 1 --results-dir eval-results
+      - name: Harness self-check (null)
+        run: uv run courts-eval run --answerer null --quiet --expect-accuracy 0 --results-dir eval-results
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: eval-results
+          path: eval-results/

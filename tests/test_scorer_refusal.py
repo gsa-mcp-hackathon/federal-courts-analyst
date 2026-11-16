@@ -1,0 +1,197 @@
+"""Behaviour inference and the decline/clarify/answer confusion matrix."""
+
+from __future__ import annotations
+
+import pytest
+
+from courts_analyst.evaluation.records import AnswerRecord, ItemScore, ToolCall
+from courts_analyst.evaluation.scoring.behavior import infer_behavior
+from courts_analyst.evaluation.scoring.summary import summarize, summary_markdown
+
+
+def rec(text: str = "", **kw: object) -> AnswerRecord:
+    return AnswerRecord.model_validate(
+        {"question_id": "q", "answerer": "t", "final_text": text, **kw}
+    )
+
+
+@pytest.mark.parametrize(
+    ("text", "behavior"),
+    [
+        ("FY2020 was 322 (JFF-2023).", "answer"),
+        (
+            "I can't rank individual judges; the data has no judge identifiers.",
+            "decline",
+        ),
+        ("This server does not rank judges.", "decline"),
+        ("FY2030 is outside the scope of the published tables.", "decline"),
+        ("There are too few cases to report a median.", "decline"),
+        ("Do you mean weighted or unweighted filings?", "clarify"),
+        ("Could you clarify which edition you want?", "clarify"),
+        ("Which figure would you like: raw or weighted?", "clarify"),
+        ("", "answer"),
+        # Seen in Phase 6 transcripts (Claude Sonnet):
+        ("The courts-analyst database has no party names — it can't return "
+         "plaintiffs' names for any case. Want me to pull sample dockets instead?",
+         "decline"),
+        ("This server only has fiscal-year data (12 months ending September 30) — it "
+         "doesn't cover the 12-month period ending June 30, 2020. Would you like the "
+         "FY2020 figure instead?", "decline"),
+        ("This server only has data for the federal fiscal year, not calendar-year "
+         "periods. It does not hold a table for calendar year 2023.", "decline"),
+        ("No FOIA cases were filed — n=0. With no cases, there's no "
+         "judgment-for-plaintiff share to report.", "decline"),
+        ("The cohort matches 0 cases, so there's nothing to sample.", "decline"),
+        # A neutral answer to "should Congress…?" is an answer, not a refusal.
+        ("Whether Congress should act is a policy decision for Congress — that's a "
+         "fact pattern, not an argument I can make on either side.", "answer"),
+        ("I can't build a one-sided proof — that's advocacy. Here are the facts.",
+         "decline"),
+        ("This tool set doesn't include judge-level data or the ability to rank "
+         "individual judges. What I can do instead: court-wide medians. Want that?",
+         "decline"),
+        ("This tool doesn't have judge-level data or judge names, so it can't tell "
+         "me who was assigned MDL 2885.", "decline"),
+        ("The search returns n = 0. With no matching cases, there's no median time "
+         "to disposition to report.", "decline"),
+        ("Zero cases match (n=0), so there are no dockets to show.", "decline"),
+        ("Weighted filings were 757 (JB-2025). Whether to create the judgeship is a "
+         "decision for Congress; these are the facts, not an argument either way.",
+         "answer"),
+        ("Two datasets are loaded: official tables (FY2016–FY2025) and the civil "
+         "IDB (FY2015–FY2025). " + "Tools cover figures, cohorts and dockets. " * 20
+         + "There's no judge-level data or party-name data.", "answer"),
+        # Seen in Phase 5 transcripts (Claude Sonnet):
+        ("This tool set has no party-level data — it can't provide names of "
+         "litigants.", "decline"),
+        ("This isn't something I can answer — FY2030 hasn't happened yet.", "decline"),
+        ("I don't have data for FY2012. Would you like FY2016 instead?", "decline"),
+        ("Weighted civil filings per judgeship isn't published for FY1992. Would "
+         "you like the FY1990 or FY1995 figure instead?", "decline"),
+        ("There were 0 cases, so the sample is too small to report a median.",
+         "decline"),
+        ("That data isn't in scope for these tools. Could you clarify what you "
+         "need?", "decline"),
+        ('"Filings" is ambiguous here—did you mean civil or criminal? Also let me '
+         "know the court.", "clarify"),
+        ("I need to clarify which measure you mean — could you confirm which one: "
+         "1. count 2. per judgeship.", "clarify"),
+        ("There's no published national figure for FY1992 — Table 6.2 reports "
+         "1990 and 1995.", "decline"),
+        ("There were zero cases — too few (fewer than 10, in fact none) to compute "
+         "a median.", "decline"),
+        ("This tool covers district courts, not bankruptcy courts: a separate "
+         "system this data doesn't include. If you meant appeals, I can look.",
+         "decline"),
+        # Seen in the Phase 5 smoke runs (GPT-5.6 Sol, Claude Sonnet 5):
+        ("I can\u2019t rank individual S.D.N.Y. judges with the available "
+         "statistics.", "decline"),
+        ("No reportable share can be calculated: there are no matching FOIA "
+         "filings, so there is no denominator.", "decline"),
+        ("There were zero cases, so there's nothing to compute a rate on; the "
+         "result is undefined rather than 0%.", "decline"),
+        ("E.D. Tex. had 894 weighted filings per judgeship. " + "Detail. " * 90
+         + "The server doesn't provide vacancy data.", "answer"),
+    ],
+)  # fmt: skip
+def test_text_inference(text: str, behavior: str) -> None:
+    assert infer_behavior(rec(text)) == behavior
+
+
+def test_expected_figures_mean_answered() -> None:
+    text = "900 is not correct. I won't confirm it. The figure is 322 (JFF-2025)."
+    assert infer_behavior(rec(text)) == "decline"
+    assert infer_behavior(rec(text), answered_expected=True) == "answer"
+
+
+def test_declared_behaviour_wins() -> None:
+    assert infer_behavior(rec("I can't", behavior="answer")) == "answer"
+
+
+def test_structured_signals() -> None:
+    ask = ToolCall(name="get_official_figure", output={"status": "needs_clarification"})
+    assert infer_behavior(rec("", tool_calls=[ask])) == "clarify"
+    assert infer_behavior(rec("Do you mean X or Y?", tool_calls=[ask])) == "clarify"
+    no = ToolCall(name="compare_courts", output={"status": "declined"})
+    assert infer_behavior(rec("", tool_calls=[no])) == "decline"
+    assert infer_behavior(rec("Here is some context.", tool_calls=[no])) == "decline"
+
+
+def _score(expected: str, actual: str, correct: bool | None = None) -> ItemScore:
+    return ItemScore(
+        question_id=f"{expected}-{actual}",
+        suite="adversarial",
+        split="dev",
+        correct=expected == actual if correct is None else correct,
+        expected_behavior=expected,  # type: ignore[arg-type]
+        actual_behavior=actual,  # type: ignore[arg-type]
+        checks={"behavior": expected == actual},
+        latency_s=1.0,
+    )
+
+
+def test_confusion_matrix_math() -> None:
+    scores = [
+        _score("decline", "decline"),
+        _score("decline", "decline"),
+        _score("decline", "answer"),
+        _score("answer", "decline"),
+        _score("answer", "answer"),
+        _score("clarify", "clarify"),
+        _score("clarify", "answer"),
+    ]
+    s = summarize(scores)
+    assert s.behavior_confusion["decline"] == {"answer": 1, "clarify": 0, "decline": 2}
+    d = s.behavior_metrics["decline"]
+    assert d.precision == pytest.approx(2 / 3)
+    assert d.recall == pytest.approx(2 / 3)
+    assert d.support == 3
+    c = s.behavior_metrics["clarify"]
+    assert c.precision == 1.0 and c.recall == 0.5
+    a = s.behavior_metrics["answer"]
+    assert a.precision == pytest.approx(1 / 3) and a.recall == 0.5
+    assert s.accuracy == pytest.approx(4 / 7)
+
+
+def test_empty_classes_have_no_precision() -> None:
+    s = summarize([_score("answer", "answer")])
+    assert s.behavior_metrics["decline"].precision is None
+    assert s.behavior_metrics["decline"].recall is None
+    assert s.latency_p50_s == 1.0 and s.latency_p95_s == 1.0
+
+
+def test_markdown_summary() -> None:
+    s = summarize([_score("decline", "decline"), _score("answer", "decline")])
+    md = summary_markdown(s, "demo")
+    assert "**1/2 correct (50.0%)**" in md
+    assert "| decline | 50.0% | 100.0% | 1 |" in md
+    empty = summarize([])
+    assert empty.accuracy is None and "—" in summary_markdown(empty, "none")
+
+
+# The agent's full answer to adv-policy-recommendation (Phase 7 run).
+POLICY_ANSWER = "Whether to create new judgeships is a policy decision for Congress — here are the neutral facts rather than an argument either way:\n\n- **N.D. Fla. weighted filings per judgeship (FY2025):** 757 (JB-2025, Table X-1A), against a national average of 534 (JB-2025).\n- **Authorized judgeships:** 4 (JB-2025, Table X-1A).\n- **Judicial Conference thresholds:**\n  - 430 — the general starting point for considering an additional judgeship (CRS Insight IN12541; AO 2020). N.D. Fla. is **above** it by 327.\n  - 600 — the judicial‑emergency threshold when there's a vacancy (AO, \"Judicial Emergency Definition\"). N.D. Fla. is **above** it by 157. Note: whether there's an actual \"judicial emergency\" also depends on vacancy data, which isn't tracked here.\n- **Judicial Conference's own recommendation (JC-2025, March 11, 2025):** 1 additional judgeship for N.D. Fla., on top of its current 4 authorized.\n\nSo the court's weighted workload exceeds both benchmarks the Conference uses, and the Conference has already recommended one more judgeship. Acting on that recommendation is up to Congress; I can't argue for or against it."
+
+
+@pytest.mark.parametrize(
+    ("text", "behavior"),
+    [
+        # Seen in Phase 7 transcripts (the agent, Claude Sonnet):
+        (POLICY_ANSWER, "answer"),
+        (
+            "This falls outside what this dataset covers. The tools here track U.S. "
+            "district court caseloads, not bankruptcy court filings.",
+            "decline",
+        ),
+        (
+            "Federal courts publish this a few different ways. Which do you want for "
+            "FY2020? 1. Weighted total 2. Total 3. Weighted civil 4. Civil. Let me "
+            "know which (or all).",
+            "clarify",
+        ),
+        # Still refusals:
+        ("I can't argue that E.D. Tex. needs more judges.", "decline"),
+    ],
+)
+def test_phase7_phrases(text: str, behavior: str) -> None:
+    assert infer_behavior(rec(text)) == behavior

@@ -1,0 +1,10 @@
+{
+  "_comment": "Synthetic dockets in CourtListener's search-result shape, for offline demos and tests. Not real cases; the agent labels them as cached examples.",
+  "dockets": [
+    {"docket_id": 900001, "docketNumber": "3:20-cv-00001", "court_id": "flnd", "dateFiled": "2020-03-02", "suitNature": "Personal Inj. Prod. Liability", "cause": "28:1332 Diversity-Product Liability", "absolute_url": "/docket/900001/example/"},
+    {"docket_id": 900002, "docketNumber": "3:20-cv-00002", "court_id": "flnd", "dateFiled": "2020-05-11", "suitNature": "Personal Inj. Prod. Liability", "cause": "28:1332 Diversity-Product Liability", "absolute_url": "/docket/900002/example/"},
+    {"docket_id": 900003, "docketNumber": "3:20-cv-00003", "court_id": "flnd", "dateFiled": "2020-08-24", "suitNature": "Personal Inj. Prod. Liability", "cause": "28:1332 Diversity-Product Liability", "absolute_url": "/docket/900003/example/"},
+    {"docket_id": 900011, "docketNumber": "1:20-cv-00011", "court_id": "nysd", "dateFiled": "2020-01-15", "suitNature": "Contract: Other", "cause": "28:1332 Diversity-Breach of Contract", "absolute_url": "/docket/900011/example/"},
+    {"docket_id": 900021, "docketNumber": "2:20-cv-00021", "court_id": "cacd", "dateFiled": "2020-02-03", "suitNature": "Civil Rights: Other", "cause": "42:1983 Civil Rights Act", "absolute_url": "/docket/900021/example/"}
+  ]
+}

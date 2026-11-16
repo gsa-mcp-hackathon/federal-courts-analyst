@@ -1,0 +1,80 @@
+# Guardrail policy settings (Phase 6). Thresholds and policy texts live here so
+# the domain expert can review them in one place (issue #12); the rules that
+# use them are in core/guardrails/.
+
+small_cells:
+  # Plan decision 3: below `warn` cases a statistic carries a caution; below
+  # `suppress` it is withheld, and so is any case count in an IDB breakdown.
+  warn: 30
+  suppress: 10
+
+output:
+  # Fail closed above this many bytes of serialized result (the tests hold
+  # every real result under 64 KB; this guards against a runaway query).
+  max_result_bytes: 524288
+
+policies:
+  judge_level:
+    policy: >-
+      Judicial Conference policy (March 1995, reaffirmed March 2003) prohibits
+      disclosing judge-identifying information from the judiciary's statistical
+      databases, and the FJC redacts judge identifiers from the Integrated
+      Database, partly to prevent judge-shopping. This server holds no
+      judge-level data.
+    source: https://www.fjc.gov/sites/default/files/IDB-Research-Guide.pdf
+    message: >-
+      This server can't rank, compare, name or profile individual judges: the
+      data has no judge identifiers, by Judicial Conference policy, partly to
+      prevent judge-shopping.
+    alternative: >-
+      Compare districts instead, for example median time to disposition by
+      court (compare_courts or analyze_cohort with group_by='court').
+  pii:
+    policy: >-
+      Party names in the FJC Integrated Database are kept out of the server's
+      database entirely; an output scanner withholds any result that contains
+      a party name.
+    source: docs/security/threat-model.md
+    message: >-
+      This server doesn't return party names or other identifying details of
+      litigants.
+    alternative: >-
+      Ask for counts or outcomes for a group of cases, or use sample_dockets
+      for docket numbers you can look up on CourtListener.
+  pii_scanner:
+    policy: >-
+      Every result is checked against a hashed index of IDB party names before
+      it leaves the server; a match withholds the whole result (fail closed).
+    source: docs/security/threat-model.md
+    message: >-
+      The result was withheld because it contained text matching a party name
+      in the case records.
+    alternative: >-
+      Rephrase the request without names; the server answers with counts,
+      rates and docket numbers only.
+  small_cell:
+    policy: >-
+      Statistics on fewer than 10 cases are withheld, and small counts in
+      breakdowns are suppressed so they can't be recovered from totals.
+    source: plan/phase-06-guardrails-security.md
+    message: >-
+      This cohort has fewer than 10 cases, so the server won't list its
+      dockets: a sample would identify most of the cohort.
+    alternative: >-
+      Broaden the filters (more years, courts or case types) until the cohort
+      has at least 10 cases.
+  advocacy:
+    policy: >-
+      The server reports neutral, sourced facts. Whether to create judgeships
+      or change court resources is a policy decision; the server never argues
+      for an outcome.
+    source: docs/security/threat-model.md
+    message: >-
+      Whether a court should get more judgeships is a policy decision for
+      Congress. The server reports the court's official workload, the
+      Judicial Conference's published standards and its own recommendation,
+      without arguing for or against.
+    alternative: >-
+      Ask for judgeship_context: the court's weighted filings per judgeship
+      against the Conference's thresholds, and what the Conference
+      recommended.

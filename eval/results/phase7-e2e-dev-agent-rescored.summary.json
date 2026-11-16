@@ -1,0 +1,138 @@
+{
+  "run_id": "phase7-e2e-dev-agent-rescored",
+  "answerer": "agent-sonnet-5",
+  "label": "rescored:phase7-e2e-dev-agent",
+  "items": [
+    "fy2020-weighted-civil-national",
+    "fy2021-weighted-civil-national",
+    "fy2024-weighted-civil-national",
+    "fy2025-weighted-civil-national",
+    "fy2018-weighted-civil-national",
+    "fy2020-weighted-total-national",
+    "fy2025-weighted-total-national",
+    "fy2020-judgeships-national",
+    "fy2020-unweighted-civil-national",
+    "fy2020-weighted-first-published",
+    "fy2020-weighted-jff2023",
+    "fy2023-unweighted-civil-national",
+    "fy2024-total-filings-per-judgeship",
+    "fy2020-civil-filed-national",
+    "fy2025-civil-terminated-national",
+    "fy2023-civil-pending-national",
+    "fy2022-us-civil-filed",
+    "fy2021-private-civil-filed",
+    "fy2025-civil-median-trial",
+    "fy2025-total-cases-filed",
+    "fy2024-total-cases-pending",
+    "fy2023-criminal-median-months",
+    "fy2020-ndfla-weighted-civil",
+    "fy2020-ndfla-unweighted-civil",
+    "fy2024-sdny-weighted-total",
+    "fy2025-dnj-weighted-total",
+    "fy2025-wdtex-judgeships",
+    "fy2024-edky-judgeships",
+    "fy2017-sdwva-weighted-civil",
+    "fy2024-dnj-civil-filed",
+    "fy2023-edpa-civil-terminated",
+    "fy2025-cdcal-civil-filed",
+    "fy2024-top5-weighted-total",
+    "fy2020-top3-weighted-civil",
+    "fy2024-top5-civil-filed",
+    "fy2025-bottom3-weighted-total",
+    "fy2019-2020-civil-filed-change",
+    "fy2019-ddel-patent-median-days"
+  ],
+  "finished_at": "2026-09-27T16:32:13+00:00",
+  "summary": {
+    "n": 38,
+    "correct": 37,
+    "accuracy": 0.9736842105263158,
+    "by_suite": {
+      "e2e": {
+        "n": 38,
+        "correct": 37,
+        "accuracy": 0.9736842105263158
+      }
+    },
+    "by_split": {
+      "dev": {
+        "n": 38,
+        "correct": 37,
+        "accuracy": 0.9736842105263158
+      }
+    },
+    "by_check": {
+      "behavior": {
+        "n": 38,
+        "passed": 38,
+        "rate": 1.0
+      },
+      "edition": {
+        "n": 33,
+        "passed": 33,
+        "rate": 1.0
+      },
+      "numeric": {
+        "n": 34,
+        "passed": 34,
+        "rate": 1.0
+      },
+      "ranking": {
+        "n": 4,
+        "passed": 3,
+        "rate": 0.75
+      },
+      "revision": {
+        "n": 9,
+        "passed": 9,
+        "rate": 1.0
+      },
+      "tools": {
+        "n": 38,
+        "passed": 38,
+        "rate": 1.0
+      }
+    },
+    "behavior_confusion": {
+      "answer": {
+        "answer": 38,
+        "clarify": 0,
+        "decline": 0
+      },
+      "clarify": {
+        "answer": 0,
+        "clarify": 0,
+        "decline": 0
+      },
+      "decline": {
+        "answer": 0,
+        "clarify": 0,
+        "decline": 0
+      }
+    },
+    "behavior_metrics": {
+      "answer": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "support": 38
+      },
+      "clarify": {
+        "precision": null,
+        "recall": null,
+        "support": 0
+      },
+      "decline": {
+        "precision": null,
+        "recall": null,
+        "support": 0
+      }
+    },
+    "error_categories": {
+      "output_interpretation": 1
+    },
+    "latency_p50_s": 4.757561985999018,
+    "latency_p95_s": 6.210115178999331,
+    "cost_usd": 1.838157,
+    "cost_per_question_usd": 0.04837255263157895
+  }
+}

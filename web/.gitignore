@@ -1,0 +1,5 @@
+lighthouse
+.lighthouseci
+playwright-report
+test-results
+*.tsbuildinfo
