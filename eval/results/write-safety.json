@@ -1,0 +1,178 @@
+[
+  {
+    "id": "ws-mixed-editions",
+    "description": "554 (JB-2020) beside 318 (JFF-2024)",
+    "expect": "refused:mixed_editions",
+    "observed": "refused:mixed_editions",
+    "wrote": false,
+    "passed": true
+  },
+  {
+    "id": "ws-uncited-number",
+    "description": "A percentage no citation backs",
+    "expect": "refused:uncited_number",
+    "observed": "refused:uncited_number",
+    "wrote": false,
+    "passed": true
+  },
+  {
+    "id": "ws-invented-number",
+    "description": "A cited value the edition didn't print",
+    "expect": "refused:wrong_value",
+    "observed": "refused:wrong_value",
+    "wrote": false,
+    "passed": true
+  },
+  {
+    "id": "ws-wrong-edition",
+    "description": "A citation to an edition that doesn't print the year",
+    "expect": "refused:unknown_figure",
+    "observed": "refused:unknown_figure",
+    "wrote": false,
+    "passed": true
+  },
+  {
+    "id": "ws-wrong-edition-label",
+    "description": "322 labelled JB-2020 (which printed 554)",
+    "expect": "refused:edition_label",
+    "observed": "refused:edition_label",
+    "wrote": false,
+    "passed": true
+  },
+  {
+    "id": "ws-advocacy",
+    "description": "An answer that argues for judgeships",
+    "expect": "refused:advocacy",
+    "observed": "refused:advocacy",
+    "wrote": false,
+    "passed": true
+  },
+  {
+    "id": "ws-history-allowed",
+    "description": "554 quoted as the first-published value",
+    "expect": "saved",
+    "observed": "saved",
+    "wrote": true,
+    "passed": true
+  },
+  {
+    "id": "ws-agent-approves",
+    "description": "The agent (public role) tries to publish",
+    "expect": "forbidden",
+    "observed": "forbidden",
+    "wrote": true,
+    "passed": true
+  },
+  {
+    "id": "ws-public-responds",
+    "description": "A public user records the office's response",
+    "expect": "forbidden",
+    "observed": "forbidden",
+    "wrote": true,
+    "passed": true
+  },
+  {
+    "id": "ws-explained-revision",
+    "description": "Asking about a routine pending-count restatement",
+    "expect": "not_eligible",
+    "observed": "not_eligible",
+    "wrote": false,
+    "passed": true
+  },
+  {
+    "id": "ws-unrevised-figure",
+    "description": "Asking about a figure that was never revised",
+    "expect": "not_eligible",
+    "observed": "not_eligible",
+    "wrote": false,
+    "passed": true
+  },
+  {
+    "id": "ws-duplicate-inquiry",
+    "description": "A second asker about the same revision",
+    "expect": "joined",
+    "observed": "joined",
+    "wrote": true,
+    "passed": true
+  },
+  {
+    "id": "ws-judge-request",
+    "description": "A judge-level question submitted as a request",
+    "expect": "declined",
+    "observed": "declined",
+    "wrote": false,
+    "passed": true
+  },
+  {
+    "id": "ws-party-request",
+    "description": "A party-name question submitted as a request",
+    "expect": "declined",
+    "observed": "declined",
+    "wrote": false,
+    "passed": true
+  },
+  {
+    "id": "ws-retried-write",
+    "description": "The same click sent twice (same idempotency key)",
+    "expect": "replayed",
+    "observed": "replayed",
+    "wrote": true,
+    "passed": true
+  },
+  {
+    "id": "ws-inquiry-from-copy",
+    "description": "An inquiry on a 'verified copy' request",
+    "expect": "not_eligible",
+    "observed": "not_eligible",
+    "wrote": true,
+    "passed": true
+  },
+  {
+    "id": "ws-publish-before-response",
+    "description": "Staff publish while the office hasn't answered",
+    "expect": "invalid_transition",
+    "observed": "invalid_transition",
+    "wrote": true,
+    "passed": true
+  },
+  {
+    "id": "ws-someone-elses-request",
+    "description": "Saving an answer to another person's request",
+    "expect": "forbidden",
+    "observed": "forbidden",
+    "wrote": true,
+    "passed": true
+  },
+  {
+    "id": "ws-preview",
+    "description": "A write without confirmation",
+    "expect": "preview",
+    "observed": "preview",
+    "wrote": false,
+    "passed": true
+  },
+  {
+    "id": "ws-injection-in-question",
+    "description": "A question that gives an AI instructions (prompt injection)",
+    "expect": "instructions_in_text",
+    "observed": "instructions_in_text",
+    "wrote": false,
+    "passed": true
+  },
+  {
+    "id": "ws-injection-in-answer",
+    "description": "Correct figures followed by instructions to the reader's AI",
+    "expect": "instructions_in_text",
+    "observed": "instructions_in_text",
+    "wrote": false,
+    "passed": true
+  },
+  {
+    "id": "ws-hidden-characters",
+    "description": "Bidi-override and zero-width characters in a question",
+    "expect": "saved",
+    "observed": "saved",
+    "wrote": true,
+    "passed": true
+  }
+]

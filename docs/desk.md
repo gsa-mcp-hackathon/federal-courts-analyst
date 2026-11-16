@@ -96,7 +96,7 @@ Anything else is `invalid_transition` (409).
 | Action | Public (demo account) | Statistics office (staff token) | The agent |
 | --- | --- | --- | --- |
 | Ask questions | yes | yes | yes |
-| Keep an answer, see My requests (web or any MCP client) | yes | n/a | **never** (the web app's agent is not offered desk tools) |
+| Keep an answer, see My requests (web or any MCP client) | yes | n/a | **only on the user's yes**: the web app's agent is not offered desk tools; an MCP agent (such as the watsonx Orchestrate agent, which has `keep_answer` and `my_requests`) must preview the save, ask "Shall I go ahead?" and pass the preview's `preview_id` |
 | See the inquiry queue, respond, publish, audit log | no | yes | never |
 | Search the library | yes | yes | no (the web app shows matches) |
 
