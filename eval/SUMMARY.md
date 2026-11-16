@@ -146,6 +146,12 @@ v8. Runs: `results/wxo-l1-2026-11-16/`.
   They are reported as scored and haven't been changed.
 - **Tool-runtime errors are on IBM's side** and affect 3–7% of attempts.
 - **Test2 is small.** With 45 items, the interval is about ±7 points.
+- **The instructions and `keep_answer` describe the save flow differently.**
+  v8's rule 2 says not to call `keep_answer` until the user says yes. The
+  tool's description says to make a `confirm=false` call first (it returns a
+  `preview_id`), then confirm with that id. In practice the agent follows v8,
+  is refused once, then previews and asks again: safe but clunky. Two
+  instruction changes to align them (v12, v13) were not kept.
 
 ## Reproduce
 
