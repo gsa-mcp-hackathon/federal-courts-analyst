@@ -76,7 +76,7 @@ def _base_env(tmp_path: Path, name: str) -> dict[str, str]:
         "WXO_ENV_NAME": "testenv",
         "WXO_INSTANCE_URL": "https://example.invalid",
         "TOOLKIT_NAME": name,
-        "WXO_API_KEY": "dummy",
+        "WXO_API_KEY": "dummy",  # pragma: allowlist secret
         "DUCKDB_PATH": str(duckdb),
     }
 
