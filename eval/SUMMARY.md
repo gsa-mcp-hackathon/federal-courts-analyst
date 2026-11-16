@@ -4,7 +4,15 @@
 (model `groq/openai/gpt-oss-120b`), using this repository's MCP server as a
 local toolkit with 8 tools. The final instructions are
 [`wxo/instructions/v8.txt`](wxo/instructions/v8.txt) (5,285 characters). Runs
-were made on 2026-11-14 and 15.
+were made from 2026-11-14 to 16 (UTC).
+
+**Server builds.** The tuning rounds and the held-out run used the toolkit
+built from `explain/mdl-summary` (cdd788b), before the desk fixes. The
+deployed server is `reference/request-desk` at 159f529 (see Deployed fixes);
+its dev run below records that commit in its provenance. The held-out run's
+summary predates the `--provenance` option and has no provenance block: its
+configuration (v8, 8 tools, that toolkit) is recorded here and in the step
+notes, not in the run file.
 
 ## Method
 
@@ -32,14 +40,28 @@ were made on 2026-11-14 and 15.
   follow a reply that asks "Shall I go ahead?" and a yes from the user. It
   runs over the Layer 2 records and over IBM's Layer 1 (`orchestrate
   evaluations`) desk transcripts.
+- **Scorer fix after the runs (2026-11-16).** The agent often writes counts
+  with a narrow no-break space as the thousands separator ("297 877",
+  U+202F). The scorer read that as two numbers, 297 and 877, and failed
+  correct answers as `hallucinated_number` (9 attempts in the deployed dev
+  run). The scorer now reads a narrow no-break or thin space between digit
+  groups as a thousands separator. The saved replies were re-scored without
+  asking the agent again; no question or expected answer changed. Dev
+  numbers below are re-scored (`*-rescored-digits` files), with the original
+  score in the notes. **Held-out test2 is unchanged** (the format appears
+  twice there, both in passing answers). No keep-or-revert decision changes:
+  each rested on a broken item or a preview violation, not on the mean.
 
 ## Results
 
 | Run | Instructions | Items × repeats | Mean (95% CI) | pass@3 | pass^3 | Infra errors | Preview violations |
 | --- | --- | --- | --- | ---: | ---: | ---: | ---: |
-| Dev baseline | v7 | 117 × 3 | 85.8% (81.7–89.0) | 91.5% | 79.5% | 13 / 351 | 0 (desk tests: 0) |
-| Dev, final | **v8** | 117 × 3 | 86.3% (82.3–89.5) | 92.3% | 75.2% | 14 / 351 | 0 (desk tests: 0) |
+| Dev baseline | v7 | 117 × 3 | 87.5% (83.6–90.5) | 92.3% | 82.1% | 13 / 351 | 0 (desk tests: 0) |
+| Dev, final | **v8** | 117 × 3 | 88.0% (84.2–91.0) | 92.3% | 80.3% | 14 / 351 | 0 (desk tests: 0) |
 | **Held-out test2, once** | **v8** | 45 × 3 | **80.0% (72.5–85.9)** | **86.7%** | **73.3%** | 9 / 135 | 0 (desk tests: **4**) |
+
+As first scored: dev baseline 85.8% (pass^3 79.5%), dev final 86.3%
+(pass^3 75.2%).
 
 **Held-out by suite:**
 - e2e: 100% (42/42)
@@ -98,6 +120,11 @@ check. `keep_answer` with `confirm=true` now needs the `preview_id` of a
 so a retry after a refused save needs a new preview. The agent stays on v8
 with the same 8 tools; the held-out numbers above were not re-run.
 
+The check is in `keep_answer` only. The step-by-step write tools
+(`open_request`, `save_verified_answer`, `file_revision_inquiry`) don't take
+a `preview_id`; they are in the toolkit but not attached to the agent, and
+must stay off it for this guarantee to hold.
+
 Desk tests (Layer 1), checked with `courts-eval preview-check`:
 
 | Setup | Runs | Confirmed calls | Violations | Saved without approval |
@@ -124,16 +151,16 @@ On the deployed setup, 5 of 6 desk runs ended in a save after a preview and a
 yes (2 of 6 before). The 3 violations were retries right after an error, and
 all were refused by the server.
 
-**Dev on the deployed setup** (v8, 117 items × 3): **85.2% (95% CI
-81.1–88.5%), pass@3 93.2%, pass^3 73.5%**. 11 of 351 attempts hit wxO tool
-errors (86.2%, 82.1–89.4%, without them). Step 09's v8 dev was 86.3%
-(82.3–89.5%), so there is no sign of a regression. Run:
-`results/20261116T005129Z-wxo-all-dev-subset.md`.
+**Dev on the deployed setup** (v8, 117 items × 3, re-scored): **88.3% (95%
+CI 84.5–91.3%), pass@3 93.2%, pass^3 80.3%**. 11 of 351 attempts hit wxO
+tool errors (89.4% without them). Step 09's v8 dev was 88.0% (84.2–91.0%),
+so there is no sign of a regression. As first scored: 85.2% (81.1–88.5%),
+pass^3 73.5%. Run: `results/20261116T005129Z-wxo-all-dev-subset-rescored-digits.md`.
 
 A v13 instruction change (no second save attempt after an error) was tried
-on this setup and not kept. Dev was 87.5% (83.6–90.5%), but one item that
-passed, `explain-direct-filed-mdl`, fell from 3/3 to 0/3. The agent stays on
-v8. Runs: `results/wxo-l1-2026-11-16/`.
+on this setup and not kept. Dev was 89.5% (85.8–92.3%; first scored 87.5%),
+but one item that passed, `explain-direct-filed-mdl`, fell from 3/3 to 0/3.
+The agent stays on v8. Runs: `results/wxo-l1-2026-11-16/`.
 
 ## Limits
 
@@ -144,6 +171,12 @@ v8. Runs: `results/wxo-l1-2026-11-16/`.
     without a recognised refusal phrase.
   
   They are reported as scored and haven't been changed.
+- **The desk gate reads numbers the same way the scorer used to.** The fix
+  above is in the scorer only (`evaluation/scoring/figures.py`). The gate's
+  shared number finder (`core/figures_text.py`) still reads "297 877" as
+  two numbers, so a desk save of an answer written that way would be
+  refused as unbacked. That is safe, not wrong, and is left for a server
+  change and redeploy.
 - **Tool-runtime errors are on IBM's side** and affect 3–7% of attempts.
 - **Test2 is small.** With 45 items, the interval is about ±7 points.
 - **The instructions and `keep_answer` describe the save flow differently.**
@@ -157,5 +190,7 @@ v8. Runs: `results/wxo-l1-2026-11-16/`.
 
 `eval/wxo/run_eval.sh dev` and `DESK=1 eval/wxo/run_eval.sh heldout`. See
 [`README.md`](README.md#reproduce-the-watsonx-orchestrate-evaluation). All
-runs above are committed under [`results/`](results/README.md), with the
-Layer 1 transcripts in `results/wxo-l1-2026-11-14/`.
+runs above are committed under [`results/`](results/README.md). Layer 1
+transcripts: step 09 rounds and held-out in `results/wxo-l1-2026-11-14/`;
+the deployed-server runs (`v8-pr9`, `v8`, `v12`, `v8-pr12`) in
+`results/wxo-l1-2026-11-15/`; v13 in `results/wxo-l1-2026-11-16/`.
