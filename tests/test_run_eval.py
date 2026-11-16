@@ -121,7 +121,7 @@ def _fakes(tmp: Path, listing: str, violations: int) -> dict[str, str]:
         "COURTS_EVAL": str(ce),
         "PYTHON": sys.executable,
         "WXO_INSTANCE_URL": "https://example.invalid",
-        "WXO_API_KEY": "not-a-real-key-0123456789",
+        "WXO_API_KEY": "not-a-real-key-0123456789",  # pragma: allowlist secret
         "WXO_AGENT_ID": AGENT,
         "WXO_ENV_NAME": "testenv",
         "RESULTS_DIR": str(tmp / "results"),
