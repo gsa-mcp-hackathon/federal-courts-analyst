@@ -1,5 +1,8 @@
 # Evaluation Summary: courts-analyst on watsonx Orchestrate
 
+The full write-up, in the hackathon's evaluation-document format, is
+[`EVALUATION.md`](EVALUATION.md).
+
 **System evaluated:** the `courts-analyst` agent on watsonx Orchestrate
 (model `groq/openai/gpt-oss-120b`), using this repository's MCP server as a
 local toolkit with 8 tools. The final instructions are
