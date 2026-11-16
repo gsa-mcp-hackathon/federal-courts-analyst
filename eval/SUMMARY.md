@@ -130,6 +130,11 @@ errors (86.2%, 82.1–89.4%, without them). Step 09's v8 dev was 86.3%
 (82.3–89.5%), so there is no sign of a regression. Run:
 `results/20261116T005129Z-wxo-all-dev-subset.md`.
 
+A v13 instruction change (no second save attempt after an error) was tried
+on this setup and not kept. Dev was 87.5% (83.6–90.5%), but one item that
+passed, `explain-direct-filed-mdl`, fell from 3/3 to 0/3. The agent stays on
+v8. Runs: `results/wxo-l1-2026-11-16/`.
+
 ## Limits
 
 - **Two held-out items look like scorer or item limits, not agent errors.**
