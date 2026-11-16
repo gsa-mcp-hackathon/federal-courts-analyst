@@ -141,3 +141,28 @@ def test_all_vs_any_modes() -> None:
     assert check_figures(both, "any", one).edition_ok
     none = check_figures(both, "all", [])
     assert not none.numeric_ok and none.needs_edition
+
+
+@pytest.mark.parametrize("sep", [" ", " "])
+def test_typographic_thousands_separator_is_one_number(sep: str) -> None:
+    """The wxO agent writes "297 877 (JB-2019)"; that is one figure."""
+    text = f"Civil cases filed in FY2019: **297{sep}877 (JB-2019, Table C-1)**."
+    assert figures_in_text(text) == [ReportedFigure(value=297877, edition="JB-2019")]
+    assert figures_in_text(f"1{sep}234{sep}567 cases")[0].value == 1234567
+    rec = AnswerRecord(question_id="q", answerer="t", final_text=text)
+    result = check_figures(
+        [exp(297877, edition="JB-2019")], "all", reported_figures(rec)
+    )
+    assert result.numeric_ok and result.edition_ok
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "297 877 cases",  # an ASCII space can separate two numbers
+        "297 8770 cases",  # not a three-digit group
+        "297 877 cases",  # no-break space: used between words and numbers
+    ],
+)
+def test_other_spaces_still_split_numbers(text: str) -> None:
+    assert figures_in_text(text)[0].value == 297
