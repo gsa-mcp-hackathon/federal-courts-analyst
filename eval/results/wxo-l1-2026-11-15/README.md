@@ -12,3 +12,6 @@ Check with `uv run courts-eval preview-check <dir>`.
 
 v12 was rejected (3 preview violations; each confirmed call without a
 preview_id was refused by the server). The agent stays on v8.
+| `v8-pr12/` | #9 + #10 + #12 (gate places re-run numbers; ask_office checked before asking) | v8 | 6 |
+
+On the #12 server (v8, deployed): 14 confirmed calls, 3 violations, all refused by the server; 5 of 6 runs ended in a save after a preview and a yes. Dev on the same setup: `../20261116T005129Z-wxo-all-dev-subset.md`.
