@@ -54,6 +54,10 @@ tables (no LLM judge). Full detail in [`eval/SUMMARY.md`](eval/SUMMARY.md).
 | **Held-out `test2`**, written before any agent run, scored once | 45 × 3 | **80.0% (72.5–85.9%)** | 73.3% |
 | Dev split, on the deployed server | 117 × 3 | 88.3% (84.5–91.3%) | 80.3% |
 
+- **The server is what makes the answers possible.** The same model (Claude
+  Sonnet) on the same 117 dev items scored **93.5% with the server and
+  20.6% without it**. With the server it got all 38 single-figure answers
+  right, each with its edition; without it, none.
 - **Figures are reliable.** On held-out, every single-figure answer had the
   official value with the right edition, 3 times out of 3.
 - **Saving is safe.** In 30 desk test runs on the deployed server, no answer
@@ -67,7 +71,10 @@ The held-out run used the server build from before the desk fixes. Those
 fixes touch only the desk tools, and dev on the deployed build shows no
 regression (88.3% against 88.0% before). Dev scores are re-scored after a
 scorer fix for thousands separators written as narrow spaces ("297 877");
-as first scored they were 85.2% and 86.3%. Held-out was unaffected.
+as first scored they were 85.2% and 86.3%. Held-out was unaffected. A
+later fix, found by checking the scorer against an LLM judge, would raise
+held-out to 81.5%; we keep 80.0% as the headline because the fix was found
+by reading held-out replies.
 
 ## How it works
 
@@ -229,8 +236,13 @@ party names, edition-mixing traps, prompt injection, over-refusal controls).
 - **Scoring is deterministic.** Numbers are matched against the official
   tables at printed precision, the edition label must match, claims are
   checked by phrase, and behaviour is inferred from the reply and the tool
-  calls. An LLM judge is likely to pass "554 (JFF-2025)" because 554 is a
-  real published figure; our scorer fails it, because JFF-2025 prints 322.
+  calls. "554 (JFF-2025)" fails, because JFF-2025 prints 322.
+- **Checked against an LLM judge.** `courts-eval judge` re-grades saved
+  replies with an LLM judge in the GSA template's style. It agrees with our
+  scorer on 96.7% of the agent's replies, but it passed all 155 replies we
+  stripped of their edition labels, and it changes its verdict on 3% of
+  replies when asked again. Reading the disagreements found one scorer bug,
+  now fixed ([`eval/EVALUATION.md`](eval/EVALUATION.md), section 3.10).
 - **Two layers against the real agent.** Layer 2 sends the question bank to
   the watsonx Orchestrate agent over its runs API (`--answerer wxo`). Layer 1
   runs IBM's `orchestrate evaluations` on multi-turn desk conversations, and

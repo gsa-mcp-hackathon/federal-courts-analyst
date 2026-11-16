@@ -113,6 +113,34 @@ As first scored: dev baseline 85.8% (pass^3 79.5%), dev final 86.3%
    talking points (0/3 → 3/3 on dev). It still answers "should Congress add
    judgeships" with figures and thresholds and no recommendation.
 
+## No-tool baseline and an LLM-judge check (2026-11-16)
+
+- **What the server adds.** The same model (Claude Sonnet, headless Claude
+  Code) on the same 117 dev items, one attempt each: **93.5% (87.1–96.8)
+  with the server, 20.6% (14.0–29.2) with no tools**, leaving out the 10
+  tool-selection items. Single official figures: 38/38 against 0/38. Without
+  the server the model refused or quoted from memory with no edition.
+  [`EVALUATION.md`](EVALUATION.md) 3.9.
+- **Our scorer against an LLM judge.** `courts-eval judge` re-graded the
+  486 saved held-out and deployed-dev replies with Claude Sonnet as judge.
+  - It agreed with our scorer on 96.7% (template-style prompt, κ 0.86) and
+    97.1% (with this domain's rules, κ 0.88).
+  - It caught every swapped edition ("554 (JFF-2025)"), but the
+    template-style judge passed **all 155** replies with the edition labels
+    removed.
+  - Graded twice, it changed 3.0% of its verdicts (0.7% with the rules).
+  - In the 20 disagreements we read, the judge was right 10 times (our
+    scorer too strict 8, too lenient 2) and our scorer 9 times; 1 is
+    debatable. [`EVALUATION.md`](EVALUATION.md) 3.10.
+- **A scorer fix from that review.** Phrase checks read markdown literally,
+  so "**7** additional judgeships" failed a check for "7 additional". With
+  the fix, held-out is 81.5% (74.1–87.1), pass^3 75.6%
+  (`*-rescored-md`). We keep **80.0%** as the headline because the fix was
+  found by reading held-out replies. No dev run changed.
+- **The engine suite is easy on watsonx Orchestrate.** The toolkit there has
+  no IDB, so the agent quotes Table C-1, which is within the items' 1%
+  tolerance. Dev without the engine items is 86.1% (81.6–89.6).
+
 ## Deployed fixes (step 10, 2026-11-15)
 
 Deployed to watsonx Orchestrate after the scored runs above: the gate fix

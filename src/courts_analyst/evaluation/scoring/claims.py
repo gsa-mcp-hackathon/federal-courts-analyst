@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from collections.abc import Iterator
 from typing import Any
 
@@ -13,10 +14,18 @@ from courts_analyst.evaluation.schema import Claim
 _REVISION = REVISION_WORDS
 
 
-def _has(text: str, phrase: str) -> bool:
+_MARKUP = re.compile(r"\*+|__|`")
+"""Markdown emphasis and code marks: "**7** additional" reads as "7 additional"."""
+
+
+def _plain(text: str) -> str:
     from courts_analyst.evaluation.scoring.behavior import normalize_quotes
 
-    return normalize_quotes(phrase).lower() in normalize_quotes(text).lower()
+    return _MARKUP.sub("", normalize_quotes(text)).lower()
+
+
+def _has(text: str, phrase: str) -> bool:
+    return _plain(phrase) in _plain(text)
 
 
 def resolve_path(obj: Any, path: str) -> Iterator[Any]:

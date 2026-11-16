@@ -35,6 +35,8 @@ SYSTEM = (
     "can't ask the user follow-up questions mid-answer: if the question is too "
     "ambiguous to answer, end with one clarifying question instead of guessing."
 )
+SYSTEM_NO_TOOLS = SYSTEM.replace(" using only the courts-analyst tools", "")
+"""The no-tool baseline's prompt: the same words, minus the tools."""
 TIMEOUT_S = 240
 
 
@@ -120,11 +122,19 @@ def parse_transcript(lines: list[str], question_id: str, name: str) -> AnswerRec
 
 
 class ClaudeCodeAnswerer:
-    """Claude with only this MCP server, through ``claude -p``."""
+    """Claude with only this MCP server, through ``claude -p``.
 
-    def __init__(self, model: str = "sonnet", data_dir: Path | None = None) -> None:
+    With ``server=False`` it is the no-tool baseline: the same model with no
+    tools, and the same instructions (minus the mention of the tools) as its
+    whole system prompt.
+    """
+
+    def __init__(
+        self, model: str = "sonnet", data_dir: Path | None = None, server: bool = True
+    ) -> None:
         self.model = model
-        self.name = f"claude-code-{model}"
+        self.server = server
+        self.name = f"claude-code-{model}" + ("" if server else "-notools")
         self.data_dir = data_dir or (ROOT / "data")
         self.exe = shutil.which("claude")
 
@@ -137,17 +147,23 @@ class ClaudeCodeAnswerer:
             )
         with tempfile.TemporaryDirectory(prefix="courts-eval-") as tmp:
             cfg = Path(tmp) / "mcp.json"
-            cfg.write_text(json.dumps(_mcp_config(self.data_dir)))
+            servers = _mcp_config(self.data_dir) if self.server else {"mcpServers": {}}
+            cfg.write_text(json.dumps(servers))
             cmd = [
                 self.exe, "-p", item.question,
                 "--output-format", "stream-json", "--verbose",
                 "--tools", "",
                 "--mcp-config", str(cfg), "--strict-mcp-config",
-                "--allowedTools", f"mcp__{SERVER}",
                 "--no-session-persistence",
                 "--model", self.model,
-                "--append-system-prompt", SYSTEM,
             ]  # fmt: skip
+            if self.server:
+                cmd += ["--append-system-prompt", SYSTEM]
+                cmd += ["--allowedTools", f"mcp__{SERVER}"]
+            else:
+                # Replace Claude Code's own prompt, which describes tools the
+                # baseline doesn't have (it otherwise tries to call them).
+                cmd += ["--system-prompt", SYSTEM_NO_TOOLS]
             start = time.perf_counter()
             env = {k: v for k, v in os.environ.items() if k != "ANTHROPIC_API_KEY"}
             try:

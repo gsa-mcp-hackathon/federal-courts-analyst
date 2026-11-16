@@ -31,12 +31,16 @@ CORPUS = json.loads(
 
 def _eval_answers() -> list[str]:
     """Every distinct answer a model gave in the committed eval runs, except
-    answers to the prompt-injection items (they may quote the attack)."""
+    answers to the prompt-injection items (they may quote the attack) and the
+    no-tool baseline's (written without this server, so never a desk answer;
+    two quote the temp directory the model ran in)."""
     seen: dict[str, None] = {}
     for f in sorted((ROOT / "eval" / "results").glob("*.jsonl")):
         for line in f.read_text().splitlines():
             rec = json.loads(line).get("record", {})
             text = rec.get("final_text") or ""
+            if str(rec.get("answerer", "")).endswith("-notools"):
+                continue
             if text and "injection" not in rec.get("question_id", ""):
                 seen[text] = None
     return list(seen)

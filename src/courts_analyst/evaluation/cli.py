@@ -87,6 +87,21 @@ def _parser() -> argparse.ArgumentParser:
     rs.add_argument("records", type=Path, help="<run_id>.jsonl")
     rs.add_argument("--results-dir", type=Path, default=DEFAULT_RESULTS)
     rs.add_argument("--run-id")
+    jd = sub.add_parser(
+        "judge",
+        help=(
+            "Grade saved replies with an LLM judge (claude -p) and compare it "
+            "with the deterministic scorer; never changes a score"
+        ),
+    )
+    jd.add_argument("records", nargs="+", type=Path, help="<run_id>.jsonl files")
+    jd.add_argument("--out", type=Path, required=True, help="output stem (.jsonl, .md)")
+    jd.add_argument("--model", default="sonnet", help="judge model (claude --model)")
+    jd.add_argument("--variant", action="append", choices=["generic", "informed"])
+    jd.add_argument("--repeats", type=int, default=1, help="grade each reply N times")
+    jd.add_argument("--workers", type=int, default=8)
+    jd.add_argument("--no-mutants", action="store_true")
+    jd.add_argument("--limit", type=int, help="first N replies per file (trial runs)")
     s = sub.add_parser("show", help="Print a past run's summary as Markdown")
     s.add_argument("summary", type=Path, help="<run_id>.summary.json")
     pc = sub.add_parser(
@@ -152,6 +167,40 @@ def main(argv: list[str] | None = None) -> int:
         result = rescore(args.records, items, args.results_dir, args.run_id)
         print(result.paths["markdown"].read_text())
         return 0
+    if args.cmd == "judge":
+        from courts_analyst.evaluation import llm_judge
+
+        by_id = {i.id: i for i in items}
+        cases = llm_judge.load_cases(args.records, by_id, not args.no_mutants)
+        if args.limit:
+            keep = {(c.source, c.line) for c in cases if c.line < args.limit}
+            cases = [c for c in cases if (c.source, c.line) in keep]
+        jsonl = args.out.with_suffix(".jsonl")
+        jsonl.parent.mkdir(parents=True, exist_ok=True)
+
+        def tick(done: int, total: int) -> None:
+            if done % 25 == 0 or done == total:
+                print(f"  judged {done}/{total}", file=sys.stderr, flush=True)
+
+        graded = llm_judge.run_judge(
+            cases,
+            by_id,
+            llm_judge.ClaudeJudge(args.model),
+            variants=args.variant or llm_judge.VARIANTS,
+            repeats=args.repeats,
+            workers=args.workers,
+            out=jsonl,
+            progress=tick,
+        )
+        md = llm_judge.report_markdown(
+            graded, args.model, [r.name for r in args.records]
+        )
+        args.out.with_suffix(".md").write_text(md)
+        print(md)
+        missing = sum(g.verdict.label is None for g in graded)
+        if missing:
+            print(f"{missing} verdict(s) failed; run again to retry", file=sys.stderr)
+        return 1 if missing else 0
     if args.cmd == "validate":
         held = sum(i.resolved_split == "test" for i in items)
         t2 = sum(i.resolved_split == "test2" for i in items)

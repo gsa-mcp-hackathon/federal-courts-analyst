@@ -62,3 +62,17 @@ def test_direct_filing_claim_accepts_hyphenated_directly() -> None:
     claim = next(c for c in item.claims if c.id == "notes_direct_filing")
     for text in ("**Directly-filed** MDL cases", "Directly‑filed MDL cases"):
         assert check_claim(claim, _rec(text))
+
+
+def test_mentions_ignores_markdown_emphasis() -> None:
+    """The wxO agent bolds numbers: "**7** additional" says "7 additional"."""
+    text = "The Conference recommended **7** additional judgeships (JC‑2025)."
+    assert check_claim(_mentions("7 additional"), _rec(text))
+    assert check_claim(_mentions("7 additional"), _rec("recommended `7` additional"))
+
+
+def test_not_mentions_sees_through_markdown_emphasis() -> None:
+    claim = Claim.model_validate(
+        {"id": "c", "kind": "not_mentions", "any": ["I recommend"]}
+    )
+    assert not check_claim(claim, _rec("**I** recommend adding judgeships."))
