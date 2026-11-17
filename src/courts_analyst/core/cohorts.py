@@ -41,6 +41,7 @@ from courts_analyst.core.enums import (
     NosGroup,
     OriginGroup,
     ProSeGroup,
+    label_lookup,
     nos_entry,
 )
 from courts_analyst.core.errors import InvalidCohortError, UnknownHandleError
@@ -240,6 +241,8 @@ class CohortRecord(BaseModel):
 
 log = logging.getLogger(__name__)
 
+_NOS_LABEL = label_lookup("nos")
+
 
 class CohortStore:
     """Handles → specs. An in-process LRU, optionally backed by a small DuckDB
@@ -347,6 +350,11 @@ class CohortSummary(BaseModel):
     mdl_direct_share: float | None
     terminated_share: float | None = Field(
         default=None, description="Share of the cohort already terminated."
+    )
+    case_types: dict[str, str] = Field(
+        default_factory=dict,
+        description="Each nature-of-suit code filtered on, with its codebook "
+        "label: check it is the case type the user asked about.",
     )
 
 
@@ -531,6 +539,7 @@ def find_cases(
         top_nos_groups=_counts(db, spec, "nos_group", n, 5) if shown else [],
         mdl_direct_share=float(row[1]) if row[1] is not None and shown else None,
         terminated_share=float(row[2]) if row[2] is not None and shown else None,
+        case_types={c: _NOS_LABEL(c) or "unknown code" for c in spec.nos_codes or []},
     )
     # An empty cohort isn't a suppressed one: out_of_scope below says so.
     warnings = (_cell_caveats(n) if n else []) + _data_break_caveats(db, spec)

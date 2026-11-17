@@ -56,3 +56,54 @@ def test_glossary_entries_are_complete_and_unique() -> None:
         see = e.get("see_also")
         if see:
             assert see in registry(), see
+
+
+@pytest.mark.parametrize(
+    ("query", "code", "matches"),
+    [
+        # The live agent guessed 442 and then 430 for "patent cases".
+        ("patent", "830", ["830", "835"]),
+        ("patent cases", "830", ["830", "835"]),
+        ("Patents", "830", ["830", "835"]),
+        ("employment discrimination", "442", ["442"]),
+        ("copyright", "820", ["820"]),
+        ("trademark infringement", "840", ["840"]),
+        ("medical malpractice", "362", ["362"]),
+        ("ERISA", "791", ["791"]),
+        ("social security disability", "863", ["863"]),
+    ],
+)
+def test_case_types_in_words_find_their_codes(
+    query: str, code: str, matches: list[str]
+) -> None:
+    r = explain_term(query).data
+    assert r is not None and r.found and r.definition is not None
+    assert r.definition.nos_code == code
+    assert [m.code for m in r.nos_matches] == matches
+
+
+def test_a_group_name_returns_the_whole_group() -> None:
+    r = explain_term("civil rights").data
+    assert r is not None and r.definition is not None
+    assert r.definition.nos_group == "Civil Rights" and r.definition.nos_code is None
+    assert "nos_groups=['Civil Rights']" in r.definition.definition
+    assert {m.code for m in r.nos_matches} >= {"440", "442", "445", "446"}
+    ip = explain_term("intellectual property").data
+    assert ip is not None and ip.definition is not None
+    assert ip.definition.nos_group == "Intellectual Property Rights"
+
+
+def test_several_partial_matches_are_listed_not_picked() -> None:
+    r = explain_term("personal injury").data
+    assert r is not None and r.definition is not None
+    assert r.definition.nos_code is None
+    assert len(r.nos_matches) > 1
+    assert "Several nature-of-suit codes match" in r.definition.definition
+
+
+def test_glossary_and_measures_still_win_over_codebook_labels() -> None:
+    weighted = explain_term("weighted filings").data
+    assert weighted is not None and weighted.definition is not None
+    assert weighted.definition.kind == "glossary" and weighted.nos_matches == []
+    assert explain_term("civil filings").data.found is False  # type: ignore[union-attr]
+    assert explain_term("qwertyuiop").data.nos_matches == []  # type: ignore[union-attr]

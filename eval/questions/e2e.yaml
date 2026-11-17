@@ -1339,3 +1339,88 @@
   tags:
   - circuit
   notes: 15,750 (JB-2023, Table C-1).
+
+# Case types named in words, as users ask (2026-11-17). The live agent guessed
+# nature-of-suit codes for "patent cases" (442, then 430); the items above give
+# the code in the question, so they couldn't catch it. Counts and the median
+# are from the IDB civil release of 2026-08-26 (AO filing dates).
+- id: words-ddel-patent-count-fy2019
+  question: How many patent cases were filed in the District of Delaware in FY2019?
+  expected:
+    figures:
+    - value: 845
+      tolerance_pct: 1.0
+      label: IDB-derived
+  expected_tools:
+  - find_cases
+  tags: [idb, cohort, case_type_words]
+  notes: Nature of suit 830 (patent). 845 cases.
+- id: words-ddel-patent-median-fy2019
+  question: What was the median time to disposition for patent cases filed in the District of Delaware
+    in FY2019?
+  expected:
+    figures:
+    - value: 166
+      tolerance_pct: 3.0
+      label: IDB-derived
+  expected_tools:
+  - find_cases
+  - analyze_cohort
+  tags: [idb, cohort, time, case_type_words]
+  notes: Nature of suit 830. Same cohort as fy2019-ddel-patent-median-days, without the code. 166 days, n=845.
+- id: words-txw-patent-count-fy2021
+  question: How many patent cases were filed in the Western District of Texas in FY2021?
+  expected:
+    figures:
+    - value: 914
+      tolerance_pct: 1.0
+      label: IDB-derived
+  expected_tools:
+  - find_cases
+  tags: [idb, cohort, case_type_words]
+  notes: Nature of suit 830. 914 cases.
+- id: words-pae-medmal-count-fy2023
+  question: How many medical malpractice cases were filed in the Eastern District of Pennsylvania in
+    FY2023?
+  expected:
+    figures:
+    - value: 28
+      tolerance_pct: 1.0
+      label: IDB-derived
+  expected_tools:
+  - find_cases
+  tags: [idb, cohort, case_type_words]
+  notes: Nature of suit 362. 28 cases (under 30, so the server adds a caution; not suppressed).
+- id: words-nys-trademark-count-fy2024
+  question: How many trademark cases were filed in the Southern District of New York in FY2024?
+  expected:
+    figures:
+    - value: 186
+      tolerance_pct: 1.0
+      label: IDB-derived
+  expected_tools:
+  - find_cases
+  tags: [idb, cohort, case_type_words]
+  notes: Nature of suit 840. 186 cases.
+- id: words-iln-erisa-count-fy2022
+  question: How many ERISA cases were filed in the Northern District of Illinois in FY2022?
+  expected:
+    figures:
+    - value: 344
+      tolerance_pct: 1.0
+      label: IDB-derived
+  expected_tools:
+  - find_cases
+  tags: [idb, cohort, case_type_words]
+  notes: Nature of suit 791 (Employee Retirement Income Security Act). 344 cases.
+- id: words-cac-copyright-count-fy2020
+  question: How many copyright cases were filed in the Central District of California in FY2020?
+  expected:
+    figures:
+    - value: 557
+      tolerance_pct: 1.0
+      label: IDB-derived
+  expected_tools:
+  - find_cases
+  tags: [idb, cohort, case_type_words]
+  notes: Nature of suit 820. 557 cases.

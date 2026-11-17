@@ -14,18 +14,22 @@ from courts_analyst.tools._common import READ_ONLY, core_errors, get_db
 DESCRIPTION = """\
 Use this when the user asks what a term, code or statistic means: "weighted \
 filings", "directly filed MDL", "nature of suit 442", "statistical year", \
-"what is Judicial Facts and Figures", "Table X-1A".
+"what is Judicial Facts and Figures", "Table X-1A". Also use it to get the \
+nature-of-suit code for a case type named in words ("patent cases", \
+"employment discrimination", "ERISA") before calling find_cases.
 
 Not for numbers (use get_official_figure) or for why they changed \
 (explain_change).
 
 Returns the definition with its source (glossary, measure registry or the \
 IDB codebook), related terms, and the measure id or nature-of-suit group when \
-there is one. Unknown terms return found=false with "did you mean" \
-suggestions instead of a guess.
+there is one. For a case type, nos_matches lists every matching code (or the \
+whole Table C-2 group): pass those to find_cases. Unknown terms return \
+found=false with "did you mean" suggestions instead of a guess.
 
-Example: term='nature of suit 442' → Employment (civil rights), Table C-2 \
-group Civil Rights."""
+Example: term='patent' → 830 Patent, plus 835 Patent – abbreviated new \
+drug application in nos_matches; term='nature of suit 442' → Employment \
+(civil rights), Table C-2 group Civil Rights."""
 
 
 def register(mcp: FastMCP) -> None:

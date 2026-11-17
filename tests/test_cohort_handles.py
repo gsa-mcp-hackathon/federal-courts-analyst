@@ -174,3 +174,12 @@ def test_data_break_warnings_are_scoped(core_db: Database, store: CohortStore) -
         core_db, store, spec(fy_from=2018, fy_to=2020, nos_codes=["830"])
     )
     assert not any("nos-485" in w.message for w in other.warnings)
+
+
+def test_summary_names_each_case_type_filtered_on(core_db: Database) -> None:
+    """So a wrong guess (442 for "patent") shows in the result."""
+    s = find_cases(core_db, CohortStore(), spec(nos_codes=["830", "442"])).data
+    assert s is not None
+    assert s.case_types == {"830": "Patent", "442": "Civil rights – employment"}
+    plain = find_cases(core_db, CohortStore(), spec(courts=["NJ"])).data
+    assert plain is not None and plain.case_types == {}
