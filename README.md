@@ -53,6 +53,7 @@ tables (no LLM judge). Full detail in [`eval/SUMMARY.md`](eval/SUMMARY.md).
 | --- | --- | --- | ---: |
 | **Held-out `test2`**, written before any agent run, scored once | 45 × 3 | **80.0% (72.5–85.9%)** | 73.3% |
 | Dev split, on the deployed server | 117 × 3 | 88.3% (84.5–91.3%) | 80.3% |
+| Dev split, draft agent with the 4 case-level tools added (12 tools) | 117 × 3 | 92.9% (89.7–95.1%) | 88.9% |
 
 - **The server is what makes the answers possible.** The same model (Claude
   Sonnet) on the same 117 dev items scored **93.5% with the server and
@@ -65,8 +66,9 @@ tables (no LLM judge). Full detail in [`eval/SUMMARY.md`](eval/SUMMARY.md).
   10 runs did.
 - **Every tool is evaluated, and the evidence picks the agent's 8.** Claude
   runs on the full server cover the 4 case-level tools. They now run on wxO
-  too, from a compact copy of the IDB shipped inside a second toolkit; their
-  dev run on wxO is in progress. Three step-by-step save tools trust
+  too, from a compact copy of the IDB shipped inside a second toolkit: on
+  the draft agent with all 12 tools, dev on the same 117 items was 92.9%
+  (89.7–95.1), pass^3 88.9%, with the engine items rebuilt from the IDB. Three step-by-step save tools trust
   the model's `confirm`: in scripted desk conversations Claude Sonnet saved
   before asking in 6 of 6 save conversations with them, and 0 of 15 with
   `keep_answer`'s server-checked preview. Table:

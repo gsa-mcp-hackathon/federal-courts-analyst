@@ -214,7 +214,14 @@ The agent stays on v8. Runs: `results/wxo-l1-2026-11-16/`.
   The agent was snapshotted first (`ROLLBACK.md`). In a Draft Preview smoke
   test it matched the local server: 739 employment cases in N.D. Ill.
   (FY2024), the same cohort handle, dockets and median. Live 1.0.0 is
-  unchanged; the dev run on this setup is in progress.
+  unchanged.
+- **Dev on that setup** (2026-11-17, 125 items × 3): on the 117 items
+  shared with the deployed run, 92.9% (89.7–95.1), pass^3 88.9%, 4 infra
+  errors (deployed: 88.3%, 80.3%, 11). The engine items now rebuild counts
+  from the IDB (63/63 via `reconcile`). The 8 items needing a case-level
+  tool: 17/24, with 3 timeouts and one item whose expectation the data
+  contradicts. Held-out was not re-run; 80.0% stays the headline
+  (`EVALUATION.md` 3.1, 3.12).
 - **Checked against the code.** Before deploying, the instructions, the
   tool list and every tool description on the instance were compared with
   `main` and matched exactly.
