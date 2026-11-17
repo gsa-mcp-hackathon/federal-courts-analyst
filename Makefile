@@ -1,7 +1,7 @@
 # Federal Courts Analyst — developer entry points. Run `make help`.
 .DEFAULT_GOAL := help
 .PHONY: help setup lint format typecheck test test-full cov data data-tables \
-        data-discover data-idb data-idb-sample data-pii-index serve serve-http security \
+        data-discover data-idb data-idb-slim data-idb-sample data-pii-index serve serve-http security \
         variance-report schemas inspector docker-build docker-run docker-test web eval eval-validate eval-claude eval-api eval-agent-smoke ask web-build web-test web-types web-geo clean
 
 IMAGE ?= federal-courts-analyst:dev
@@ -42,6 +42,9 @@ data-tables: ## Fetch the official tables in the manifest and build courts.duckd
 data-idb: ## Fetch the pinned civil IDB release (~330 MB) and build idb.duckdb (~1.5 min)
 	uv sync --group dev --group pipeline --group eval
 	uv run python -m courts_analyst.pipeline.idb all
+
+data-idb-slim: ## Write the smaller IDB copy shipped to watsonx Orchestrate (data/build/slim/)
+	uv run python -m courts_analyst.pipeline.idb slim
 
 data-idb-sample: ## Rebuild the committed IDB test fixture from the downloaded release
 	uv run python -m courts_analyst.pipeline.idb sample

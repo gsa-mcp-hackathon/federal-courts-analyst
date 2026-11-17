@@ -5,6 +5,7 @@
 - ``profile``  regenerate docs/data-profile.md from the built database
 - ``sample``   write the committed CI fixture (tests/fixtures/idb/)
 - ``pii-index`` rebuild only the output scanner's hashed party-name index
+- ``slim``     write the smaller copy shipped to watsonx Orchestrate (slim.py)
 - ``all``      fetch, build, profile (what ``make data-idb`` runs)
 """
 
@@ -24,6 +25,7 @@ from courts_analyst.pipeline.idb.manifest import dump_manifest, load_manifest
 from courts_analyst.pipeline.idb.normalize import normalize_zip
 from courts_analyst.pipeline.idb.profile import write_profile
 from courts_analyst.pipeline.idb.sample import build_sample
+from courts_analyst.pipeline.idb.slim import build_slim
 from courts_analyst.pipeline.tables.fetch import FetchError
 
 ROOT = Path(__file__).resolve().parents[4]
@@ -35,7 +37,8 @@ SAMPLE_ZIP = ROOT / "tests" / "fixtures" / "idb" / "cv_sample.zip"
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="courts_analyst.pipeline.idb", description=__doc__)
     p.add_argument(
-        "command", choices=["fetch", "build", "profile", "sample", "pii-index", "all"]
+        "command",
+        choices=["fetch", "build", "profile", "sample", "pii-index", "slim", "all"],
     )
     p.add_argument("--manifest", type=Path, default=MANIFEST)
     p.add_argument(
@@ -50,6 +53,12 @@ def main(argv: list[str] | None = None) -> int:
     )
     p.add_argument("--profile-doc", type=Path, default=PROFILE_DOC)
     p.add_argument("--sample-out", type=Path, default=SAMPLE_ZIP)
+    p.add_argument(
+        "--slim-out",
+        type=Path,
+        default=None,
+        help="slim copy path (default DATA_DIR/build/slim/idb.duckdb)",
+    )
     args = p.parse_args(argv)
     logging.basicConfig(
         level=logging.INFO, format="%(levelname)s %(message)s", stream=sys.stderr
@@ -66,6 +75,21 @@ def main(argv: list[str] | None = None) -> int:
         out = db_path.with_name(PII_INDEX_NAME)
         n = build_pii_index(settings.idb_parties_path, out)
         print(f"pii index: {n:,} hashed names -> {out}")
+        return 0
+
+    if args.command == "slim":
+        if not db_path.is_file():
+            print(f"{db_path} not found; run `make data-idb` first", file=sys.stderr)
+            return 1
+        out = args.slim_out or settings.data_dir / "build" / "slim" / "idb.duckdb"
+        slim = build_slim(db_path, out)
+        mib = 1024 * 1024
+        print(
+            f"slim: {slim.source_bytes / mib:,.0f} MiB → {slim.bytes / mib:,.0f} MiB "
+            f"({len(slim.dropped_columns)} unread columns and "
+            f"idb_civil_raw left out; {slim.tables['idb_civil_record']:,} records) "
+            f"→ {out}"
+        )
         return 0
 
     if args.command in ("fetch", "all"):
