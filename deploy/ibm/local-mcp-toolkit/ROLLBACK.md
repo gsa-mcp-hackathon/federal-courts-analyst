@@ -6,6 +6,18 @@ inside the local toolkit, and how to return to the evaluated setup. Nothing here
 creates a public endpoint: the data travels inside the toolkit upload and the
 server runs inside Orchestrate.
 
+## Current state (2026-11-17)
+
+| Toolkit | What it holds | Used by |
+|---|---|---|
+| `courts_analyst_syed` | 17 tools, no IDB, from 159f529 | Version 1.0.0 (held-out's configuration) |
+| `courts_analyst_syed_idb` | 17 tools, compact IDB, from 3356240 | **Live 1.1.0** (12 tools attached) |
+| `courts_analyst_syed_v2` | the same plus the case-type fix (PR #42) | Nothing yet: next, the draft agent's 12 tools, a dev run, then 1.2.0 |
+
+Rolling Live back is a redeploy of an earlier version (Deploy → Deploy to
+Live → pick the version). A deployed version keeps its own snapshot of the
+tools, so registering a new toolkit doesn't change Live.
+
 ## What "the evaluated setup" is
 
 The figures quoted in the README and `eval/EVALUATION.md` (dev 88.3% re-scored,

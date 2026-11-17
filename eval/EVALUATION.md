@@ -10,7 +10,7 @@ GSA MCP Server and SI Agent Government Hackathon
 | **Datasets** | Question bank of 231 items: **dev** split, 117 items on the agent's tools, for tuning; held-out **test2** split, 45 items, scored once; 3 multi-turn desk tests; a 22-case write-safety suite |
 | **Runs** | 2026-11-10 to 2026-11-16; every item asked 3 times |
 | **Also measured** | A no-tool baseline on the same model (3.9: 93.5% with the server, 20.6% without) our scorer against an LLM judge on 486 saved replies and 340 planted errors (3.10), scripted desk conversations with the save tools kept off the agent (3.11), and where each of the 17 tools is evaluated (3.12) |
-| **On the instance** | Deployed to Live as version 1.0.0 "v8 evaluated, submission" (2026-11-16) and available in Orchestrate Chat; 6 showcase tests on the agent's Evaluate page pass 6/6 (section 3.7) |
+| **On the instance** | Live: version 1.1.0 (v8, 12 tools: the 8 plus the 4 case-level tools, compact IDB) since 2026-11-17; before it, 1.0.0 "v8 evaluated, submission" (8 tools, 2026-11-16), the configuration held-out measured. Available in Orchestrate Chat; 6 showcase tests on the agent's Evaluate page pass 6/6 (section 3.7) |
 | **Short version** | [`SUMMARY.md`](SUMMARY.md) |
 
 ## 1. Overview and objectives
@@ -207,6 +207,7 @@ was right: 42 of 42 each.**
 | Before the `preview_id` check (step 09, v8–v11) | 10 | 18 | 8 (in 3 runs) | **2** |
 | With the `preview_id` check (5 configurations, including two rejected instruction variants) | 30 | 64 | 9 | **0** |
 | Deployed configuration (v8 on 159f529) | 6 | 14 | 3 | **0** |
+| 12 tools, compact IDB (v8 on 3356240, deployed as Live 1.1.0) | 6 | 14 | 1 | **0** |
 
 - A violation here is the agent calling save without asking again. Since the
   server-side check, **the server refused every one**, so nothing was saved
@@ -520,12 +521,25 @@ scenarios and scoring: `src/courts_analyst/evaluation/desk_flows.py`.
 
 The server has 17 tools for users, plus 3 for statistics-office staff that
 are off unless `DESK_STAFF_MODE` is set. Every tool has unit tests. The
-evaluated watsonx Orchestrate agent (Live 1.0.0) carries 8, chosen from the
-evidence below. The case-level tools were off it because the IDB didn't fit
-wxO's upload limit. A compact copy now does: it ships in a second toolkit,
-and the draft agent carries the 8 plus the 4 case-level tools. A smoke test
-there matched the local server (739 cases, the same cohort handle, dockets
-and median).
+evaluated watsonx Orchestrate agent (1.0.0, the configuration held-out
+measured) carries 8, chosen from the evidence below. The case-level tools
+were off it because the IDB didn't fit wxO's upload limit. A compact copy
+now does: it ships in a second toolkit, and **Live 1.1.0 (2026-11-17)**
+carries the 8 plus the 4 case-level tools. A smoke test matched the local
+server (739 cases, the same cohort handle, dockets and median). Before the
+deploy, the desk tests ran 6 times on that setup: every conversation ended
+in one save after a preview and a yes, and the one save attempt without a
+fresh preview was refused by the server (3.3).
+
+**A gap found after the deploy: case types in words.** Asked for "patent
+cases filed in D. Del. in FY2019" on Live, the agent looked up nature of
+suit 442 (employment), then 430 (banks and banking): it guessed codes, and
+`explain_term("patent")` found nothing. The dev items all gave the code in
+the question, so the run below didn't catch it; the tool-selection item
+"patent filings in W.D. Tex." only scores which tool is called. PR #42 makes
+`explain_term` map case types to codes, makes `find_cases` say which case
+type each code is, and adds 7 dev items worded the way users ask. It ships
+in a third toolkit, `courts_analyst_syed_v2`; its dev run is pending.
 
 **Dev on that setup (2026-11-17, `--agent-tools wxo-idb`, 125 items × 3):**
 - The 117 items shared with the deployed run: 92.9% (89.7–95.1), pass^3
@@ -554,10 +568,10 @@ and median).
 | `check_inquiry_eligibility` | read | yes | wxO desk tests: 12 calls; dev: 3; desk conversations | Write-safety suite (not-eligible cases) |
 | `keep_answer` | write, preview check | yes | wxO desk tests (3.3); desk conversations, 15 / 15 (3.11) | Write-safety suite, 22 / 22 |
 | `my_requests` | read | yes | wxO desk tests: 20 calls; desk conversations | |
-| `find_cases` | read, case-level | draft agent, IDB toolkit (not Live 1.0.0) | wxO IDB dev: 19 calls; Claude runs: 127 calls | Identical answers from the compact IDB (`test_idb_slim.py`) |
-| `analyze_cohort` | read, case-level | draft agent, IDB toolkit (not Live 1.0.0) | wxO IDB dev: 13 calls; Claude runs: 40 calls | Small-cell suppression tests |
-| `sample_dockets` | read, case-level | draft agent, IDB toolkit (not Live 1.0.0) | wxO IDB dev: 5 calls; Claude runs: 24 calls | Party-name scanner tests |
-| `reconcile` | read, case-level | draft agent, IDB toolkit (not Live 1.0.0) | wxO IDB dev: 68 calls, engine 63 / 63; Claude runs: 81 calls; 21 / 21 engine items in the baseline (3.9) | Engine suite, 30 / 30 (phase 4) |
+| `find_cases` | read, case-level | Live 1.1.0 (IDB toolkit) | wxO IDB dev: 19 calls; Claude runs: 127 calls | Identical answers from the compact IDB (`test_idb_slim.py`) |
+| `analyze_cohort` | read, case-level | Live 1.1.0 (IDB toolkit) | wxO IDB dev: 13 calls; Claude runs: 40 calls | Small-cell suppression tests |
+| `sample_dockets` | read, case-level | Live 1.1.0 (IDB toolkit) | wxO IDB dev: 5 calls; Claude runs: 24 calls | Party-name scanner tests |
+| `reconcile` | read, case-level | Live 1.1.0 (IDB toolkit) | wxO IDB dev: 68 calls, engine 63 / 63; Claude runs: 81 calls; 21 / 21 engine items in the baseline (3.9) | Engine suite, 30 / 30 (phase 4) |
 | `server_info` | read | no: not needed to answer | Claude runs: 26 calls | |
 | `find_published_answers` | read | no: library empty until staff publish | Desk conversations, 6 / 6 (3.11) | |
 | `open_request` | write, no preview check | **no: saves without asking** (3.11) | Desk conversations | Write-safety suite |
@@ -580,8 +594,8 @@ baseline (3.9).
   - They are split off at build time into a folder the server never mounts.
   - An output scanner withholds any result containing a known multi-word
     party name.
-  - The evaluated toolkit (Live 1.0.0) ships no IDB, only the official
-    tables. The second toolkit, `courts_analyst_syed_idb`, ships the compact
+  - The evaluated 8-tool toolkit (version 1.0.0) ships no IDB, only the
+    official tables. The second toolkit, `courts_analyst_syed_idb`, ships the compact
     IDB, which has no party-name columns (split off at build time,
     test-enforced), and the hashed party-name index, so the output scanner
     works inside wxO. Nothing from `data/private/` is uploaded, and the data
@@ -721,10 +735,12 @@ Up to ten participants share one watsonx Orchestrate instance.
   211 of the 232-point drop is in N.D. Fla., where over 200,000 3M earplug
   MDL cases were filed directly in FY2020. The server labels it *inferred*;
   the AO hasn't confirmed it.
-- **The case-level tools have one dev run on watsonx Orchestrate** (3.12),
-  on the draft agent, and no held-out run: test2 has no case-level items and
-  was scored once on the 8-tool configuration. Only 8 dev items need a
-  case-level tool; Claude runs on the full server cover them more widely.
+- **The case-level tools have one dev run on watsonx Orchestrate** (3.12)
+  and no held-out run: test2 has no case-level items and was scored once on
+  the 8-tool configuration. Only 8 dev items needed a case-level tool, and
+  all of them named the nature-of-suit code, so the run missed that the
+  agent guesses codes for case types in words (3.12; fix in PR #42, dev run
+  pending). Claude runs on the full server cover these tools more widely.
 - **The desk conversations (3.11) are scripted, with Claude only.** The
   user always says "Yes, go ahead", and 3 runs per scenario is small; they
   show a pattern, not a rate.

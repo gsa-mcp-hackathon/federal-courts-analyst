@@ -132,9 +132,11 @@ watsonx Orchestrate SaaS accepts in a toolkit upload (413). A compact copy
 fits: `make data-idb-slim` keeps every record and only the columns the server
 reads, stores the record table as a view over a narrower table, and gives
 identical answers (37 MiB zipped with the code and catalog). It is
-registered as a second toolkit, `courts_analyst_syed_idb`, and the draft
-agent carries its 12 tools: the 8 ✓ plus these 4. Live (1.0.0) keeps the
-evaluated 8 until the dev run on the new setup is in.
+registered as a second toolkit, `courts_analyst_syed_idb`. Since 2026-11-17
+**Live is version 1.1.0** with its 12 tools: the 8 ✓ plus these 4. Asked
+for a case type in words ("patent cases"), that version can guess the wrong
+nature-of-suit code; the fix (PR #42) is in a third toolkit,
+`courts_analyst_syed_v2`, awaiting its dev run.
 
 **Request desk tools** (sandbox, [docs/desk.md](docs/desk.md)). Asking a
 question never writes anything.
@@ -201,8 +203,11 @@ container. The full runbook is
 `eval/wxo/agent_check.py` checks that a live agent matches an instruction
 file and tool count before an evaluation run.
 
-**The submitted agent** is deployed to Live on our instance as version 1.0.0,
-"v8 evaluated, submission", and is available in Orchestrate Chat. Its
+**The agent** is deployed to Live on our instance and available in
+Orchestrate Chat: version 1.1.0 (v8, 12 tools, the case-level tools
+included) since 2026-11-17. Version 1.0.0, "v8 evaluated, submission" (8
+tools), is the configuration held-out test2 measured, and stays in the
+version history. Its
 **Evaluate** page holds six showcase tests run by IBM's built-in evaluator
 (6 of 6 pass): see [`eval/EVALUATION.md`](eval/EVALUATION.md), section 3.7.
 
