@@ -20,6 +20,8 @@
 # WXO_ENV_NAME (orchestrate env, needed for the agent check and DESK=1);
 # AGENT_NAME (the agent's internal name, needed for DESK=1);
 # REPEATS (3), WORKERS (3), TOOLS (8), RESULTS_DIR (eval/results);
+# AGENT_TOOLS (wxo): the --agent-tools preset; wxo-idb with TOOLS=12 for the
+# agent with the case-level tools (toolkit shipped with INCLUDE_IDB=1);
 # SKIP_AGENT_CHECK=1 to run without the orchestrate CLI (provenance is then
 # the instruction file's hash only).
 set -euo pipefail
@@ -75,7 +77,7 @@ fi
 stamp="$work/stamp"
 touch "$stamp"
 $COURTS_EVAL run --answerer wxo --split "$split" --repeats "$REPEATS" \
-  --agent-tools wxo --workers "$WORKERS" --results-dir "$RESULTS_DIR" \
+  --agent-tools "${AGENT_TOOLS:-wxo}" --workers "$WORKERS" --results-dir "$RESULTS_DIR" \
   --provenance "$prov"
 records=$(find "$RESULTS_DIR" -maxdepth 1 -name '*.jsonl' -newer "$stamp" | sort | tail -1)
 [[ -n "$records" ]] || die "courts-eval wrote no run records to $RESULTS_DIR"

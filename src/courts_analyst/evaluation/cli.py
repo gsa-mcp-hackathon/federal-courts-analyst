@@ -74,8 +74,9 @@ def _parser() -> argparse.ArgumentParser:
         "--agent-tools",
         metavar="VALUE",
         help=(
-            "only score items answerable by the agent: 'wxo' (WXO_AGENT_TOOLS preset) "
-            "or a comma-separated list of tool names"
+            "only score items answerable by the agent: 'wxo' (WXO_AGENT_TOOLS preset), "
+            "'wxo-idb' (plus the case-level tools) or a comma-separated list of "
+            "tool names"
         ),
     )
     r.add_argument(
@@ -283,11 +284,11 @@ def main(argv: list[str] | None = None) -> int:
     subset_info: SubsetInfo | None = None
     if args.agent_tools:
         raw = args.agent_tools
-        if raw == "wxo":
-            from courts_analyst.evaluation.wxo_agent import WXO_AGENT_TOOLS
+        from courts_analyst.evaluation.wxo_agent import WXO_PRESETS
 
-            tools: frozenset[str] = WXO_AGENT_TOOLS
-            preset_name: str = "wxo"
+        if raw in WXO_PRESETS:
+            tools: frozenset[str] = WXO_PRESETS[raw]
+            preset_name: str = raw
         else:
             tools = frozenset(t.strip() for t in raw.split(",") if t.strip())
             preset_name = raw
