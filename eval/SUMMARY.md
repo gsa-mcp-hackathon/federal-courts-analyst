@@ -228,8 +228,16 @@ The agent stays on v8. Runs: `results/wxo-l1-2026-11-16/`.
   was looked up as nature of suit 442, then 430: the agent guessed codes,
   and `explain_term` couldn't map "patent". The dev items gave the code, so
   the run missed it. Fix in PR #42 (codebook-label lookup, `case_types`
-  echo, 7 new dev items), registered as toolkit `courts_analyst_syed_v2`;
-  dev run pending. The 8 items needing a case-level
+  echo, 7 new dev items), registered as toolkit `courts_analyst_syed_v2`.
+- **Live 1.2.0 (2026-11-17).** Dev on the fix (132 items × 3): no wrong
+  case-type code in 21 attempts on the 7 new items (15/21 correct; the
+  patent median was declined 3 times after the right cohort). The 117
+  shared items: 88.6% (84.9–91.5), pass^3 83.8%, 14 infra errors, back to
+  the 8-tool level (88.3%) from 92.9%. The drop is in explanation items,
+  from the model's arguments (an ambiguous measure, `ND` for N.D. Fla.),
+  not from changed server answers (`EVALUATION.md` 3.1). Deployed, because
+  1.1.0 gives wrong numbers for case types in words. In the first 12-tool
+  run, the 8 items needing a case-level
   tool: 17/24, with 3 timeouts and one item whose expectation the data
   contradicts. Held-out was not re-run; 80.0% stays the headline
   (`EVALUATION.md` 3.1, 3.12).
