@@ -53,14 +53,17 @@ instruction hash).
 
 ```bash
 make data-idb          # full build, data/build/idb.duckdb (~440 MB)
-make data-idb-slim     # data/build/slim/idb.duckdb (~120 MiB) + pii_index.bin
+make data-idb-slim     # data/build/slim/idb.duckdb (~66 MiB) + pii_index.bin
 uv run pytest tests/test_idb_slim.py   # same rows; same tool answers as full
 ```
 
-The register script zips the package before upload (ADK `ZIP_DEFLATED`): the
-slim package is ~137 MB on disk and ~61 MiB zipped. The full IDB alone zips to
-~176 MiB and the 454 MB package was refused (413), while ~10 MB packages are
-accepted. The exact limit is unknown.
+The register script zips the package before upload (ADK `ZIP_DEFLATED`), and
+the size that counts is the zip. Refused with a 413: the 454 MB package with
+the full IDB, and a first slim package (137 MB, ~61 MiB zipped, 2026-11-16).
+~10 MB packages are accepted. The slim copy now stores the record table
+compactly (a view over a narrower table, see `pipeline/idb/slim.py`): the
+package is ~83 MB on disk and ~37 MiB zipped. The IDB is ~29 MiB of that, the
+party-name index ~6 MiB, the tables catalog ~1 MiB.
 
 ## 2a. Recommended: a second toolkit next to the live one
 
@@ -73,7 +76,10 @@ TOOLKIT_NAME=courts_analyst_syed_idb INCLUDE_IDB=1 \
   bash deploy/ibm/local-mcp-toolkit/register-toolkit.sh
 ```
 
-- **413 / refused:** nothing changed. Shrink further before trying again.
+- **413 / refused:** nothing changed. Shrink further before trying again. The
+  next candidates are the party-name index (8-byte hashes; a delta-encoded
+  format would change the output scanner, so it needs its own review) and
+  the date columns.
 - **Accepted:** check `orchestrate toolkits list` shows both toolkits with 17
   tools each. If wxO refuses duplicate tool names across toolkits, use 2b.
 
@@ -95,13 +101,13 @@ re-attached. The **Live** version may lose them too: check Orchestrate Chat
 right after.
 
 ```bash
-TOOLKIT_NAME=courts_analyst_syed REPLACE_EXISTING=1 INCLUDE_IDB=1 MAX_STAGE_MB=200 \
+TOOLKIT_NAME=courts_analyst_syed REPLACE_EXISTING=1 INCLUDE_IDB=1 \
   bash deploy/ibm/local-mcp-toolkit/register-toolkit.sh
 ```
 
 Without `REPLACE_EXISTING=1` the script stops with "Nothing changed". When
 replacing, it also stops before removing anything if the package is over
-`MAX_STAGE_MB` (default 100; the slim package is ~137 MB, hence 200).
+`MAX_STAGE_MB` (default 100; the slim package is ~83 MB on disk).
 
 Re-attach in the UI: Tools → Add Tool → Local instance → search
 `courts_analyst_syed`. Add the 8 tools, plus the 4 case tools if wanted.

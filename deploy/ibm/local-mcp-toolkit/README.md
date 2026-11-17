@@ -50,8 +50,9 @@ deploy/ibm/local-mcp-toolkit/
 > party-name index `pii_index.bin`) is left out by default, so the case-level
 > tools (`find_cases`, `analyze_cohort`, `sample_dockets`, `reconcile`) say case
 > data isn't loaded. `INCLUDE_IDB=1` ships the slim copy from
-> `make data-idb-slim` (~120 MiB, every record, identical tool answers; the full
-> ~440 MB build was refused with a 413), or `IDB_DUCKDB_PATH`. `data/private/`
+> `make data-idb-slim` (~66 MiB, every record, identical tool answers; the full
+> ~440 MB build and a first ~120 MiB slim copy were refused with a 413), or
+> `IDB_DUCKDB_PATH`. `data/private/`
 > (party names) is never shipped.
 >
 > **Existing toolkits are kept unless you say otherwise:** re-importing removes

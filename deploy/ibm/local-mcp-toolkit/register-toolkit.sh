@@ -19,7 +19,7 @@
 #   INCLUDE_IDB=1        also ship the civil IDB, so the case-level tools work
 #                        (find_cases, analyze_cohort, sample_dockets, reconcile).
 #   IDB_DUCKDB_PATH      which IDB to ship; default data/build/slim/idb.duckdb,
-#                        the slim copy from `make data-idb-slim` (~120 MiB; the
+#                        the slim copy from `make data-idb-slim` (~66 MiB; the
 #                        full build is ~440 MB and was refused with a 413).
 #   REPLACE_EXISTING=1   replace a toolkit that already has TOOLKIT_NAME. Without
 #                        it the script stops and changes nothing: replacing
@@ -127,10 +127,11 @@ cp "${CATALOG}" "${STAGE_DIR}/data/courts.duckdb"
 # analyze_cohort, sample_dockets, reconcile) work. It has no party names; the
 # hashed name index next to it lets the output scanner block any name that
 # slips through. data/private/ (the party names) is never shipped.
-# The default is the slim copy (`make data-idb-slim`, ~120 MiB): every record,
-# minus the raw table and the columns the server never reads, with identical
-# tool answers (tests/test_idb_slim.py). The full build (~440 MB) was refused by
-# watsonx Orchestrate SaaS with a 413. Without INCLUDE_IDB=1 those tools say
+# The default is the slim copy (`make data-idb-slim`, ~66 MiB): every record,
+# minus the raw table and the columns the server never reads, stored compactly,
+# with identical tool answers (tests/test_idb_slim.py). watsonx Orchestrate
+# SaaS refused the full build (~440 MB) and a first slim copy (~61 MiB zipped)
+# with a 413. Without INCLUDE_IDB=1 those tools say
 # case data isn't loaded.
 IDB="${IDB_DUCKDB_PATH:-${REPO_ROOT}/data/build/slim/idb.duckdb}"
 if [[ "${INCLUDE_IDB:-0}" == "1" ]]; then
@@ -162,7 +163,8 @@ echo "  staged package_root size: ${STAGE_SIZE}"
 # When replacing, stop before touching the existing toolkit if the upload may be
 # too large to be accepted: the import below removes the old toolkit first
 # (which also takes its tools off every agent), so a refused upload would leave
-# nothing behind. 454 MB was refused with a 413; ~10 MB is accepted. A new name
+# nothing behind. Refused with a 413: 454 MB, and 137 MB (~61 MiB zipped);
+# ~10 MB is accepted. The ADK uploads a deflated zip. A new name
 # has nothing to lose, so the cap doesn't apply: that's how to test a size.
 STAGE_MB="$(du -sm "${STAGE_DIR}" | cut -f1)"
 if (( TOOLKIT_EXISTS == 1 && STAGE_MB > ${MAX_STAGE_MB:-100} )); then

@@ -14,9 +14,11 @@ from fastmcp import Client
 from courts_analyst.app import mcp
 from courts_analyst.core.db import PII_INDEX_NAME
 from courts_analyst.pipeline.idb.slim import (
+    BASE_TABLE,
     DROPPED_COLUMNS,
     DROPPED_TABLES,
     RECORD_TABLE,
+    SlimResult,
     build_slim,
 )
 
@@ -26,10 +28,13 @@ SRC = Path(__file__).resolve().parents[1] / "src" / "courts_analyst"
 
 
 @pytest.fixture(scope="module")
-def slim(idb: IdbBuild, tmp_path_factory: pytest.TempPathFactory) -> Path:
-    out = tmp_path_factory.mktemp("slim") / "idb.duckdb"
-    build_slim(idb.db, out)
-    return out
+def built(idb: IdbBuild, tmp_path_factory: pytest.TempPathFactory) -> SlimResult:
+    return build_slim(idb.db, tmp_path_factory.mktemp("slim") / "idb.duckdb")
+
+
+@pytest.fixture(scope="module")
+def slim(built: SlimResult) -> Path:
+    return built.path
 
 
 def _tables(path: Path) -> dict[str, int]:
@@ -56,23 +61,63 @@ def _tables(path: Path) -> dict[str, int]:
 
 def test_same_rows_without_the_unread_parts(idb: IdbBuild, slim: Path) -> None:
     full, small = _tables(idb.db), _tables(slim)
-    assert set(small) == set(full) - set(DROPPED_TABLES)
-    assert all(small[t] == full[t] for t in small)
+    added = {t for t in small if t == BASE_TABLE or t.startswith("idb_lookup_")}
+    assert BASE_TABLE in added
+    assert set(small) - added == set(full) - set(DROPPED_TABLES)
+    assert all(small[t] == full[t] for t in set(small) - added)
     con = duckdb.connect(str(slim), read_only=True)
     try:
-        cols = {
-            r[0]
-            for r in con.execute(
-                "SELECT column_name FROM duckdb_columns() WHERE table_name = ?",
-                [RECORD_TABLE],
-            ).fetchall()
-        }
+        cols = [
+            d[0]
+            for d in con.execute(f"SELECT * FROM {RECORD_TABLE} LIMIT 0").description
+        ]
     finally:
         con.close()
-    assert cols and not cols & set(DROPPED_COLUMNS)
+    assert cols and not set(cols) & set(DROPPED_COLUMNS)
     assert (slim.parent / PII_INDEX_NAME).read_bytes() == (
         idb.db.parent / PII_INDEX_NAME
     ).read_bytes()
+
+
+def test_compact_view_is_the_record_table(idb: IdbBuild, built: SlimResult) -> None:
+    """The record table is a view over a narrower base table, and gives back
+    exactly the full build's rows (less the dropped columns), in column order."""
+    assert {"case_key", "days_to_disposition", "nos_group"} <= set(
+        built.computed_columns
+    )
+    con = duckdb.connect(str(built.path), read_only=True)
+    try:
+        con.execute(f"ATTACH '{idb.db}' AS fullbuild (READ_ONLY)")
+        full_cols = [
+            d[0]
+            for d in con.execute(
+                f"SELECT * FROM fullbuild.{RECORD_TABLE} LIMIT 0"
+            ).description
+        ]
+        keep = ", ".join(f'"{c}"' for c in full_cols if c not in DROPPED_COLUMNS)
+        view_cols = ", ".join(
+            f'"{d[0]}"'
+            for d in con.execute(f"SELECT * FROM {RECORD_TABLE} LIMIT 0").description
+        )
+        assert view_cols == keep
+        for a, b in (
+            (f"fullbuild.{RECORD_TABLE}", RECORD_TABLE),
+            (RECORD_TABLE, f"fullbuild.{RECORD_TABLE}"),
+        ):
+            row = con.execute(
+                f"SELECT count(*) FROM (SELECT {keep} FROM {a} EXCEPT ALL SELECT {keep} FROM {b})"
+            ).fetchone()
+            assert row == (0,)
+        stored = {
+            r[0]
+            for r in con.execute(
+                "SELECT column_name FROM duckdb_columns() WHERE table_name = ?",
+                [BASE_TABLE],
+            ).fetchall()
+        }
+        assert not stored & set(built.computed_columns)
+    finally:
+        con.close()
 
 
 def test_refuses_to_overwrite_the_full_build(idb: IdbBuild) -> None:
