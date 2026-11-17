@@ -32,6 +32,10 @@ os.environ.setdefault("IDB_DUCKDB_PATH", os.path.join(HERE, "data", "idb.duckdb"
 # The request desk (ADR 0013) needs a writable file; the toolkit's own folder
 # may not be writable, /tmp is.
 os.environ.setdefault("DESK_STORE_PATH", "/tmp/courts-analyst/desk.sqlite")
+# Cohort handles from find_cases must outlive the process: Orchestrate may start
+# a fresh server per tool call, and an in-memory store would then forget the
+# handle before analyze_cohort or sample_dockets sees it.
+os.environ.setdefault("COHORT_STORE_PATH", "/tmp/courts-analyst/cohorts.duckdb")
 
 from courts_analyst.app import mcp  # noqa: E402
 

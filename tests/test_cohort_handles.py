@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -94,6 +96,42 @@ def test_store_persists_across_instances(core_db: Database, tmp_path: Path) -> N
     handle = find_cases(core_db, first, spec(courts=["NJ"])).data.handle  # type: ignore[union-attr]
     again = CohortStore(path)
     assert again.get(handle).spec.courts == ["NJ"]
+
+
+def test_store_carries_on_when_another_process_holds_the_file(
+    core_db: Database, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """watsonx Orchestrate may run a server process per tool call, all sharing
+    one store file; DuckDB lets one process open it at a time. A store that
+    can't get the file keeps working from memory instead of failing the call."""
+    path = tmp_path / "cohorts.duckdb"
+    CohortStore(path)  # creates the table
+    holder = subprocess.Popen(
+        [
+            sys.executable,
+            "-c",
+            "import duckdb, sys; c = duckdb.connect(sys.argv[1]); "
+            "print('held', flush=True); sys.stdin.read()",
+            str(path),
+        ],
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        text=True,
+    )
+    try:
+        assert holder.stdout is not None
+        assert holder.stdout.readline().strip() == "held"
+        monkeypatch.setattr(CohortStore, "LOCK_WAIT_S", 0.2)
+        blocked = CohortStore(path)
+        handle = find_cases(core_db, blocked, spec(courts=["NJ"])).data.handle  # type: ignore[union-attr]
+        assert blocked.get(handle).spec.courts == ["NJ"]  # from memory
+        with pytest.raises(UnknownHandleError):
+            CohortStore(path).get("coh_000000000000")  # a miss, not a lock error
+    finally:
+        holder.communicate("")
+    later = CohortStore(path)
+    handle = find_cases(core_db, later, spec(courts=["DE"])).data.handle  # type: ignore[union-attr]
+    assert CohortStore(path).get(handle).spec.courts == ["DE"]
 
 
 def test_lru_capacity(core_db: Database) -> None:
