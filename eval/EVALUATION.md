@@ -164,7 +164,9 @@ and each run also reports the score without them.
   original **80.0%** as the headline. No dev run changed.
 - **The engine suite is easy on watsonx Orchestrate.** Its items ask for a
   case count rebuilt from the IDB and accept anything within 1% of Table C-1.
-  The toolkit there has no IDB, so the agent quotes the table and passes.
+  The evaluated toolkit had no IDB, so the agent quoted the table and passed.
+  (The compact IDB now ships in a second toolkit, so a dev run on it tests
+  these items for real; see 3.12.)
   Without the engine items, dev is **86.1% (81.6–89.6)**. test2 has no
   engine items.
 
@@ -509,7 +511,12 @@ scenarios and scoring: `src/courts_analyst/evaluation/desk_flows.py`.
 
 The server has 17 tools for users, plus 3 for statistics-office staff that
 are off unless `DESK_STAFF_MODE` is set. Every tool has unit tests. The
-watsonx Orchestrate agent carries 8, chosen from the evidence below:
+evaluated watsonx Orchestrate agent (Live 1.0.0) carries 8, chosen from the
+evidence below. The case-level tools were off it because the IDB didn't fit
+wxO's upload limit. A compact copy now does: it ships in a second toolkit,
+and the draft agent carries the 8 plus the 4 case-level tools. A smoke test
+there matched the local server (739 cases, the same cohort handle, dockets
+and median); their dev run on wxO is in progress.
 
 | Tool | Kind | On the agent | Evaluated by a model | Other evidence |
 | --- | --- | --- | --- | --- |
@@ -521,10 +528,10 @@ watsonx Orchestrate agent carries 8, chosen from the evidence below:
 | `check_inquiry_eligibility` | read | yes | wxO desk tests: 12 calls; dev: 3; desk conversations | Write-safety suite (not-eligible cases) |
 | `keep_answer` | write, preview check | yes | wxO desk tests (3.3); desk conversations, 15 / 15 (3.11) | Write-safety suite, 22 / 22 |
 | `my_requests` | read | yes | wxO desk tests: 20 calls; desk conversations | |
-| `find_cases` | read, case-level | no: no IDB on wxO | Claude runs: 127 calls | |
-| `analyze_cohort` | read, case-level | no: no IDB on wxO | Claude runs: 40 calls | Small-cell suppression tests |
-| `sample_dockets` | read, case-level | no: no IDB on wxO | Claude runs: 24 calls | Party-name scanner tests |
-| `reconcile` | read, case-level | no: no IDB on wxO | Claude runs: 81 calls; 21 / 21 engine items in the baseline (3.9) | Engine suite, 30 / 30 (phase 4) |
+| `find_cases` | read, case-level | draft agent, IDB toolkit (not Live 1.0.0) | Claude runs: 127 calls; wxO dev run in progress | Identical answers from the compact IDB (`test_idb_slim.py`) |
+| `analyze_cohort` | read, case-level | draft agent, IDB toolkit (not Live 1.0.0) | Claude runs: 40 calls; wxO dev run in progress | Small-cell suppression tests |
+| `sample_dockets` | read, case-level | draft agent, IDB toolkit (not Live 1.0.0) | Claude runs: 24 calls; wxO dev run in progress | Party-name scanner tests |
+| `reconcile` | read, case-level | draft agent, IDB toolkit (not Live 1.0.0) | Claude runs: 81 calls; 21 / 21 engine items in the baseline (3.9); wxO dev run in progress | Engine suite, 30 / 30 (phase 4) |
 | `server_info` | read | no: not needed to answer | Claude runs: 26 calls | |
 | `find_published_answers` | read | no: library empty until staff publish | Desk conversations, 6 / 6 (3.11) | |
 | `open_request` | write, no preview check | **no: saves without asking** (3.11) | Desk conversations | Write-safety suite |
@@ -547,8 +554,12 @@ baseline (3.9).
   - They are split off at build time into a folder the server never mounts.
   - An output scanner withholds any result containing a known multi-word
     party name.
-  - The toolkit deployed to watsonx Orchestrate ships no IDB at all, only
-    the official tables.
+  - The evaluated toolkit (Live 1.0.0) ships no IDB, only the official
+    tables. The second toolkit, `courts_analyst_syed_idb`, ships the compact
+    IDB, which has no party-name columns (split off at build time,
+    test-enforced), and the hashed party-name index, so the output scanner
+    works inside wxO. Nothing from `data/private/` is uploaded, and the data
+    goes only into our wxO instance: no public endpoint.
 - No user data is collected. Desk users are invented demo accounts.
 
 ### Scope containment
@@ -614,8 +625,10 @@ executed.
 ### Transport and isolation
 
 - **On watsonx Orchestrate** the server runs as a local MCP toolkit over
-  stdio inside the platform's tool runtime. The upload holds only the server
-  package and the official tables, with no credentials and no IDB.
+  stdio inside the platform's tool runtime. The upload holds the server
+  package and the official tables, with no credentials. The IDB toolkit
+  also holds the compact IDB and the hashed party-name index; neither
+  contains party names.
 - **The running server makes no outbound network calls.** Only the build
   pipeline (`src/courts_analyst/pipeline/*/fetch.py`) downloads from
   uscourts.gov and the FJC, and it runs before deployment, not on requests.

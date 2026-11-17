@@ -76,6 +76,11 @@ TOOLKIT_NAME=courts_analyst_syed_idb INCLUDE_IDB=1 \
   bash deploy/ibm/local-mcp-toolkit/register-toolkit.sh
 ```
 
+- **Done 2026-11-16:** accepted at ~37 MiB zipped (the ~61 MiB package was
+  refused first). Same tool names in two toolkits are fine: wxO prefixes
+  them (`courts_analyst_syed_idb:find_cases`). Adding a tool to the agent
+  from the new toolkit did not detach the old one; each old tool was
+  removed separately.
 - **413 / refused:** nothing changed. Shrink further before trying again. The
   next candidates are the party-name index (8-byte hashes; a delta-encoded
   format would change the output scanner, so it needs its own review) and

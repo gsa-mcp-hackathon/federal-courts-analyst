@@ -63,9 +63,10 @@ tables (no LLM judge). Full detail in [`eval/SUMMARY.md`](eval/SUMMARY.md).
 - **Saving is safe.** In 30 desk test runs on the deployed server, no answer
   was saved without the user's approval. Before the server-side check, 2 of
   10 runs did.
-- **Every tool is evaluated, and the evidence picks the agent's 8.** The 4
-  case-level tools need the IDB, which doesn't fit wxO's upload limit; Claude
-  runs on the full server cover them. Three step-by-step save tools trust
+- **Every tool is evaluated, and the evidence picks the agent's 8.** Claude
+  runs on the full server cover the 4 case-level tools. They now run on wxO
+  too, from a compact copy of the IDB shipped inside a second toolkit; their
+  dev run on wxO is in progress. Three step-by-step save tools trust
   the model's `confirm`: in scripted desk conversations Claude Sonnet saved
   before asking in 6 of 6 save conversations with them, and 0 of 15 with
   `keep_answer`'s server-checked preview. Table:
@@ -124,8 +125,14 @@ flowchart LR
 | `sample_dockets` | | Example docket references for CourtListener, labelled "match may be inexact" |
 | `server_info` | | Version, protocols and which datasets are loaded |
 
-The case-level tools need the 440 MB IDB, which is larger than watsonx
-Orchestrate SaaS accepts in a toolkit upload, so they aren't attached there.
+The case-level tools need the IDB. The full build (440 MB) is larger than
+watsonx Orchestrate SaaS accepts in a toolkit upload (413). A compact copy
+fits: `make data-idb-slim` keeps every record and only the columns the server
+reads, stores the record table as a view over a narrower table, and gives
+identical answers (37 MiB zipped with the code and catalog). It is
+registered as a second toolkit, `courts_analyst_syed_idb`, and the draft
+agent carries its 12 tools: the 8 ✓ plus these 4. Live (1.0.0) keeps the
+evaluated 8 until the dev run on the new setup is in.
 
 **Request desk tools** (sandbox, [docs/desk.md](docs/desk.md)). Asking a
 question never writes anything.
@@ -175,12 +182,15 @@ Orchestrate installs it and runs it over stdio, with no HTTP endpoint or
 container. The full runbook is
 [`deploy/ibm/local-mcp-toolkit/README.md`](deploy/ibm/local-mcp-toolkit/README.md).
 
-1. Build the catalog: `make data-tables`.
+1. Build the catalog: `make data-tables`. For the case-level tools, also
+   `make data-idb data-idb-slim`.
 2. Configure `deploy/ibm/local-mcp-toolkit/.env` (instance URL, environment
    and toolkit names; no secrets) and put the API key in `WXO_API_KEY`.
-3. Register: `deploy/ibm/local-mcp-toolkit/register-toolkit.sh`. Re-running
-   it replaces the toolkit, which takes its tools off every agent; re-attach
-   them afterwards.
+3. Register: `deploy/ibm/local-mcp-toolkit/register-toolkit.sh`
+   (`INCLUDE_IDB=1` ships the compact IDB). It won't replace an existing
+   toolkit unless `REPLACE_EXISTING=1`, because replacing takes its tools off
+   every agent. Snapshot, deploy and rollback steps:
+   [`ROLLBACK.md`](deploy/ibm/local-mcp-toolkit/ROLLBACK.md).
 4. In Orchestrate, create an agent with the model `groq/openai/gpt-oss-120b`,
    attach the 8 tools marked ✓ above, and paste
    [`eval/wxo/instructions/v8.txt`](eval/wxo/instructions/v8.txt) as its

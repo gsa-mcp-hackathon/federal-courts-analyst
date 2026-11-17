@@ -137,8 +137,8 @@ As first scored: dev baseline 85.8% (pass^3 79.5%), dev final 86.3%
   the fix, held-out is 81.5% (74.1–87.1), pass^3 75.6%
   (`*-rescored-md`). We keep **80.0%** as the headline because the fix was
   found by reading held-out replies. No dev run changed.
-- **The engine suite is easy on watsonx Orchestrate.** The toolkit there has
-  no IDB, so the agent quotes Table C-1, which is within the items' 1%
+- **The engine suite is easy on watsonx Orchestrate.** The evaluated toolkit
+  had no IDB, so the agent quoted Table C-1, which is within the items' 1%
   tolerance. Dev without the engine items is 86.1% (81.6–89.6).
 
 - **The tools kept off the agent.** In scripted request-desk conversations
@@ -206,6 +206,15 @@ The agent stays on v8. Runs: `results/wxo-l1-2026-11-16/`.
 - **Live.** The evaluated configuration (v8, the 8 tools, toolkit from
   159f529) was saved as agent version 1.0.0, "v8 evaluated, submission",
   and deployed to Live. The agent is available in Orchestrate Chat.
+- **Case-level tools (late 2026-11-16).** A compact copy of the IDB (every
+  record, 37 MiB zipped) was accepted as a second toolkit,
+  `courts_analyst_syed_idb`; the full build had been refused (413). The
+  draft agent now carries its 12 tools, the 8 plus `find_cases`,
+  `analyze_cohort`, `sample_dockets` and `reconcile`, with v8 unchanged.
+  The agent was snapshotted first (`ROLLBACK.md`). In a Draft Preview smoke
+  test it matched the local server: 739 employment cases in N.D. Ill.
+  (FY2024), the same cohort handle, dockets and median. Live 1.0.0 is
+  unchanged; the dev run on this setup is in progress.
 - **Checked against the code.** Before deploying, the instructions, the
   tool list and every tool description on the instance were compared with
   `main` and matched exactly.
