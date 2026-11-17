@@ -18,7 +18,9 @@ from __future__ import annotations
 
 import hashlib
 import json
+import logging
 import threading
+import time
 from collections import OrderedDict
 from collections.abc import Sequence
 from datetime import UTC, datetime
@@ -236,10 +238,18 @@ class CohortRecord(BaseModel):
     created_at: str
 
 
+log = logging.getLogger(__name__)
+
+
 class CohortStore:
     """Handles → specs. An in-process LRU, optionally backed by a small DuckDB
-    file so handles survive a restart in HTTP mode. Because handles are
-    deterministic, a lost handle is recreated by calling ``find_cases`` again."""
+    file so handles survive a restart in HTTP mode, or a fresh process per call
+    (watsonx Orchestrate's local toolkits). Because handles are deterministic, a
+    lost handle is recreated by calling ``find_cases`` again, so the file is
+    best effort: DuckDB lets one process open it at a time, and a store that
+    still can't open it after a short wait carries on in memory."""
+
+    LOCK_WAIT_S = 2.0
 
     def __init__(self, path: Path | None = None, capacity: int = 2048) -> None:
         self._mem: OrderedDict[str, CohortRecord] = OrderedDict()
@@ -248,11 +258,31 @@ class CohortStore:
         self._path = path
         if path is not None:
             path.parent.mkdir(parents=True, exist_ok=True)
-            with duckdb.connect(str(path)) as con:
-                con.execute(
-                    "CREATE TABLE IF NOT EXISTS cohort (handle VARCHAR PRIMARY KEY, "
-                    "record VARCHAR)"
-                )
+            self._on_file(
+                "CREATE TABLE IF NOT EXISTS cohort (handle VARCHAR PRIMARY KEY, "
+                "record VARCHAR)"
+            )
+
+    def _on_file(
+        self, sql: str, params: list[str] | None = None
+    ) -> tuple[Any, ...] | None:
+        """Run one statement on the backing file; the first row, or None when
+        there's no row or the file stayed locked by another process."""
+        assert self._path is not None
+        deadline = time.monotonic() + self.LOCK_WAIT_S
+        while True:
+            try:
+                with duckdb.connect(str(self._path)) as con:
+                    return con.execute(sql, params or []).fetchone()
+            except duckdb.IOException as exc:
+                if "lock" not in str(exc).lower():
+                    raise
+                if time.monotonic() >= deadline:
+                    log.warning(
+                        "cohort store %s stayed locked; in memory only", self._path
+                    )
+                    return None
+                time.sleep(0.05)
 
     def put(self, record: CohortRecord) -> None:
         with self._lock:
@@ -261,11 +291,10 @@ class CohortStore:
             while len(self._mem) > self._capacity:
                 self._mem.popitem(last=False)
             if self._path is not None:
-                with duckdb.connect(str(self._path)) as con:
-                    con.execute(
-                        "INSERT OR REPLACE INTO cohort VALUES (?, ?)",
-                        [record.handle, record.model_dump_json()],
-                    )
+                self._on_file(
+                    "INSERT OR REPLACE INTO cohort VALUES (?, ?)",
+                    [record.handle, record.model_dump_json()],
+                )
 
     def get(self, handle: str) -> CohortRecord:
         with self._lock:
@@ -273,10 +302,9 @@ class CohortStore:
                 self._mem.move_to_end(handle)
                 return self._mem[handle]
             if self._path is not None:
-                with duckdb.connect(str(self._path), read_only=True) as con:
-                    row = con.execute(
-                        "SELECT record FROM cohort WHERE handle = ?", [handle]
-                    ).fetchone()
+                row = self._on_file(
+                    "SELECT record FROM cohort WHERE handle = ?", [handle]
+                )
                 if row:
                     rec = CohortRecord.model_validate_json(row[0])
                     self._mem[handle] = rec

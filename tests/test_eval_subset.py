@@ -134,6 +134,17 @@ class TestPresetAndCustom:
         assert len(smoke_dev) == 25
         assert len(subset) == 20
 
+    def test_wxo_idb_preset_adds_the_case_tools(self) -> None:
+        from courts_analyst.evaluation.wxo_agent import WXO_PRESETS
+
+        assert WXO_PRESETS["wxo"] == WXO_AGENT_TOOLS
+        assert WXO_PRESETS["wxo-idb"] - WXO_AGENT_TOOLS == {
+            "find_cases",
+            "analyze_cohort",
+            "sample_dockets",
+            "reconcile",
+        }
+
     def test_unknown_tool_names_are_fine(self) -> None:
         """Custom list with tool names not in the bank is not an error."""
         custom: frozenset[str] = frozenset({"totally_unknown_tool", "another_fake"})

@@ -38,6 +38,18 @@ WXO_AGENT_TOOLS: frozenset[str] = frozenset(
     }
 )
 
+# The case-level tools, attachable once the toolkit ships the civil IDB
+# (register-toolkit.sh INCLUDE_IDB=1, the slim copy from `make data-idb-slim`).
+WXO_IDB_TOOLS: frozenset[str] = frozenset(
+    {"find_cases", "analyze_cohort", "sample_dockets", "reconcile"}
+)
+# --agent-tools presets: 'wxo' is the evaluated agent, 'wxo-idb' adds the
+# case-level tools.
+WXO_PRESETS: dict[str, frozenset[str]] = {
+    "wxo": WXO_AGENT_TOOLS,
+    "wxo-idb": WXO_AGENT_TOOLS | WXO_IDB_TOOLS,
+}
+
 _IAM_URL = "https://iam.cloud.ibm.com/identity/token"
 _EXPIRE_BUFFER_S = 60  # refresh token this many seconds before it expires
 _POLL_INTERVAL_S = 1.0
