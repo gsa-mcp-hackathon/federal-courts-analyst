@@ -204,6 +204,14 @@
           "default": null,
           "description": "Share of the cohort already terminated.",
           "title": "Terminated Share"
+        },
+        "case_types": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Each nature-of-suit code filtered on, with its codebook label: check it is the case type the user asked about.",
+          "title": "Case Types",
+          "type": "object"
         }
       },
       "required": [

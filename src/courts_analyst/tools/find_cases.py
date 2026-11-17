@@ -29,10 +29,14 @@ MDL cases), jurisdiction, disposition, pro se status, class actions or an MDL \
 docket, for FY2015–FY2025 civil cases in the FJC Integrated Database. \
 "How many employment discrimination cases were filed in N.D. Ill. in FY2024?"
 
+Never guess a nature-of-suit code: for a case type in words ("patent"), get \
+the code from explain_term first, then check case_types in the result.
+
 Not for published totals without filters (use get_official_figure: it is \
 authoritative) or for rankings (compare_courts).
 
-Returns a cohort handle (coh_…), the count and a small preview (by fiscal \
+Returns a cohort handle (coh_…), the count, the label of each \
+nature-of-suit code filtered on (case_types) and a small preview (by fiscal \
 year, top courts, top case types, MDL share); never case rows or party names. \
 Pass the handle to analyze_cohort for medians, outcome rates and trends, or \
 to sample_dockets for example dockets. To narrow a cohort, call again with \
@@ -64,7 +68,11 @@ def register(mcp: FastMCP) -> None:
         ] = "filed",
         nos_codes: Annotated[
             list[NosCode] | None,
-            Field(description="Nature-of-suit codes, e.g. ['442'] employment."),
+            Field(
+                description="Nature-of-suit codes the user gave or explain_term "
+                "returned, never guessed: e.g. ['442'] employment discrimination, "
+                "['830'] patent."
+            ),
         ] = None,
         nos_groups: Annotated[
             list[NosGroup] | None,

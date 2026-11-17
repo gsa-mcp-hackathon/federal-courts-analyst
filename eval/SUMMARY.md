@@ -218,7 +218,18 @@ The agent stays on v8. Runs: `results/wxo-l1-2026-11-16/`.
 - **Dev on that setup** (2026-11-17, 125 items × 3): on the 117 items
   shared with the deployed run, 92.9% (89.7–95.1), pass^3 88.9%, 4 infra
   errors (deployed: 88.3%, 80.3%, 11). The engine items now rebuild counts
-  from the IDB (63/63 via `reconcile`). The 8 items needing a case-level
+  from the IDB (63/63 via `reconcile`).
+- **Live 1.1.0 (2026-11-17).** After a desk check on that setup (6 runs, 14
+  confirmed save calls, every conversation saved once after a preview and a
+  yes, 1 retry without a fresh preview refused by the server, 0 unapproved
+  saves), it was deployed to Live as version 1.1.0, v8 with the 12 tools.
+  1.0.0 stays in the history; held-out describes it.
+- **Gap: case types in words.** On Live, "patent cases in D. Del., FY2019"
+  was looked up as nature of suit 442, then 430: the agent guessed codes,
+  and `explain_term` couldn't map "patent". The dev items gave the code, so
+  the run missed it. Fix in PR #42 (codebook-label lookup, `case_types`
+  echo, 7 new dev items), registered as toolkit `courts_analyst_syed_v2`;
+  dev run pending. The 8 items needing a case-level
   tool: 17/24, with 3 timeouts and one item whose expectation the data
   contradicts. Held-out was not re-run; 80.0% stays the headline
   (`EVALUATION.md` 3.1, 3.12).

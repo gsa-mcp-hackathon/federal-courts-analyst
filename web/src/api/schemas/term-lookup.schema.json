@@ -214,6 +214,29 @@
       "title": "FigureRef",
       "type": "object"
     },
+    "NosMatch": {
+      "properties": {
+        "code": {
+          "title": "Code",
+          "type": "string"
+        },
+        "label": {
+          "title": "Label",
+          "type": "string"
+        },
+        "group": {
+          "title": "Group",
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "label",
+        "group"
+      ],
+      "title": "NosMatch",
+      "type": "object"
+    },
     "Period": {
       "description": "The 12-month period a figure covers.",
       "properties": {
@@ -607,6 +630,14 @@
             }
           ],
           "default": null
+        },
+        "nos_matches": {
+          "description": "Nature-of-suit codes whose label matches a case type given in words, best first: pass these to find_cases, never a guessed code.",
+          "items": {
+            "$ref": "#/$defs/NosMatch"
+          },
+          "title": "Nos Matches",
+          "type": "array"
         },
         "did_you_mean": {
           "items": {

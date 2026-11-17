@@ -380,6 +380,8 @@
       'did_you_mean': list([
       ]),
       'found': True,
+      'nos_matches': list([
+      ]),
       'query': 'nature of suit 442',
     }),
     'declined': None,
@@ -422,6 +424,8 @@
           'suppressed': False,
         }),
       ]),
+      'case_types': dict({
+      }),
       'handle': 'coh_d07645b5512a',
       'mdl_direct_share': 0.9933774834437086,
       'n': 151,

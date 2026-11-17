@@ -908,6 +908,12 @@ export interface CohortSummary {
    * Share of the cohort already terminated.
    */
   terminated_share: number | null;
+  /**
+   * Each nature-of-suit code filtered on, with its codebook label: check it is the case type the user asked about.
+   */
+  case_types: {
+    [k: string]: string | undefined;
+  };
 }
 // ── court-comparison.schema.json ──
 export interface ResultCourtComparison {
@@ -1675,6 +1681,10 @@ export interface TermLookup {
   query: string;
   found: boolean;
   definition: TermDefinition | null;
+  /**
+   * Nature-of-suit codes whose label matches a case type given in words, best first: pass these to find_cases, never a guessed code.
+   */
+  nos_matches: NosMatch[];
   did_you_mean: string[];
 }
 export interface TermDefinition {
@@ -1687,6 +1697,11 @@ export interface TermDefinition {
   nos_code: string | null;
   nos_group: string | null;
   nos_category: string | null;
+}
+export interface NosMatch {
+  code: string;
+  label: string;
+  group: string;
 }
 /**
  * A question the server needs answered before it can give one figure.
