@@ -61,14 +61,15 @@ tables (no LLM judge). Full detail in [`eval/SUMMARY.md`](eval/SUMMARY.md).
   right, each with its edition; without it, none.
 - **Figures are reliable.** On held-out, every single-figure answer had the
   official value with the right edition, 3 times out of 3.
-- **Saving is safe.** In 30 desk test runs on the deployed server, no answer
-  was saved without the user's approval. Before the server-side check, 2 of
+- **Saving is safe.** In 36 desk test runs since the server-side check, no
+  answer was saved without the user's approval. Before the server-side check, 2 of
   10 runs did.
 - **Every tool is evaluated, and the evidence picks the agent's 8.** Claude
   runs on the full server cover the 4 case-level tools. They now run on wxO
   too, from a compact copy of the IDB shipped inside a second toolkit: on
-  the draft agent with all 12 tools, dev on the same 117 items was 92.9%
-  (89.7–95.1), pass^3 88.9%, with the engine items rebuilt from the IDB. Three step-by-step save tools trust
+  all 12 tools, dev on the same 117 items was 92.9% (89.7–95.1), pass^3
+  88.9%, with the engine items rebuilt from the IDB; on Live 1.2.0, with
+  the case-type fix, 88.6% (84.9–91.5) in a second run (EVALUATION.md 3.1). Three step-by-step save tools trust
   the model's `confirm`: in scripted desk conversations Claude Sonnet saved
   before asking in 6 of 6 save conversations with them, and 0 of 15 with
   `keep_answer`'s server-checked preview. Table:
@@ -133,10 +134,12 @@ fits: `make data-idb-slim` keeps every record and only the columns the server
 reads, stores the record table as a view over a narrower table, and gives
 identical answers (37 MiB zipped with the code and catalog). It is
 registered as a second toolkit, `courts_analyst_syed_idb`. Since 2026-11-17
-**Live is version 1.1.0** with its 12 tools: the 8 ✓ plus these 4. Asked
-for a case type in words ("patent cases"), that version can guess the wrong
-nature-of-suit code; the fix (PR #42) is in a third toolkit,
-`courts_analyst_syed_v2`, awaiting its dev run.
+**Live is version 1.2.0** with 12 tools: the 8 ✓ plus these 4, from a third
+toolkit, `courts_analyst_syed_v2`. It adds a fix found on Live: asked for a
+case type in words ("patent cases"), version 1.1.0 guessed the wrong
+nature-of-suit code. Now `explain_term` maps case types to codes, and on 7
+new dev items worded that way the agent never used a wrong code (21
+attempts).
 
 **Request desk tools** (sandbox, [docs/desk.md](docs/desk.md)). Asking a
 question never writes anything.
@@ -204,8 +207,8 @@ container. The full runbook is
 file and tool count before an evaluation run.
 
 **The agent** is deployed to Live on our instance and available in
-Orchestrate Chat: version 1.1.0 (v8, 12 tools, the case-level tools
-included) since 2026-11-17. Version 1.0.0, "v8 evaluated, submission" (8
+Orchestrate Chat: version 1.2.0 (v8, 12 tools, the case-level tools
+included, with the case-type fix) since 2026-11-17. Version 1.0.0, "v8 evaluated, submission" (8
 tools), is the configuration held-out test2 measured, and stays in the
 version history. Its
 **Evaluate** page holds six showcase tests run by IBM's built-in evaluator

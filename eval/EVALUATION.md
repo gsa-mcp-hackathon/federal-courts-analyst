@@ -10,7 +10,7 @@ GSA MCP Server and SI Agent Government Hackathon
 | **Datasets** | Question bank of 231 items: **dev** split, 117 items on the agent's tools, for tuning; held-out **test2** split, 45 items, scored once; 3 multi-turn desk tests; a 22-case write-safety suite |
 | **Runs** | 2026-11-10 to 2026-11-16; every item asked 3 times |
 | **Also measured** | A no-tool baseline on the same model (3.9: 93.5% with the server, 20.6% without) our scorer against an LLM judge on 486 saved replies and 340 planted errors (3.10), scripted desk conversations with the save tools kept off the agent (3.11), and where each of the 17 tools is evaluated (3.12) |
-| **On the instance** | Live: version 1.1.0 (v8, 12 tools: the 8 plus the 4 case-level tools, compact IDB) since 2026-11-17; before it, 1.0.0 "v8 evaluated, submission" (8 tools, 2026-11-16), the configuration held-out measured. Available in Orchestrate Chat; 6 showcase tests on the agent's Evaluate page pass 6/6 (section 3.7) |
+| **On the instance** | Live: version 1.2.0 (v8, 12 tools: the 8 plus the 4 case-level tools, compact IDB, with the case-type fix) since 2026-11-17; before it, 1.1.0 (the same without the fix) and 1.0.0 "v8 evaluated, submission" (8 tools, 2026-11-16), the configuration held-out measured. Available in Orchestrate Chat; 6 showcase tests on the agent's Evaluate page pass 6/6 (section 3.7) |
 | **Short version** | [`SUMMARY.md`](SUMMARY.md) |
 
 ## 1. Overview and objectives
@@ -145,6 +145,7 @@ and each run also reports the score without them.
 | Dev, deployed server (159f529) | v8 | 117 × 3 | 88.3% (84.5–91.3) | 93.2% | 80.3% | 11 / 351 |
 | Dev, before the desk fixes | v8, server cdd788b | 117 × 3 | 88.0% (84.2–91.0) | 92.3% | 80.3% | 14 / 351 |
 | Dev, 12 tools with the compact IDB (draft agent) | v8, server 3356240 | 117 × 3 | 92.9% (89.7–95.1) | 95.7% | 88.9% | 4 / 351 |
+| Dev, 12 tools with the case-type fix (deployed as Live 1.2.0) | v8, server 0aca081 | 117 × 3 | 88.6% (84.9–91.5) | 93.2% | 83.8% | 14 / 351 |
 
 - The ~8-point gap between dev and held-out is expected: the instructions
   were tuned on dev.
@@ -178,6 +179,23 @@ and each run also reports the score without them.
   also adds IDB breakdowns, which may explain part of the explanation gain
   (35/42 → 39/42). Held-out test2 was not re-run on it: **80.0% stays the
   headline**, and it describes the 8-tool configuration.
+- **The fix run fell back to the 8-tool level.** With the case-type fix
+  (last row) the same 117 items scored 88.6%, against 92.9% the run before.
+  The drop is in the explanation items (39/42 → 29/42), and comes from the
+  model's arguments, not from the server's answers. It asked
+  `explain_change` for the ambiguous measure `civil_filings` (so the server
+  asked back which one) in 4 of 12 attempts on four "why did filings
+  change" items, against 1 of 12 before, and looked up N.D. Fla. as `ND`
+  (North Dakota) in all 3 attempts of `why-weighted-ndfla-drop-fy2025`.
+  `explain_change` didn't change between the two toolkits, and
+  `explain_term` returns byte-identical definitions apart from an empty
+  `nos_matches` field. We can't rule out that the longer `find_cases` and
+  `explain_term` descriptions shifted the model's choices; one more run
+  would tell. Infra errors were also higher (14 against 4), 7 of them a
+  new wxO failure, "MCP server is still initializing". Without infra
+  errors: 89.3% against 93.1%. We deployed it anyway, because version
+  1.1.0 gives wrong numbers for case types in words (3.12), and this run
+  matches the 8-tool dev run (88.3%).
 
 ### 3.2 By suite and behaviour
 
@@ -208,6 +226,11 @@ was right: 42 of 42 each.**
 | With the `preview_id` check (5 configurations, including two rejected instruction variants) | 30 | 64 | 9 | **0** |
 | Deployed configuration (v8 on 159f529) | 6 | 14 | 3 | **0** |
 | 12 tools, compact IDB (v8 on 3356240, deployed as Live 1.1.0) | 6 | 14 | 1 | **0** |
+
+Since the `preview_id` check: 36 desk runs, 0 saved without approval; every
+one of the 10 violations was refused by the server. The dev run on the
+case-type fix (Live 1.2.0) made no confirmed save call, so its preview check
+is trivially clean; its desk code is unchanged from 1.1.0.
 
 - A violation here is the agent calling save without asking again. Since the
   server-side check, **the server refused every one**, so nothing was saved
@@ -539,7 +562,28 @@ the question, so the run below didn't catch it; the tool-selection item
 "patent filings in W.D. Tex." only scores which tool is called. PR #42 makes
 `explain_term` map case types to codes, makes `find_cases` say which case
 type each code is, and adds 7 dev items worded the way users ask. It ships
-in a third toolkit, `courts_analyst_syed_v2`; its dev run is pending.
+in a third toolkit, `courts_analyst_syed_v2`, deployed as **Live 1.2.0**
+after the dev run below.
+
+**Dev on the fix (2026-11-17, `wxo-idb`, 132 items × 3,
+`results/20261117T172544Z-wxo-all-dev-subset`):**
+- The 7 `words-*` items: 15 of 21 attempts. In every attempt that filtered
+  cases (20 of 21), the code was right: patent 830, copyright 820, ERISA
+  791, trademark 840, medical malpractice 362. `explain_term` was called
+  first in 16. One ERISA attempt left out the court (4,742 nationally
+  instead of 344 in N.D. Ill.), and 2 attempts were infra errors.
+- `words-ddel-patent-median-fy2019`, the question that exposed the gap, was
+  0 of 3. The agent built the right cohort (830, D. Del., FY2019) each
+  time, then declined, saying medians for a case type aren't in the
+  published tables. Twice it never called `analyze_cohort`; the third time
+  that call hit an infra error.
+  The same question with the code (`fy2019-ddel-patent-median-days`) was
+  3 of 3. A refusal, not a wrong number; the fix for it is an instruction
+  change, not tried before the deadline. In a Live Preview smoke test of
+  1.2.0, the agent answered it: 845 cases, median 166 days (154–183).
+- The 8 earlier case-level items: 19 of 24 (17 before); the cohort items
+  9 of 9 (6).
+- The 117 shared items: 88.6% (3.1, last row, and the note under it).
 
 **Dev on that setup (2026-11-17, `--agent-tools wxo-idb`, 125 items × 3):**
 - The 117 items shared with the deployed run: 92.9% (89.7–95.1), pass^3
@@ -568,10 +612,10 @@ in a third toolkit, `courts_analyst_syed_v2`; its dev run is pending.
 | `check_inquiry_eligibility` | read | yes | wxO desk tests: 12 calls; dev: 3; desk conversations | Write-safety suite (not-eligible cases) |
 | `keep_answer` | write, preview check | yes | wxO desk tests (3.3); desk conversations, 15 / 15 (3.11) | Write-safety suite, 22 / 22 |
 | `my_requests` | read | yes | wxO desk tests: 20 calls; desk conversations | |
-| `find_cases` | read, case-level | Live 1.1.0 (IDB toolkit) | wxO IDB dev: 19 calls; Claude runs: 127 calls | Identical answers from the compact IDB (`test_idb_slim.py`) |
-| `analyze_cohort` | read, case-level | Live 1.1.0 (IDB toolkit) | wxO IDB dev: 13 calls; Claude runs: 40 calls | Small-cell suppression tests |
-| `sample_dockets` | read, case-level | Live 1.1.0 (IDB toolkit) | wxO IDB dev: 5 calls; Claude runs: 24 calls | Party-name scanner tests |
-| `reconcile` | read, case-level | Live 1.1.0 (IDB toolkit) | wxO IDB dev: 68 calls, engine 63 / 63; Claude runs: 81 calls; 21 / 21 engine items in the baseline (3.9) | Engine suite, 30 / 30 (phase 4) |
+| `find_cases` | read, case-level | Live 1.2.0 (IDB toolkit) | wxO IDB dev: 19 calls; Claude runs: 127 calls | Identical answers from the compact IDB (`test_idb_slim.py`) |
+| `analyze_cohort` | read, case-level | Live 1.2.0 (IDB toolkit) | wxO IDB dev: 13 calls; Claude runs: 40 calls | Small-cell suppression tests |
+| `sample_dockets` | read, case-level | Live 1.2.0 (IDB toolkit) | wxO IDB dev: 5 calls; Claude runs: 24 calls | Party-name scanner tests |
+| `reconcile` | read, case-level | Live 1.2.0 (IDB toolkit) | wxO IDB dev: 68 calls, engine 63 / 63; Claude runs: 81 calls; 21 / 21 engine items in the baseline (3.9) | Engine suite, 30 / 30 (phase 4) |
 | `server_info` | read | no: not needed to answer | Claude runs: 26 calls | |
 | `find_published_answers` | read | no: library empty until staff publish | Desk conversations, 6 / 6 (3.11) | |
 | `open_request` | write, no preview check | **no: saves without asking** (3.11) | Desk conversations | Write-safety suite |
@@ -735,12 +779,16 @@ Up to ten participants share one watsonx Orchestrate instance.
   211 of the 232-point drop is in N.D. Fla., where over 200,000 3M earplug
   MDL cases were filed directly in FY2020. The server labels it *inferred*;
   the AO hasn't confirmed it.
-- **The case-level tools have one dev run on watsonx Orchestrate** (3.12)
+- **The case-level tools have two dev runs on watsonx Orchestrate** (3.12)
   and no held-out run: test2 has no case-level items and was scored once on
-  the 8-tool configuration. Only 8 dev items needed a case-level tool, and
-  all of them named the nature-of-suit code, so the run missed that the
-  agent guesses codes for case types in words (3.12; fix in PR #42, dev run
-  pending). Claude runs on the full server cover these tools more widely.
+  the 8-tool configuration. The first run's 8 case-level items all named the
+  nature-of-suit code, so it missed that the agent guessed codes for case
+  types in words; we found that on Live. The fix (Live 1.2.0) and 7 items
+  worded the way users ask closed the wrong-code gap, but the agent still
+  sometimes declines a median for a case type in words (3.12). The two runs
+  on the same 117 items differ by 4 points (92.9% and 88.6%), which shows
+  how much one run can move. Claude runs on the full server cover these
+  tools more widely.
 - **The desk conversations (3.11) are scripted, with Claude only.** The
   user always says "Yes, go ahead", and 3 runs per scenario is small; they
   show a pattern, not a rate.
@@ -779,4 +827,8 @@ Up to ten participants share one watsonx Orchestrate instance.
   that without knowing which measure" as a clarification (3.10).
 - Have the AO statistics staff review the revision narrative, and a domain
   expert review the two held-out items.
-- Write a fresh held-out set before any further tuning.
+- Write a fresh held-out set before any further tuning, with items worded
+  the way users ask ("patent cases"), not in the data's codes.
+- An instruction rule for case-level answers: report an IDB-derived figure
+  as IDB-derived (not "inferred"), and don't decline a median that
+  `analyze_cohort` returned.
