@@ -30,8 +30,9 @@ deploy/ibm/local-mcp-toolkit/
 ├── server.py           # stdio entrypoint: `from courts_analyst.app import mcp; mcp.run(transport="stdio")`
 ├── requirements.txt    # pinned runtime deps staged next to the package
 ├── toolkit.yaml        # import config template (kind: mcp, command: python server.py, tools: *)
-├── register-toolkit.sh # stage flattened package_root + activate ADK env + import (idempotent)
+├── register-toolkit.sh # stage flattened package_root + activate ADK env + import
 ├── .env.example        # instance URL + env/toolkit names (no secrets)
+├── ROLLBACK.md         # ship the IDB, snapshot the agent, roll back
 └── README.md           # this runbook
 ```
 
@@ -45,15 +46,20 @@ deploy/ibm/local-mcp-toolkit/
 > at runtime), and a missing-deps error (the ADK reads `requirements.txt`).
 >
 > **Data it ships:** `data/courts.duckdb` (the official tables, required; build
-> with `make data-tables`). The FJC civil IDB (`data/idb.duckdb`, ~440 MB, no
-> party names, with its hashed party-name index `pii_index.bin`) is left out by
-> default: watsonx Orchestrate SaaS refused a 454 MB upload with a 413, so the
-> case-level tools (`find_cases`, `analyze_cohort`, `sample_dockets`,
-> `reconcile`) say case data isn't loaded. `INCLUDE_IDB=1` ships it for an
-> instance that accepts large uploads; `data/private/` (party names) is never
-> shipped. The script stops before removing the old toolkit if the package is
-> over `MAX_STAGE_MB` (100), because re-importing removes the toolkit first and
-> takes its tools off every agent.
+> with `make data-tables`). The FJC civil IDB (no party names, with its hashed
+> party-name index `pii_index.bin`) is left out by default, so the case-level
+> tools (`find_cases`, `analyze_cohort`, `sample_dockets`, `reconcile`) say case
+> data isn't loaded. `INCLUDE_IDB=1` ships the slim copy from
+> `make data-idb-slim` (~120 MiB, every record, identical tool answers; the full
+> ~440 MB build was refused with a 413), or `IDB_DUCKDB_PATH`. `data/private/`
+> (party names) is never shipped.
+>
+> **Existing toolkits are kept unless you say otherwise:** re-importing removes
+> the toolkit first and takes its tools off every agent, so the script stops
+> ("Nothing changed") when `TOOLKIT_NAME` exists, unless `REPLACE_EXISTING=1`.
+> When replacing, it also stops if the package is over `MAX_STAGE_MB` (100).
+> Test a new size under a new name, where a refusal breaks nothing.
+> [ROLLBACK.md](ROLLBACK.md) has the snapshot, deploy and rollback steps.
 
 ---
 
