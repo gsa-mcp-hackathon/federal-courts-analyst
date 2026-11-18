@@ -25,7 +25,7 @@ RUN npm ci --no-audit --no-fund
 COPY web/ ./
 RUN npx vite build
 
-FROM python:3.12-slim
+FROM python:3.15-slim
 
 ARG GIT_SHA=unknown
 
