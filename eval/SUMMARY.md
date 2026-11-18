@@ -276,6 +276,10 @@ The agent stays on v8. Runs: `results/wxo-l1-2026-11-16/`.
 
 ## Reproduce
 
+To check the numbers without access to our instance, see
+[`VERIFY.md`](VERIFY.md): every run's replies are committed and can be
+re-scored in seconds.
+
 `eval/wxo/run_eval.sh dev` and `DESK=1 eval/wxo/run_eval.sh heldout`. See
 [`README.md`](README.md#reproduce-the-watsonx-orchestrate-evaluation). All
 runs above are committed under [`results/`](results/README.md). Layer 1

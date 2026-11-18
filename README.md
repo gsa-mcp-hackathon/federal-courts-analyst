@@ -35,6 +35,7 @@ in IBM's environment: the IBM Bob IDE on a TechZone VM, with the agent in
 | --- | --- |
 | **Evaluation summary** | [`eval/SUMMARY.md`](eval/SUMMARY.md): method, results, findings, limits |
 | **The watsonx Orchestrate agent** | [Running on watsonx Orchestrate](#running-on-watsonx-orchestrate), instructions [`eval/wxo/instructions/v8.txt`](eval/wxo/instructions/v8.txt) |
+| **Check the evaluation yourself** | [`eval/VERIFY.md`](eval/VERIFY.md): re-derive every number from the saved replies in minutes, with no keys or accounts |
 | **Reproduce the evaluation** | [`eval/wxo/README.md`](eval/wxo/README.md), `eval/wxo/run_eval.sh` |
 | **The request desk** | [`docs/desk.md`](docs/desk.md), [ADR 0013](docs/adr/0013-request-desk.md) |
 | **Security** | [`SECURITY.md`](SECURITY.md), [threat model](docs/security/threat-model.md) |

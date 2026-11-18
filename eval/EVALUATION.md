@@ -12,6 +12,7 @@ GSA MCP Server and SI Agent Government Hackathon
 | **Also measured** | A no-tool baseline on the same model (3.9: 93.5% with the server, 20.6% without) our scorer against an LLM judge on 486 saved replies and 340 planted errors (3.10), scripted desk conversations with the save tools kept off the agent (3.11), and where each of the 17 tools is evaluated (3.12) |
 | **On the instance** | Live: version 1.2.0 (v8, 12 tools: the 8 plus the 4 case-level tools, compact IDB, with the case-type fix) since 2026-11-17; before it, 1.1.0 (the same without the fix) and 1.0.0 "v8 evaluated, submission" (8 tools, 2026-11-16), the configuration held-out measured. Available in Orchestrate Chat; 6 showcase tests on the agent's Evaluate page pass 6/6 (section 3.7) |
 | **Short version** | [`SUMMARY.md`](SUMMARY.md) |
+| **Check it yourself** | [`VERIFY.md`](VERIFY.md): re-derive every number here from the committed replies, with no keys or accounts |
 
 ## 1. Overview and objectives
 

@@ -462,6 +462,13 @@ def report(results: list[CaseResult]) -> str:
 def main(argv: list[str] | None = None) -> int:  # pragma: no cover - CLI
     from courts_analyst.config import settings
 
+    if not settings.resolved_duckdb_path.is_file():
+        print(
+            "The write-safety suite needs the official tables catalog. "
+            "Run `make data-tables` first (it downloads the uscourts.gov tables).",
+            file=sys.stderr,
+        )
+        return 2
     db = Database(settings.resolved_duckdb_path, settings.resolved_idb_path)
     results = run(db)
     out = Path(settings.eval_results_dir)
