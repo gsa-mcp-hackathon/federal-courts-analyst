@@ -51,7 +51,7 @@ jobs:
         run: npx playwright test
       - name: Lighthouse (Ask, presentation mode, gallery)
         run: npx lhci autorun
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: web-reports
