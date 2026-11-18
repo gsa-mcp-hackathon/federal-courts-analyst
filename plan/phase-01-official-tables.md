@@ -136,7 +136,7 @@ revision      (measure_id, court, fiscal_year, edition, value, prior_value, delt
 | `test_tables_manifest.py` | 11 | discovery with pagination and series filtering (mocked site), pins survive rediscovery, fixtures match pins, mirror fallback, CLI discover/fetch |
 | `test_tables_build.py` | 9 | counts, cross-check, reproducibility, Parquet, revision doc, CLI build and failure paths |
 
-**Claude in Chrome:**
+**Browser check (Chrome):**
 - Opened the JB-2024 X-1A landing page on uscourts.gov: its two file links are exactly the manifest's `2025-01/` URLs.
 - Opened the source PDFs from the manifest. Chrome's PDF viewer only drew thumbnails in automated tabs, so the pages were rendered locally (pypdfium2) and read: **JB-2020 X-1A national row 673 / 676 / 554** ([image](../docs/evidence/phase-01/jb-2020-x1a-national-row.png)) and **JFF-2023 6.2 FY2020 row 674 / 322 / 675** ([image](../docs/evidence/phase-01/jff-2023-6.2-fy2020-row.png)).
 - MCP Inspector v2.8.0 web UI over stdio (MCP 2025-11-25): `server_info` returns `data_status: "ready"` with the catalog built ([screenshot](../docs/evidence/phase-01/inspector-server-info-ready.jpg)).

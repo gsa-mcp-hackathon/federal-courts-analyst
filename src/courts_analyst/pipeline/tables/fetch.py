@@ -29,7 +29,7 @@ log = logging.getLogger("courts_analyst.pipeline.fetch")
 
 USER_AGENT = (
     "Mozilla/5.0 (compatible; FederalCourtsAnalyst/0.1; "
-    "+https://github.com/syedaun-techsur/federal-courts-analyst)"
+    "+https://github.com/techsur-solutions/courts-mcp)"
 )
 RETRY_STATUS = frozenset({429, 500, 502, 503, 504})
 

@@ -2,15 +2,17 @@
 
 This folder splits the build into phases. Each phase has its own file with scope, tasks, design notes, a **test plan**, and **exit criteria**. We run them in order and don't start a phase until the previous one meets its exit criteria. Two exceptions: the eval benchmark (Phase 3) and the frontend design system (Phase 8a) can start early alongside other work.
 
-**Repository:** [github.com/syedaun-techsur/federal-courts-analyst](https://github.com/syedaun-techsur/federal-courts-analyst) (private; built from the [GSA template](https://github.com/GSA-TTS/mcp-hackathon-template), whose history is kept and which stays available as the `template` git remote so we can pull upstream fixes)
+**Repository:** [github.com/techsur-solutions/courts-mcp](https://github.com/techsur-solutions/courts-mcp) (built from the [GSA template](https://github.com/GSA-TTS/mcp-hackathon-template), whose history is kept and which stays available as the `template` git remote so we can pull upstream fixes)
+
+Phases 0 to 9 tracked issues in an earlier private repository, so the issue links in those phase files (to `syedaun-techsur/federal-courts-analyst`) won't open for readers outside the team. Their numbers don't match this repository's issues.
 
 Source concept: [`../Federal Courts Analyst — MCP Hackathon Concept.md`](../Federal%20Courts%20Analyst%20—%20MCP%20Hackathon%20Concept.md)
 
-## How we win
+## Judging criteria
 
 The judges score four things. For each one, here's what should stand out:
 
-| Criterion | Our winning move | Where it's built |
+| Criterion | Our approach | Where it's built |
 | --- | --- | --- |
 | Technical quality | Clean core/adapter architecture, strict typing, >85% coverage, CI on every PR, deterministic eval harness | P0, P4, P5, P10 |
 | Innovation | Edition-aware provenance, `explain_change` decomposition, cohort handles, guardrails that decline bad conclusions, an inline MCP App chart | P1, P4, P6, P9 |
@@ -37,22 +39,22 @@ The judges score four things. For each one, here's what should stand out:
 | 10 | [Full evaluation](phase-10-full-evaluation.md) | Baselines (web search, Genie), multiple models, MLflow and Phoenix, results dashboard | P3, P7 |
 | 11 | [Submission and demo](phase-11-submission.md) | Deck, evaluation document, demo script and video, rehearsals | all |
 
-## Working agreement for Claude (how each phase is executed)
+## Working agreement (how each phase is executed)
 
 **Status:** we're already registered for the hackathon. Eligibility and registration aren't blockers.
 
-Claude executes the phases one at a time and follows these rules in every phase:
+Phases are executed one at a time, and every phase follows these rules:
 
 1. **Validate your own code.** Write and run the tests for everything you build (unit, integration, MCP protocol, API, frontend, as listed in the phase file). Don't report a task as done until its tests pass locally. If something fails, fix it or report it plainly with the output.
 2. **Use local Docker.** Docker is running on this machine. Use it to build and run the app the way it will be deployed (the container image, DuckDB, the FastAPI + MCP server, the web build), and run integration and e2e tests against the running container, not just in-process.
-3. **Test in Chrome at the end of every phase.** After the automated tests pass, use Claude in Chrome to exercise everything the phase built through a real browser:
+3. **Test in Chrome at the end of every phase.** After the automated tests pass, use Chrome to exercise everything the phase built through a real browser:
    - Web pages (once they exist): click through the journeys, check layout, dark mode and mobile width, look for console errors
    - Before the frontend exists: the MCP Inspector, the API docs (`/docs`), `/health` and `/version`, and any generated reports
    Record what was tested and any issues in the phase's "Evidence" section, and fix issues before closing the phase.
 4. **Improve on the plan.** These plans are a starting point, not a contract. If you find a better approach, library, data source or design while working, use it. Record the change and the reason in the phase file (a "Deviations" section) or an ADR, and update later phases if they're affected.
 5. **Search the web when it helps.** Check current docs (FastMCP, MCP spec, Databricks, watsonx, library APIs), uscourts.gov and FJC data details, codebooks, and best practices whenever you're unsure, instead of guessing. Cite the sources you relied on in `docs/`.
 6. **End-of-phase report.** When a phase is finished, summarize what was built, test results (counts and coverage), the Chrome check, deviations from the plan, and any open issues. Then wait for the go-ahead before starting the next phase.
-7. **Track open issues on GitHub.** The [issue tracker](https://github.com/syedaun-techsur/federal-courts-analyst/issues) is the live list of open issues; each phase file's "Open issues" section is a snapshot that links to it.
+7. **Track open issues on GitHub.** The [issue tracker](https://github.com/techsur-solutions/courts-mcp/issues) is the live list of open issues; each phase file's "Open issues" section is a snapshot that links to it.
    - **When a phase finishes:** file every actionable open issue as a GitHub issue (skip duplicates of existing ones and pure notes about workarounds already applied). Use one issue per decision or piece of work, with the context, a "Done when" line and links to the phase file. Label it with the phase it came from (`phase N`), the phase that should fix it if that's different, and any of `needs domain expert`, `needs team`, `data`, `dev environment`, `stretch`. Then link the issue numbers from the phase file.
    - **While working:** before starting a phase, read the open issues labelled for it. When work resolves one, close it from the PR (`Closes #N`) or comment with what changed. When new information changes one, comment on it rather than opening a duplicate.
    - Filing, commenting on and closing issues in this repo doesn't need asking. Anything that reaches outside the repo (emailing the AO, submitting to the Wayback Machine) still does.
@@ -193,7 +195,7 @@ GSA estimates about 40 hours. This plan is deliberately bigger than that because
 - [ ] All tasks checked off or explicitly moved to a later phase or cut
 - [ ] Tests written and passing in CI; coverage gates met
 - [ ] Integration/e2e tests pass against the app running in local Docker
-- [ ] Claude in Chrome walkthrough done; issues fixed; findings recorded under "Evidence"
+- [ ] Chrome walkthrough done; issues fixed; findings recorded under "Evidence"
 - [ ] Any deviations from the plan recorded (phase file "Deviations" section or an ADR)
 - [ ] Open issues filed on GitHub (or linked to existing ones) and the phase file's "Open issues" section links them; issues this phase resolved are closed
 - [ ] Public functions and every MCP tool have precise docstrings/descriptions

@@ -193,7 +193,7 @@ Metrics: count, trend by FY, median days to disposition (bootstrap CI), disposit
 | `test_architecture.py` | `core/` imports no FastMCP, FastAPI, httpx, uvicorn, anthropic or openai |
 | `test_schemas_export.py` | committed frontend schemas are current |
 
-**Claude in Chrome:** opened the generated [variance report](../docs/variance-report.md) and [analytics-core methodology](../docs/methodology/analytics-core.md) on the PR branch on GitHub; tables, the shift-share formula block and anchors render ([screenshot](../docs/evidence/phase-04/variance-report-summary.jpg)). The core has no web surface of its own yet; its MCP tools are exercised in the Inspector in Phase 5.
+**Browser check (Chrome):** opened the generated [variance report](../docs/variance-report.md) and [analytics-core methodology](../docs/methodology/analytics-core.md) on the PR branch on GitHub; tables, the shift-share formula block and anchors render ([screenshot](../docs/evidence/phase-04/variance-report-summary.jpg)). The core has no web surface of its own yet; its MCP tools are exercised in the Inspector in Phase 5.
 
 **Found and fixed during the phase:**
 - DuckDB rejects `ATTACH ?` and turning external access *on* after start; paths are quoted literals from settings, and external access is switched *off* after attaching.

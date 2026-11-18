@@ -55,7 +55,7 @@ tags: [edition_trap, weighted, fy2020]
 ## Tasks
 
 - [x] Pydantic schema for question items; validator script (`make eval-validate`)
-- [x] Write v1 questions (drafted by Claude; domain expert review is [#17](https://github.com/syedaun-techsur/federal-courts-analyst/issues/17)); every expected official answer links to a table cell, checked against the catalog
+- [x] Write v1 questions (drafted with an AI assistant; domain expert review is [#17](https://github.com/syedaun-techsur/federal-courts-analyst/issues/17)); every expected official answer links to a table cell, checked against the catalog
 - [x] Deterministic split assignment (hash of id) so the held-out set can't drift
 - [x] Scorer library (numeric, edition, claims, refusal, taxonomy), in `courts_analyst.evaluation.scoring` (see Deviations)
 - [x] `Answerer` protocol: `answer(question) -> AnswerRecord(final_text, tool_calls, structured_outputs, latency, tokens)`. Implementations come later (our agent, web-search baseline, Genie)
@@ -130,7 +130,7 @@ tags: [edition_trap, weighted, fy2020]
 | `test_gold_answerer.py` | gold 100%, null 0%, runner outputs, answerer failures recorded, error taxonomy, claims, court mentions in order, CLI |
 | `test_split_stability.py` | pinned assignments, same split in a fresh interpreter with another hash seed, ~30% over 5,000 ids |
 
-**Claude in Chrome:** opened `eval/README.md` and the committed null-run summary on the PR branch on GitHub. Headings, tables and code blocks render, and the held-out policy reads correctly ([screenshot](../docs/evidence/phase-03/null-run-summary.jpg)).
+**Browser check (Chrome):** opened `eval/README.md` and the committed null-run summary on the PR branch on GitHub. Headings, tables and code blocks render, and the held-out policy reads correctly ([screenshot](../docs/evidence/phase-03/null-run-summary.jpg)).
 
 ## Open issues
 

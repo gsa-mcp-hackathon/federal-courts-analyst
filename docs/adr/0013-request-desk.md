@@ -27,8 +27,7 @@ Three things argue for adding writes on top:
   explanation "Unconfirmed: needs AO confirmation", and issue #8 is open for
   exactly that.
 
-The proposal page for the team:
-<https://claude.ai/artifact/CewQdRmQFWWbYUVCVavbts>.
+How the desk works for users: [docs/desk.md](../desk.md).
 
 ## Decision
 

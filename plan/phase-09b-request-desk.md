@@ -9,8 +9,8 @@ matters, a user can ask the statistics office why a figure changed, save a
 verified copy, or ask to be notified if the numbers change. They follow each
 one in a My requests inbox, and confirmed answers go into a public library
 for the next person who asks. Asking a question stays read-only. Design:
-[ADR 0013](../docs/adr/0013-request-desk.md). Proposal page for the team:
-<https://claude.ai/artifact/CewQdRmQFWWbYUVCVavbts>.
+[ADR 0013](../docs/adr/0013-request-desk.md). How it works for users:
+[docs/desk.md](../docs/desk.md).
 
 **Judging impact:** Mission alignment (verified answers to Congress on a live
 judgeship decision; a public route to official explanations where FOIA
