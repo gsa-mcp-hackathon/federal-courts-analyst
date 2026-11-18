@@ -31,6 +31,9 @@ A run writes `<run_id>.jsonl` (each answer record and its score),
 
 ## Reproduce the watsonx Orchestrate evaluation
 
+Reviewing without access to our instance? [`VERIFY.md`](VERIFY.md) shows how
+to check every published number from the committed runs, with no keys.
+
 The submitted agent is `courts-analyst-syed` on watsonx Orchestrate with this
 server registered as a local MCP toolkit (8 tools). One script reproduces
 each published number (see [`wxo/README.md`](wxo/README.md) for setup):
