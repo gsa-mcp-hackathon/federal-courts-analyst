@@ -124,7 +124,7 @@ Key derived columns on `idb_civil`:
 | `test_idb_build.py` | 13 | tables and views, provenance row, dropped columns, reproducible checksum, report, profile, CLI build/sample/fetch |
 | `test_full_load.py` (`@fulldata`) | 7 | rows per FY, unknown rate < 0.5%, C-1 terminations exact, filings ±0.5%, C-2 groups ±1%, N.D. Fla. surge, origin-13 validity |
 
-**Claude in Chrome:**
+**Browser check (Chrome):**
 - Opened the FJC civil IDB page: its codebook and `cv88on.zip` links and the coverage text ("Cases terminated in SY 1988 through June 30, 2026 and cases pending as of June 30, 2026") match `data/manifest/idb.yaml` exactly ([screenshot](../docs/evidence/phase-02/fjc-civil-idb-landing.png)).
 - Ran the image (`git_sha 9763506`) with the full `data/build` mounted read-only; `/health` and `/version` respond in Chrome; `/app/data` holds only `build/`.
 - MCP Inspector v2.8.0 over stdio: `server_info` returns `data_status: ready` and `datasets: {official_tables: ready, idb_civil: ready}` ([screenshot](../docs/evidence/phase-02/inspector-server-info-datasets.png)). The Inspector's "Add servers" menu didn't respond to clicks, so the container was checked over HTTP by `make docker-test` instead of in the Inspector.

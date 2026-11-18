@@ -104,7 +104,7 @@ Build a throwaway server to confirm what actually works, then record the answers
 
 **MCP Inspector v2.8.0:**
 - CLI against `http://127.0.0.1:8000/mcp`: `tools/list` shows `outputSchema`, and `tools/call server_info` returns `structuredContent` with `isError: false`
-- Web UI in Chrome (Claude in Chrome) over stdio: connected and negotiated **MCP 2025-11-25**. The Tools tab shows `server_info` with READ-ONLY and IDEMPOTENT badges. Execute Tool returned the result and a Structured Output panel. No console errors. Screenshot: [`docs/evidence/phase-00/inspector-server-info.jpg`](../docs/evidence/phase-00/inspector-server-info.jpg)
+- Web UI in Chrome over stdio: connected and negotiated **MCP 2025-11-25**. The Tools tab shows `server_info` with READ-ONLY and IDEMPOTENT badges. Execute Tool returned the result and a Structured Output panel. No console errors. Screenshot: [`docs/evidence/phase-00/inspector-server-info.jpg`](../docs/evidence/phase-00/inspector-server-info.jpg)
 - Chrome: `/health` → `{"status":"healthy","service":"federal-courts-analyst"}` and `/version` → `{"service":…,"version":"0.1.0","git_sha":"unknown"}` (a local run has no SHA; the image bakes one in)
 
 **Issues found and fixed during the phase:**

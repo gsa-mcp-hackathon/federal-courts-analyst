@@ -151,7 +151,7 @@ Issue #27: in both adversarial runs the model answered "322 (JFF-2025)" and the 
 | `test_rest_contracts.py` | 200 for ok, clarification and decline; 422/404 per error code; validation errors; ETag 304, and a new ETag when the data is rebuilt; errors not cached; bearer token covers `/api` (`private` caching); `/api/ask` rate limit; OpenAPI lists every route |
 | `test_agent_answerer.py` | the `AnswerRecord` the scorer sees; limits become answerer errors; `adv-one-number-please` scored for real passes with the model's actual Phase 6 answer |
 
-**Claude in Chrome** (local server, full data): `/api/figures` FY2020 weighted civil filings rendered with `citation` "322 (JFF-2025, Table 6.2); revised: first published as 554 (JB-2020)" ([screenshot](../docs/evidence/phase-07/chrome-api-figures.jpg)); `/api/courts/FL-N/profile` returned the judgeship context with its thresholds and the no-recommendation note; no console errors. A `fetch` from an API JSON page was refused by the API's CSP, as intended ([#38](https://github.com/syedaun-techsur/federal-courts-analyst/issues/38)).
+**Browser check** (local server, full data): `/api/figures` FY2020 weighted civil filings rendered with `citation` "322 (JFF-2025, Table 6.2); revised: first published as 554 (JB-2020)" ([screenshot](../docs/evidence/phase-07/chrome-api-figures.jpg)); `/api/courts/FL-N/profile` returned the judgeship context with its thresholds and the no-recommendation note; no console errors. A `fetch` from an API JSON page was refused by the API's CSP, as intended ([#38](https://github.com/syedaun-techsur/federal-courts-analyst/issues/38)).
 
 **Found and fixed during the phase:**
 - Untrusted strings were capped before HTML-escaping, so escaping could push them past the cap.
