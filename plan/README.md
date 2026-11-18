@@ -2,7 +2,7 @@
 
 This folder splits the build into phases. Each phase has its own file with scope, tasks, design notes, a **test plan**, and **exit criteria**. We run them in order and don't start a phase until the previous one meets its exit criteria. Two exceptions: the eval benchmark (Phase 3) and the frontend design system (Phase 8a) can start early alongside other work.
 
-**Repository:** [github.com/techsur-solutions/courts-mcp](https://github.com/techsur-solutions/courts-mcp) (built from the [GSA template](https://github.com/GSA-TTS/mcp-hackathon-template), whose history is kept and which stays available as the `template` git remote so we can pull upstream fixes)
+**Repository:** [github.com/gsa-mcp-hackathon/federal-courts-analyst](https://github.com/gsa-mcp-hackathon/federal-courts-analyst) (built from the [GSA template](https://github.com/GSA-TTS/mcp-hackathon-template), whose history is kept and which stays available as the `template` git remote so we can pull upstream fixes)
 
 Phases 0 to 9 tracked issues in an earlier private repository, so the issue links in those phase files (to `syedaun-techsur/federal-courts-analyst`) won't open for readers outside the team. Their numbers don't match this repository's issues.
 
@@ -54,7 +54,7 @@ Phases are executed one at a time, and every phase follows these rules:
 4. **Improve on the plan.** These plans are a starting point, not a contract. If you find a better approach, library, data source or design while working, use it. Record the change and the reason in the phase file (a "Deviations" section) or an ADR, and update later phases if they're affected.
 5. **Search the web when it helps.** Check current docs (FastMCP, MCP spec, Databricks, watsonx, library APIs), uscourts.gov and FJC data details, codebooks, and best practices whenever you're unsure, instead of guessing. Cite the sources you relied on in `docs/`.
 6. **End-of-phase report.** When a phase is finished, summarize what was built, test results (counts and coverage), the Chrome check, deviations from the plan, and any open issues. Then wait for the go-ahead before starting the next phase.
-7. **Track open issues on GitHub.** The [issue tracker](https://github.com/techsur-solutions/courts-mcp/issues) is the live list of open issues; each phase file's "Open issues" section is a snapshot that links to it.
+7. **Track open issues on GitHub.** The [issue tracker](https://github.com/gsa-mcp-hackathon/federal-courts-analyst/issues) is the live list of open issues; each phase file's "Open issues" section is a snapshot that links to it.
    - **When a phase finishes:** file every actionable open issue as a GitHub issue (skip duplicates of existing ones and pure notes about workarounds already applied). Use one issue per decision or piece of work, with the context, a "Done when" line and links to the phase file. Label it with the phase it came from (`phase N`), the phase that should fix it if that's different, and any of `needs domain expert`, `needs team`, `data`, `dev environment`, `stretch`. Then link the issue numbers from the phase file.
    - **While working:** before starting a phase, read the open issues labelled for it. When work resolves one, close it from the PR (`Closes #N`) or comment with what changed. When new information changes one, comment on it rather than opening a duplicate.
    - Filing, commenting on and closing issues in this repo doesn't need asking. Anything that reaches outside the repo (emailing the AO, submitting to the Wayback Machine) still does.
