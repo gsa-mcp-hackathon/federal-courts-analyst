@@ -18,7 +18,7 @@
 # party-name index the output scanner reads.
 
 # ── Web build (Phase 8; ADR 0005): the SPA as static files ──────────────────
-FROM node:22-slim AS web
+FROM node:26-slim AS web
 WORKDIR /web
 COPY web/package.json web/package-lock.json ./
 RUN npm ci --no-audit --no-fund
